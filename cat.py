@@ -34,9 +34,11 @@ class LeftoverCategory(RowCategory):
 		if len(self.rows) > 0:
 			printer.writeLine('some leftovers:')
 			printer.indent()
-			for row in self.rows:
+			for row in self.rows[0:10]:
 				row.printSelf(printer)
 			printer.unindent()
+			if len(self.rows) > 10:
+				printer.writeLine('(and '+str(len(self.rows) - 10)+' more)')
 
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
