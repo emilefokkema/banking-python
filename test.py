@@ -6,17 +6,21 @@ class Row:
 		self.source = csvRow[1]
 
 	def printSelf(self):
-		return 'name1: '+self.name1
+		return 'source: '+self.source
 
 class RowCategory(object):
 	def __init__(self):
 		self.total = 0;
+		self.name = self.getName()
 
 	def addFromRowToTotal(self, row):
 		self.total = self.total + row.amount
 
 	def addRow(self, row):
 		self.addFromRowToTotal(row)
+
+	def getName(self):
+		return 'category'
 
 	def getPrefix(self, indent):
 		return indent * ' '
@@ -27,29 +31,46 @@ class RowCategory(object):
 	def printSelf(self, indent):
 		return self.getPrefix(indent) + self.name + '. '+self.getTotalString()
 
+class LeftoverCategory(RowCategory):
+	def __init__(self):
+		super(LeftoverCategory, self).__init__()
+		self.rows = []
+
+	def addRow(self, row):
+		super(LeftoverCategory, self).addRow(row)
+		self.rows.append(row)
+
+	def acceptsRow(self, row):
+		return True
+
+	def printSelf(self,indent):
+		if len(self.rows) > 0:
+			return self.getPrefix(indent) + 'some leftovers'
+		return ''
+
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
 		super(MultipleRowCategory, self).__init__()
 		self.categories = []
-		self.name = 'Multiple category'
-
-	def selfAcceptsRow(self, row):
-		return True
+		for category in self.getCategories():
+			self.addCategory(category)
+		self.addCategory(LeftoverCategory())
 
 	def acceptsRow(self, row):
-		if not self.selfAcceptsRow(row):
-			return False
-		for category in self.categories:
-			if category.acceptsRow(row):
-				return True
-		return False
+		return True;
+
+	def getName(self):
+		return 'Multiple category'
+
+	def getCategories(self):
+		return []
 
 	def addRow(self, row):
 		self.addFromRowToTotal(row)
 		for category in self.categories:
 			if category.acceptsRow(row):
 				category.addRow(row)
-				break
+				return
 
 
 	def printSelf(self, indent):
@@ -65,44 +86,50 @@ class MultipleRowCategory(RowCategory):
 
 
 class Positive(MultipleRowCategory):
-	def __init__(self):
-		super(Positive, self).__init__()
-		self.name = 'Positive'
-		self.addCategory(Emile())
-		self.addCategory(Fokkema())
 
-	def selfAcceptsRow(self, row):
+	def getCategories(self):
+		return [Emile(), Fokkema()]
+
+	def getName(self):
+		return 'Positive'
+
+	def acceptsRow(self, row):
 		return row.amount >= 0
 
 class Negative(RowCategory):
-	def __init__(self):
-		super(Negative, self).__init__()
-		self.name = 'Negative'
 
 	def acceptsRow(self, row):
 		return row.amount < 0
 
+	def getName(self):
+		return 'Negative'
+
 class Emile(RowCategory):
-	def __init__(self):
-		super(Emile, self).__init__()
-		self.name = 'Emile'
 
 	def acceptsRow(self, row):
 		return row.source == 'emile'
 
+	def getName(self):
+		return 'Emile'
+
 class Fokkema(RowCategory):
-	def __init__(self):
-		super(Fokkema, self).__init__()
-		self.name = 'Fokkema'
 
 	def acceptsRow(self, row):
 		return row.source == 'fokkema'
 
+	def getName(self):
+		return 'Fokkema'
+
+class TopCategory(MultipleRowCategory):
+	def getName(self):
+		return 'Top'
+
+	def getCategories(self):
+		return [Positive(), Negative()]
+
 class RowImporter:
 	def __init__(self):
-		self.category = MultipleRowCategory()
-		self.category.addCategory(Positive())
-		self.category.addCategory(Negative())
+		self.category = TopCategory()
 
 	def importRow(self, row):
 		if self.category.acceptsRow(row):
