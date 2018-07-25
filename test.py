@@ -2,6 +2,8 @@ import csv
 import row
 import custom
 import printer
+import clargs
+import sys
 
 class RowImporter:
 	def __init__(self):
@@ -19,8 +21,9 @@ class RowImporter:
 		pr.printSelf()
 
 importer = RowImporter()
+args = clargs.CLArguments(sys.argv)
 
-with open('data.csv') as csvfile:
+with open(args.csv) as csvfile:
 	reader = csv.reader(csvfile, delimiter=';')
 	for csvRow in reader:
 		importer.importRow(row.Row(csvRow))
