@@ -18,8 +18,14 @@ class RowCategory(object):
 	def addRow(self, row):
 		self.addFromRowToTotal(row)
 
-	def printSelf(self):
-		return self.name + '. Total: '+str(self.total)
+	def getPrefix(self, indent):
+		return indent * ' '
+
+	def getTotalString(self):
+		return 'Total: '+str(self.total)
+
+	def printSelf(self, indent):
+		return self.getPrefix(indent) + self.name + '. '+self.getTotalString()
 
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
@@ -46,11 +52,12 @@ class MultipleRowCategory(RowCategory):
 				break
 
 
-	def printSelf(self):
-		result = self.name + '\n'
+	def printSelf(self, indent):
+		prefix = self.getPrefix(indent)
+		result = prefix + self.name + '\n'
 		for category in self.categories:
-			result = result + "    "+category.printSelf()+'\n'
-		result = result + 'Total: '+str(self.total)
+			result = result + prefix + category.printSelf(2)+'\n'
+		result = result + prefix + self.getTotalString()
 		return result
 
 	def addCategory(self, cat):
@@ -105,7 +112,7 @@ class RowImporter:
 
 
 	def printSelf(self):
-		print(self.category.printSelf())
+		print(self.category.printSelf(0))
 
 importer = RowImporter()
 
