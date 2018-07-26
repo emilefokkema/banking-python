@@ -12,35 +12,58 @@ class RowCategory(object):
 	def getName(self):
 		return 'category'
 
-	def getTotalString(self):
-		return 'Total: '+str(self.total)
-
 	def printSelf(self, printer):
 		printer.writeLine(self.name, self.total)
 
-class LeftoverCategory(RowCategory):
-	displayLimit = 30
+class NameableCategory(RowCategory):
+	def __init__(self, name):
+		self._name = name
+		super(NameableCategory, self).__init__()
 
+	def getName(self):
+		return self._name
+
+class CollectionCategory(RowCategory):
 	def __init__(self):
-		super(LeftoverCategory, self).__init__()
+		super(CollectionCategory, self).__init__()
 		self.rows = []
 
 	def addRow(self, row):
-		super(LeftoverCategory, self).addRow(row)
+		super(CollectionCategory, self).addRow(row)
 		self.rows.append(row)
 
 	def acceptsRow(self, row):
 		return True
 
 	def printSelf(self,printer):
+		super(CollectionCategory, self).printSelf(printer)
 		if len(self.rows) > 0:
-			printer.writeLine('some leftovers',self.total)
 			printer.indent()
-			for row in self.rows[0:self.displayLimit]:
+			for row in self.rows:
 				row.printSelf(printer)
 			printer.unindent()
-			if len(self.rows) > self.displayLimit:
-				printer.writeLine('more',len(self.rows) - self.displayLimit)
+
+class LeftoverCategory(CollectionCategory):
+	displayLimit = 5
+
+	def __init__(self):
+		super(LeftoverCategory, self).__init__()
+		self.overLimit = 0
+
+	def addRow(self, row):
+		if len(self.rows) < self.displayLimit:
+			super(LeftoverCategory, self).addRow(row)
+		else:
+			self.overLimit += 1
+			self.addFromRowToTotal(row)
+
+	def printSelf(self, printer):
+		super(LeftoverCategory, self).printSelf(printer)
+		if self.overLimit > 0:
+			printer.writeLine('more', self.overLimit)
+
+	def getName(self):
+		return 'leftovers'
 
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
@@ -48,10 +71,12 @@ class MultipleRowCategory(RowCategory):
 		self.categories = []
 		for category in self.getCategories():
 			self.addCategory(category)
-		self.addCategory(LeftoverCategory())
 
 	def acceptsRow(self, row):
-		return True;
+		for category in self.categories:
+			if category.acceptsRow(row):
+				return True
+		return False
 
 	def getName(self):
 		return 'Multiple category'
@@ -66,7 +91,6 @@ class MultipleRowCategory(RowCategory):
 				category.addRow(row)
 				return
 
-
 	def printSelf(self, printer):
 		printer.writeLine(self.name, self.total)
 		printer.indent()
@@ -76,3 +100,11 @@ class MultipleRowCategory(RowCategory):
 
 	def addCategory(self, cat):
 		self.categories.append(cat)
+
+class MultipleRowCategoryWithLeftover(MultipleRowCategory):
+	def __init__(self):
+		super(MultipleRowCategoryWithLeftover, self).__init__()
+		self.addCategory(LeftoverCategory())
+
+	def acceptsRow(self, row):
+		return True;

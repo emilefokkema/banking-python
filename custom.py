@@ -1,8 +1,8 @@
 import cat
-class DescriptionStartCategory(cat.RowCategory):
+
+class DescriptionStartCategory(cat.NameableCategory):
 	def __init__(self, name, descs):
-		self._name = name
-		super(DescriptionStartCategory, self).__init__()
+		super(DescriptionStartCategory, self).__init__(name)
 		self.descs = descs
 
 	def acceptsRow(self, row):
@@ -11,23 +11,47 @@ class DescriptionStartCategory(cat.RowCategory):
 				return True
 		return False
 
-	def getName(self):
-		return self._name
+class InfoContainsCategory(cat.NameableCategory):
+	def __init__(self, name, substr):
+		super(InfoContainsCategory, self).__init__(name)
+		self.substr = substr
 
-class Af(cat.MultipleRowCategory):
+	def acceptsRow(self, row):
+		return self.substr in row.info
+
+class Abonnementen(cat.MultipleRowCategory):
+	def getCategories(self):
+		return [DescriptionStartCategory('Netflix',['NETFLIX']),
+				DescriptionStartCategory('NRC',['NRC']),
+				DescriptionStartCategory('ING',['Kosten OranjePakket']),
+				DescriptionStartCategory('Telefoon',['T-MOBILE']),
+				InfoContainsCategory('Spotify','5VL2224Q8M5JL')]
+
+	def getName(self):
+		return 'Abonnementen'
+
+class Pinnen(cat.CollectionCategory):
+	def getName(self):
+		return 'Pinnen'
+
+	def acceptsRow(self, row):
+		return row.description.startswith('ABN-AMRO')
+
+class Af(cat.MultipleRowCategoryWithLeftover):
 
 	def getCategories(self):
 		return [
 			DescriptionStartCategory('Albert Heijn', ['ALBERT HEIJN']),
-			DescriptionStartCategory('Abonnementen',['NETFLIX','NRC','Kosten OranjePakket','T-MOBILE']),
+			Abonnementen(),
 			DescriptionStartCategory('NS',['NS GROEP']),
-			DescriptionStartCategory('ABN-AMRO',['ABN-AMRO']),
+			Pinnen(),
 			DescriptionStartCategory('Zorg',['Menzis','menzis', 'PEARLE']),
 			DescriptionStartCategory('Huur',['Rijksen Beheer']),
-			DescriptionStartCategory('Boeken',['Broese Boekverkopers']),
+			DescriptionStartCategory('Boeken',['Broese Boekverkopers','BOEKHANDEL']),
 			DescriptionStartCategory('Belastingdienst',['Belastingdienst']),
 			DescriptionStartCategory('CJIB',['CJIB']),
-			DescriptionStartCategory('DUO',['DUO'])]
+			DescriptionStartCategory('DUO',['DUO']),
+			DescriptionStartCategory('Toestelverzekering',['CHUBB'])]
 
 	def getName(self):
 		return 'Af'
@@ -44,7 +68,7 @@ class Bij(cat.RowCategory):
 		return 'Bij'
 
 
-class TopCategory(cat.MultipleRowCategory):
+class TopCategory(cat.MultipleRowCategoryWithLeftover):
 	def getName(self):
 		return 'Top'
 
