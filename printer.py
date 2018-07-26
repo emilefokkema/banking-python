@@ -3,16 +3,28 @@ class Printer:
 
 	def __init__(self):
 		self.indentAmount = 0
-		self.lines = []
 
-	def indent(self):
+	def getPrefix(self):
+		return self.indentAmount * self.indentChar
+
+	def indent(self, key):
+		print(self.getPrefix() + key + ':')
 		self.indentAmount += 1
+		return PrinterIndentation(self)
 
 	def unindent(self):
 		self.indentAmount -= 1
 
 	def writeLine(self, key, value):
-		self.lines.append(self.indentAmount * self.indentChar + key + ': ' + str(value))
+		print(self.getPrefix() + key + ': ' + str(value))
 
-	def printSelf(self):
-		print('\n'.join(self.lines))
+class PrinterIndentation:
+	def __init__(self, printer):
+		self.printer = printer
+
+	def __enter__(self):
+		pass
+
+	def __exit__(self, a, b, c):
+		self.printer.unindent()
+

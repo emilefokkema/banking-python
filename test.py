@@ -15,7 +15,6 @@ class RowImporter:
 
 	def printSelf(self, pr):
 		self.category.printSelf(pr)
-		pr.printSelf()
 
 importer = RowImporter()
 args = clargs.CLArguments(sys.argv)
