@@ -13,6 +13,8 @@ class RowCategory(object):
 		return 'category'
 
 	def printSelf(self, printer):
+		if self.total == 0:
+			return
 		printer.writeLine(self.name, self.total)
 
 class NameableCategory(RowCategory):
@@ -44,7 +46,7 @@ class CollectionCategory(RowCategory):
 			printer.unindent()
 
 class LeftoverCategory(CollectionCategory):
-	displayLimit = 5
+	displayLimit = 30
 
 	def __init__(self):
 		super(LeftoverCategory, self).__init__()

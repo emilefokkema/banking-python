@@ -51,7 +51,7 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 			DescriptionStartCategory('Belastingdienst',['Belastingdienst']),
 			DescriptionStartCategory('CJIB',['CJIB']),
 			DescriptionStartCategory('DUO',['DUO']),
-			DescriptionStartCategory('Toestelverzekering',['CHUBB'])]
+			InfoContainsCategory('Toestelverzekering','Toestelverzekering')]
 
 	def getName(self):
 		return 'Af'
