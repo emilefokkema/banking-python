@@ -16,9 +16,11 @@ class RowCategory(object):
 		return 'Total: '+str(self.total)
 
 	def printSelf(self, printer):
-		printer.writeLine(self.name + '. '+self.getTotalString())
+		printer.writeLine(self.name, self.total)
 
 class LeftoverCategory(RowCategory):
+	displayLimit = 30
+
 	def __init__(self):
 		super(LeftoverCategory, self).__init__()
 		self.rows = []
@@ -32,13 +34,13 @@ class LeftoverCategory(RowCategory):
 
 	def printSelf(self,printer):
 		if len(self.rows) > 0:
-			printer.writeLine('some leftovers:')
+			printer.writeLine('some leftovers',self.total)
 			printer.indent()
-			for row in self.rows[0:10]:
+			for row in self.rows[0:self.displayLimit]:
 				row.printSelf(printer)
 			printer.unindent()
-			if len(self.rows) > 10:
-				printer.writeLine('(and '+str(len(self.rows) - 10)+' more)')
+			if len(self.rows) > self.displayLimit:
+				printer.writeLine('more',len(self.rows) - self.displayLimit)
 
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
@@ -66,12 +68,11 @@ class MultipleRowCategory(RowCategory):
 
 
 	def printSelf(self, printer):
-		printer.writeLine(self.name)
+		printer.writeLine(self.name, self.total)
 		printer.indent()
 		for category in self.categories:
 			category.printSelf(printer)
 		printer.unindent()
-		printer.writeLine(self.getTotalString())
 
 	def addCategory(self, cat):
 		self.categories.append(cat)

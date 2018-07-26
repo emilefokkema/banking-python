@@ -19,12 +19,15 @@ class Af(cat.MultipleRowCategory):
 	def getCategories(self):
 		return [
 			DescriptionStartCategory('Albert Heijn', ['ALBERT HEIJN']),
-			DescriptionStartCategory('Abonnementen',['NETFLIX','NRC','Kosten OranjePakket']),
+			DescriptionStartCategory('Abonnementen',['NETFLIX','NRC','Kosten OranjePakket','T-MOBILE']),
 			DescriptionStartCategory('NS',['NS GROEP']),
 			DescriptionStartCategory('ABN-AMRO',['ABN-AMRO']),
-			DescriptionStartCategory('Zorg',['Menzis','PEARLE']),
+			DescriptionStartCategory('Zorg',['Menzis','menzis', 'PEARLE']),
 			DescriptionStartCategory('Huur',['Rijksen Beheer']),
-			DescriptionStartCategory('Boeken',['Broese Boekverkopers'])]
+			DescriptionStartCategory('Boeken',['Broese Boekverkopers']),
+			DescriptionStartCategory('Belastingdienst',['Belastingdienst']),
+			DescriptionStartCategory('CJIB',['CJIB']),
+			DescriptionStartCategory('DUO',['DUO'])]
 
 	def getName(self):
 		return 'Af'

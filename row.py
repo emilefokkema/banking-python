@@ -5,4 +5,4 @@ class Row:
 		self.description = csvRow[1]
 
 	def printSelf(self, printer):
-		printer.writeLine(self.description)
+		printer.writeLine(self.description, self.amount)

@@ -11,8 +11,8 @@ class Printer:
 	def unindent(self):
 		self.indentAmount -= 1
 
-	def writeLine(self, line):
-		self.lines.append(self.indentAmount * self.indentChar + line)
+	def writeLine(self, key, value):
+		self.lines.append(self.indentAmount * self.indentChar + key + ': ' + str(value))
 
 	def printSelf(self):
 		print('\n'.join(self.lines))
