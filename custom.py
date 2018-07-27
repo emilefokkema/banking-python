@@ -59,7 +59,22 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 	def acceptsRow(self, row):
 		return row.afbij == 'Af'
 
-class Bij(cat.RowCategory):
+class Salaris(cat.RowCategory):
+
+	def acceptsRow(self, row):
+		return row.description.startswith('T-MOBILE')
+
+	def acceptsRowInDuplicate(self, row):
+		return not self.isRecursivelyEmpty() and row.description.startswith('T-MOBILE')
+
+	def getName(self):
+		return 'Salaris'
+
+
+class Bij(cat.MultipleRowCategoryWithLeftover):
+	def getCategories(self):
+		return [Salaris(),
+				DescriptionStartCategory('Van spaarrekening',['E C Fokkema'])]
 
 	def acceptsRow(self, row):
 		return row.afbij == 'Bij'
@@ -68,9 +83,25 @@ class Bij(cat.RowCategory):
 		return 'Bij'
 
 
-class TopCategory(cat.MultipleRowCategoryWithLeftover):
-	def getName(self):
-		return 'Top'
+class AfBij(cat.MultipleRowCategoryWithLeftover):
+	def __init__(self):
+		super(AfBij, self).__init__()
+		self.first = None
+		self.last = None
+		self.hasBeginning = False
+		self.hasEnd = False
+
+	def addRow(self, row):
+		super(AfBij, self).addRow(row)
+		if self.first == None:
+			self.first = row
+		self.last = row
+
+	def begin(self):
+		self.hasBeginning = True
+
+	def end(self):
+		self.hasEnd = True
 
 	def getCategories(self):
 		return [Af(), Bij()]
@@ -79,3 +110,21 @@ class TopCategory(cat.MultipleRowCategoryWithLeftover):
 		for category in self.categories:
 			category.printSelf(printer)
 		printer.writeLine('total', self.total)
+		printer.writeLine('from',self.first.date)
+		printer.writeLine('through',self.last.date)
+		printer.writeLine('complete', self.hasBeginning and self.hasEnd)
+
+class TopCategory(cat.RepeatingCategory):
+	def __init__(self):
+		super(TopCategory, self).__init__()
+
+	def renewCategory(self, oldCategory):
+		newCategory = AfBij()
+		if not oldCategory == None:
+			oldCategory.end()
+			newCategory.begin()
+		
+		return newCategory
+
+	def getName(self):
+		return 'maanden'

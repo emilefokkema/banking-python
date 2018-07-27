@@ -2,12 +2,30 @@ class RowCategory(object):
 	def __init__(self):
 		self.total = 0;
 		self.name = self.getName()
+		self.empty = True
+		self.parent = None
 
 	def addFromRowToTotal(self, row):
 		self.total = self.total + row.amount
 
 	def addRow(self, row):
 		self.addFromRowToTotal(row)
+		self.empty = False
+
+	def isRecursivelyEmpty(self):
+		return self.empty and (self.parent == None or self.parent.isRecursivelyEmpty())
+
+	def setParent(self, parent):
+		self.parent = parent
+
+	def acceptsRow(self, row):
+		return True
+
+	def canAddRow(self, row):
+		return self.acceptsRow(row);
+
+	def acceptsRowInDuplicate(self, row):
+		return False
 
 	def getName(self):
 		return 'category'
@@ -33,9 +51,6 @@ class CollectionCategory(RowCategory):
 	def addRow(self, row):
 		super(CollectionCategory, self).addRow(row)
 		self.rows.append(row)
-
-	def acceptsRow(self, row):
-		return True
 
 	def printSelf(self,printer):
 		if len(self.rows) == 0:
@@ -76,10 +91,21 @@ class MultipleRowCategory(RowCategory):
 		self.categories = []
 		for category in self.getCategories():
 			self.addCategory(category)
+			category.setParent(self)
 
-	def acceptsRow(self, row):
+	def canAddRow(self, row):
+		if not self.acceptsRow(row):
+			return False
 		for category in self.categories:
-			if category.acceptsRow(row):
+			if category.canAddRow(row):
+				return True
+		return False
+
+	def acceptsRowInDuplicate(self, row):
+		if not self.acceptsRow(row):
+			return False
+		for category in self.categories:
+			if category.acceptsRowInDuplicate(row):
 				return True
 		return False
 
@@ -90,9 +116,9 @@ class MultipleRowCategory(RowCategory):
 		return []
 
 	def addRow(self, row):
-		self.addFromRowToTotal(row)
+		super(MultipleRowCategory, self).addRow(row)
 		for category in self.categories:
-			if category.acceptsRow(row):
+			if category.canAddRow(row):
 				category.addRow(row)
 				return
 
@@ -110,5 +136,32 @@ class MultipleRowCategoryWithLeftover(MultipleRowCategory):
 		super(MultipleRowCategoryWithLeftover, self).__init__()
 		self.addCategory(LeftoverCategory())
 
-	def acceptsRow(self, row):
-		return True;
+
+class RepeatingCategory(RowCategory):
+	def __init__(self):
+		super(RepeatingCategory, self).__init__()
+		currentCategory = self.renewCategory(None)
+		self.currentCategory = currentCategory
+		self.categories = [currentCategory]
+
+	def renewCategory(self, oldCategory):
+		return RowCategory()
+
+	def canAddRow(self, row):
+		return self.currentCategory.canAddRow(row) or self.currentCategory.acceptsRowInDuplicate(row)
+
+	def addRow(self, row):
+		if self.currentCategory.acceptsRowInDuplicate(row):
+			self.currentCategory = self.renewCategory(self.currentCategory)
+			self.categories.append(self.currentCategory)
+
+		self.currentCategory.addRow(row)
+
+	def printSelf(self, printer):
+		with printer.indentList(self.name) as printer1:
+			for category in self.categories:
+				with printer1.indentItem() as printer2:
+					category.printSelf(printer2)
+
+
+

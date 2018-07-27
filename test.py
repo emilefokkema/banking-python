@@ -20,6 +20,7 @@ class RowImporter:
 
 importer = RowImporter()
 args = clargs.CLArguments(sys.argv)
+rows = []
 
 with open(args.csv) as csvfile:
 	reader = csv.reader(csvfile, delimiter=',')
@@ -28,9 +29,13 @@ with open(args.csv) as csvfile:
 		if counter == 0:
 			counter += 1
 			continue
-		importer.importRow(row.Row(csvRow))
+		rows.append(row.Row(csvRow))
 		counter += 1
-		
+
+rows.sort(key=lambda r:r.date)
+
+for row in rows:
+	importer.importRow(row)	
 
 importer.printSelf(printer.Printer())
 if args.json:
