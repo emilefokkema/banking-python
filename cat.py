@@ -38,12 +38,15 @@ class CollectionCategory(RowCategory):
 		return True
 
 	def printSelf(self,printer):
-		with printer.indent(self.name):
-			if len(self.rows) > 0:
-				with printer.indent('rows'):
-					for row in self.rows:
-						row.printSelf(printer)
-				printer.writeLine('total', self.total)
+		if len(self.rows) == 0:
+			return
+		with printer.indent(self.name) as printer1:
+			with printer1.indentList('rows') as printer2:
+				for row in self.rows:
+					with printer2.indentItem() as printer3:
+						row.printSelf(printer3)
+					
+			printer1.writeLine('total', self.total)
 
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 30
@@ -94,10 +97,10 @@ class MultipleRowCategory(RowCategory):
 				return
 
 	def printSelf(self, printer):
-		with printer.indent(self.name):
+		with printer.indent(self.name) as printer1:
 			for category in self.categories:
-				category.printSelf(printer)
-			printer.writeLine('total', self.total)
+				category.printSelf(printer1)
+			printer1.writeLine('total', self.total)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)

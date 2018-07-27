@@ -4,6 +4,8 @@ import custom
 import printer
 import clargs
 import sys
+import json
+import jsonprinter
 
 class RowImporter:
 	def __init__(self):
@@ -31,3 +33,8 @@ with open(args.csv) as csvfile:
 		
 
 importer.printSelf(printer.Printer())
+if args.json:
+	jp = jsonprinter.JsonPrinter()
+	importer.printSelf(jp)
+	with open(args.csv.replace('.csv','.json'), 'w') as jsonFile:
+		json.dump(jp.getObj(), jsonFile)

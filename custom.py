@@ -74,3 +74,8 @@ class TopCategory(cat.MultipleRowCategoryWithLeftover):
 
 	def getCategories(self):
 		return [Af(), Bij()]
+
+	def printSelf(self, printer):
+		for category in self.categories:
+			category.printSelf(printer)
+		printer.writeLine('total', self.total)

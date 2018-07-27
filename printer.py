@@ -1,30 +1,73 @@
-class Printer:
-	indentChar = ' '
+class Printer(object):
 
-	def __init__(self):
-		self.indentAmount = 0
-
-	def getPrefix(self):
-		return self.indentAmount * self.indentChar
+	def printLine(self, line):
+		print(line)
 
 	def indent(self, key):
-		print(self.getPrefix() + key + ':')
-		self.indentAmount += 1
-		return PrinterIndentation(self)
+		self.printLine(key + ':')
+		return IndentedPrinter(self)
 
-	def unindent(self):
-		self.indentAmount -= 1
+	def indentList(self, key):
+		self.printLine(key + ':')
+		return ListPrinter(self)
 
 	def writeLine(self, key, value):
-		print(self.getPrefix() + key + ': ' + str(value))
+		self.printLine(key + ': ' + str(value))
 
-class PrinterIndentation:
+class CompositePrinter(Printer):
 	def __init__(self, printer):
 		self.printer = printer
 
+	def printLine(self, line):
+		self.printer.printLine(line)
+
+class IndentedPrinter(CompositePrinter):
+	indentChar = ' '
+	def __init__(self, printer):
+		super(IndentedPrinter, self).__init__(printer)
+
+	def printLine(self, line):
+		super(IndentedPrinter, self).printLine(self.indentChar + line)
+
 	def __enter__(self):
-		pass
+		return self
 
 	def __exit__(self, a, b, c):
-		self.printer.unindent()
+		pass
+
+class ListPrinter(CompositePrinter):
+	def __init__(self, printer):
+		super(ListPrinter, self).__init__(printer)
+
+	def writeLine(self, key, value):
+		raise Exception('list writer cannot')
+
+	def indent(self, key):
+		raise Exception('list writer cannot')
+
+	def indentItem(self):
+		return ListItemPrinter(self.printer)
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, a, b, c):
+		pass
+
+class ListItemPrinter(CompositePrinter):
+	def __init__(self, printer):
+		super(ListItemPrinter, self).__init__(printer)
+		self.hasPrintedLine = False
+
+	def printLine(self, line):
+		super(ListItemPrinter, self).printLine(('  ' if self.hasPrintedLine else '* ') + line)
+		self.hasPrintedLine = True
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, a, b, c):
+		pass
+
+
 
