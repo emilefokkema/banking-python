@@ -1,6 +1,18 @@
 <html>
-<head>
-<title>Process my banking statements</title>
-</head>
-<body>Hi there</body>
+	<head>
+		<title>Process my banking statements</title>
+		<script
+		  src="https://code.jquery.com/jquery-3.3.1.min.js"
+		  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		  crossorigin="anonymous"></script>
+	</head>
+	<body>
+	Hi there
+	<script>
+		console.log("asking /api/test")
+		$.get( "/api/test", function(d) {
+		  console.log(d)
+		})
+	</script>
+	</body>
 </html>

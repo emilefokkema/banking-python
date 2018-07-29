@@ -1,24 +1,53 @@
 import http.server
 import socketserver
+import json
 
 PORT = 8000
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, request, client_address, server):
+		self.routes = [TestRoute()]
 		super(MyHandler, self).__init__(request, client_address, server)
 
-	def do_GET():
+	def do_GET(self):
 		if self.path.startswith('/api'):
 			self.do_api_GET()
 		else:
 			super(MyHandler, self).do_GET()
 
+	def findRoute(self, path):
+		for route in self.routes:
+			if route.handles(self.path):
+				return route
+		return None
+
 	def do_api_GET(self):
+		route = self.findRoute(self.path)
+		if route == None:
+			print('no route found, sending 404')
+			self.send_response(404)
+			self.send_header('Content-type','application/json')
+			self.end_headers()
+			self.wfile.write(b'null')
+			return
 		self.send_response(200)
-		self.send_header('Content-type','text/html')
+		self.send_header('Content-type','application/json')
 		self.end_headers()
-		self.wfile.write("ada") #Doesnt work
+		output = json.dumps(route.handle(self.path))
+		self.wfile.write(output.encode('utf-8'))
 		return
+
+class ApiRoute:
+	pass
+
+class TestRoute(ApiRoute):
+
+	def handles(self, path):
+		return path == '/api/test'
+
+	def handle(self, path):
+		return {"a":9}
+
 
 #Handler = http.server.SimpleHTTPRequestHandler
 
