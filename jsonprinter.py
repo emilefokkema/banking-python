@@ -1,4 +1,5 @@
 from datetime import date
+import json
 class JsonPrinter(object):
 	def __init__(self):
 		self.object = {}
@@ -12,10 +13,26 @@ class JsonPrinter(object):
 	def indentList(self, key):
 		return JsonListPrinter(self, key)
 
+	def startFile(self, fileName):
+		return JsonFilePrinter(fileName)
+
 	def writeLine(self, key, value):
 		if isinstance(value, date):
 			value = str(value)
 		self.object[key] = value
+
+class JsonFilePrinter(JsonPrinter):
+	def __init__(self, fileName):
+		super(JsonFilePrinter, self).__init__()
+		self.fileName = fileName
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, a, b, c):
+		print('saving json: '+self.fileName)
+		with open(self.fileName+'.json', 'w') as jsonFile:
+			json.dump(self.object, jsonFile)
 
 class CompositeJsonPrinter(JsonPrinter):
 	def __init__(self, printer):

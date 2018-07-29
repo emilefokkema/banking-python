@@ -106,13 +106,20 @@ class AfBij(cat.MultipleRowCategoryWithLeftover):
 	def getCategories(self):
 		return [Af(), Bij()]
 
-	def printSelf(self, printer):
+	def internalPrint(self, printer):
 		for category in self.categories:
 			category.printSelf(printer)
 		printer.writeLine('total', self.total)
 		printer.writeLine('from',self.first.date)
 		printer.writeLine('through',self.last.date)
 		printer.writeLine('complete', self.hasBeginning and self.hasEnd)
+
+	def printSelf(self, printer):
+		if self.hasBeginning and self.hasEnd:
+			with printer.startFile(str(self.first.date)+str(self.last.date)) as printer1:
+				self.internalPrint(printer1)
+		else:
+			self.internalPrint(printer)
 
 class TopCategory(cat.RepeatingCategory):
 	def __init__(self):

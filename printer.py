@@ -11,8 +11,12 @@ class Printer(object):
 		self.printLine(key + ':')
 		return ListPrinter(self)
 
+	def startFile(self, name):
+		return FilePrinter(name)
+
 	def writeLine(self, key, value):
 		self.printLine(key + ': ' + str(value))
+
 
 class CompositePrinter(Printer):
 	def __init__(self, printer):
@@ -20,6 +24,17 @@ class CompositePrinter(Printer):
 
 	def printLine(self, line):
 		self.printer.printLine(line)
+
+class FilePrinter(Printer):
+	def __init__(self, name):
+		self.printLine('START FILE: '+name)
+		self.name = name
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, a, b, c):
+		self.printLine('END FILE')
 
 class IndentedPrinter(CompositePrinter):
 	indentChar = ' '

@@ -39,7 +39,4 @@ for row in rows:
 
 importer.printSelf(printer.Printer())
 if args.json:
-	jp = jsonprinter.JsonPrinter()
-	importer.printSelf(jp)
-	with open(args.csv.replace('.csv','.json'), 'w') as jsonFile:
-		json.dump(jp.getObj(), jsonFile)
+	importer.printSelf(jsonprinter.JsonPrinter())
