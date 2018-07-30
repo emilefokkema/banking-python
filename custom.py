@@ -1,4 +1,5 @@
 import cat
+import wholeperiod
 
 class DescriptionStartCategory(cat.NameableCategory):
 	def __init__(self, name, descs):
@@ -86,6 +87,7 @@ class Bij(cat.MultipleRowCategoryWithLeftover):
 class AfBij(cat.MultipleRowCategoryWithLeftover):
 	def __init__(self):
 		super(AfBij, self).__init__()
+		self.printHandler = wholeperiod.WholePeriodHandler()
 		self.first = None
 		self.last = None
 		self.hasBeginning = False
@@ -106,20 +108,14 @@ class AfBij(cat.MultipleRowCategoryWithLeftover):
 	def getCategories(self):
 		return [Af(), Bij()]
 
-	def internalPrint(self, printer):
-		for category in self.categories:
-			category.printSelf(printer)
-		printer.writeLine('total', self.total)
-		printer.writeLine('from',self.first.date)
-		printer.writeLine('through',self.last.date)
-		printer.writeLine('complete', self.hasBeginning and self.hasEnd)
-
 	def printSelf(self, printer):
-		if self.hasBeginning and self.hasEnd:
-			with printer.startFile(str(self.first.date)+str(self.last.date)) as printer1:
-				self.internalPrint(printer1)
-		else:
-			self.internalPrint(printer)
+		with self.printHandler.getAfBijPrinter(self, printer) as printer1:
+			for category in self.categories:
+				category.printSelf(printer1)
+			printer1.writeLine('total', self.total)
+			printer1.writeLine('from',self.first.date)
+			printer1.writeLine('through',self.last.date)
+			printer1.writeLine('complete', self.hasBeginning and self.hasEnd)
 
 class TopCategory(cat.RepeatingCategory):
 	def __init__(self):
