@@ -5,14 +5,42 @@
 		  src="https://code.jquery.com/jquery-3.3.1.min.js"
 		  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 		  crossorigin="anonymous"></script>
+		<style type="text/css">
+			body{
+				margin:0px;
+				padding: 0px;
+			}
+			.period-list{
+				margin:10px;
+				padding: 10px;
+			}
+			.period-list-item{
+				padding: 10px;
+				font-family: monospace;
+				border:1pt solid #000;
+			}
+		</style>
 	</head>
 	<body>
-	Hi there
+		<div class="period-list"></div>
 	<script>
-		console.log("asking /api/complete")
-		$.get( "/api/complete", function(d) {
-		  console.log(d)
-		})
+		(function($){
+			var $list = $(".period-list").first();
+
+			var makePeriodItem = function(data){
+				$list.append($("<div class=\"period-list-item\">van "+data.from+" t/m "+data.through+"</div>"))
+			};
+
+			var makePeriodItems = function(list){
+				for(var i=0;i<list.length;i++){
+					makePeriodItem(list[i].file)
+				}
+			}
+
+			$.get( "/api/complete", function(d) {
+			  makePeriodItems(d)
+			});
+		})($);
 	</script>
 	</body>
 </html>
