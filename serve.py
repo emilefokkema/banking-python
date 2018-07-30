@@ -1,12 +1,13 @@
 import http.server
 import socketserver
 import json
+import wholeperiod
 
 PORT = 8000
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, request, client_address, server):
-		self.routes = [TestRoute()]
+		self.routes = [TestRoute(), CompletePeriodsRoute()]
 		super(MyHandler, self).__init__(request, client_address, server)
 
 	def do_GET(self):
@@ -47,6 +48,17 @@ class TestRoute(ApiRoute):
 
 	def handle(self, path):
 		return {"a":9}
+
+class CompletePeriodsRoute(ApiRoute):
+	def __init__(self):
+		self.periodFileFinder = wholeperiod.WholePeriodHandler()
+
+	def handles(self, path):
+		return path == '/api/complete'
+
+	def handle(self, path):
+		return self.periodFileFinder.findPeriodFiles()
+
 
 
 #Handler = http.server.SimpleHTTPRequestHandler
