@@ -13,16 +13,57 @@
 			.period-list{
 				margin:10px;
 				padding: 10px;
+				max-width: 900px;
 			}
 			.period-list-item{
 				padding: 10px;
 				font-family: monospace;
-				border:1pt solid #000;
+				border: 0.5px solid #ccc;
+			}
+			.category-top{
+				display: inline-block;
+				width: 40%;
+				vertical-align: top;
 			}
 			.category{
 				padding:5px;
 				margin: 5px;
-				border:0.5px solid #ccc;
+			}
+			.category-multiple{
+				border-bottom: 0.5px solid #ccc;
+			}
+			.category-multiple.collapsed{
+				border: none;
+			}
+			.plus{
+				display: none;
+			}
+			.collapsed > span > .minus{
+				display: none;
+			}
+			.collapsed > span > .plus{
+				display: initial;
+			}
+			.collapsed > .category{
+				display: none;
+			}
+			.collapsed > .row{
+				display: none;
+			}
+			.plus::before{
+				content:"+";
+				margin-left: 5px;
+			}
+			.minus::before{
+				content:"-";
+				margin-left: 5px;
+			}
+			.row{
+				background-color: #efefef;
+				padding:5px;
+			}
+			.toggle-collapse{
+				cursor: pointer;
 			}
 		</style>
 	</head>
@@ -35,21 +76,36 @@
 			var makePeriodItem = function(data){
 				console.log(data)
 				var $root = $("<div class=\"period-list-item\"><div>van "+data.from+" t/m "+data.through+"</div></div>");
-				$root.append(makeCategory("Bij", data.Bij))
-				$root.append(makeCategory("Af", data.Af))
+				$root.append(makeCategory("Bij", data.Bij, true))
+				$root.append(makeCategory("Af", data.Af, true))
 				$list.append($root);
 			};
 
-			var makeCategory = function(name, obj){
-				var total = (typeof obj === typeof 6) ? obj : obj.total;
-				var $root = $("<div class=\"category\">"+name+": "+total+"</div>");
-				if(typeof obj !== "Number" && obj.total !== undefined){
+			var makeRow = function(data){
+				return $("<div class=\"row\">"+data.date+" "+data.description+" "+data.amount+"</div>")
+			}
+
+			var makeCategory = function(name, obj, top){
+				var isSimple = typeof obj === typeof 6
+				var total = isSimple ? obj : obj.total;
+				var $root = $("<div class=\"collapsed category"+(isSimple?"":" category-multiple")+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+name+": "+total+(isSimple?"":"<span class=\"plus\"></span><span class=\"minus\"></span>")+"</span></div>");
+				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
+				if(!isSimple && obj.total !== undefined){
 					for(var p in obj){
-						if(obj.hasOwnProperty(p) && p !== "total"){
-							$root.append(makeCategory(p, obj[p]))
+						if(obj.hasOwnProperty(p)){
+							if(p == "rows"){
+								for(var i=0;i<obj[p].length;i++){
+									$root.append(makeRow(obj[p][i]))
+								}
+								continue;
+							}
+							if(p !== "total"){
+								$root.append(makeCategory(p, obj[p]))
+							}
 						}
 					}
 				}
+
 				return $root;
 			}
 
