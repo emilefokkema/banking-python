@@ -15,7 +15,7 @@ class RowImporter:
 	def printSelf(self, pr):
 		self.category.printSelf(pr)
 
-def processCsv(csvfile, json=False):
+def processCsv(csvfile):
 	importer = RowImporter()
 	rows = []
 
@@ -35,5 +35,4 @@ def processCsv(csvfile, json=False):
 		importer.importRow(row1)	
 
 	importer.printSelf(printer.Printer())
-	if json:
-		importer.printSelf(jsonprinter.JsonPrinter())
+	importer.printSelf(jsonprinter.JsonPrinter())

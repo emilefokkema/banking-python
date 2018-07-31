@@ -146,17 +146,21 @@
 						type:"POST",
 						url:"/",
 						data:data,
-						success:function(){console.log("success");},
+						success:function(){console.log("success");refreshList();},
 						error:function(e){console.log(e)}
 					})
 				};
 				reader.readAsBinaryString(file);
 			};
 
-			$.get( "/api/complete", function(d) {
-			  makePeriodItems(d)
-			});
-
+			var refreshList = function(){
+				$list.html("")
+				$.get( "/api/complete", function(d) {
+				  makePeriodItems(d)
+				});
+			};
+			
+			refreshList();
 			$("#postButton").on("click", postCsv);
 		})($);
 	</script>
