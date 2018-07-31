@@ -10,6 +10,17 @@
 				margin:0px;
 				padding: 0px;
 			}
+			.add{
+				margin:10px;
+				padding: 10px;
+				font-family: monospace;
+			}
+			.empty{
+				padding: 10px;
+				color:#ccc;
+				font-family: monospace;
+				border: 0.5px solid #ccc;
+			}
 			.period-list{
 				margin:10px;
 				padding: 10px;
@@ -69,6 +80,13 @@
 	</head>
 	<body>
 		<div class="period-list"></div>
+		<div class="add">
+			
+			<input type="file" id="fileInput" accept=".csv" />
+			<input type="button" value="submit" id="postButton" />
+		
+		</div>
+		
 	<script>
 		(function($){
 			var $list = $(".period-list").first();
@@ -110,14 +128,36 @@
 			}
 
 			var makePeriodItems = function(list){
+				if(list.length == 0){
+					$list.append($("<div class=\"empty\">no history</div>"));
+					return;
+				}
 				for(var i=0;i<list.length;i++){
 					makePeriodItem(list[i].file)
 				}
 			}
 
+			var postCsv = function(){
+				var file = document.getElementById("fileInput").files[0];
+				var reader = new FileReader();
+				reader.onload = function(){
+					var data = reader.result;
+					$.ajax({
+						type:"POST",
+						url:"/",
+						data:data,
+						success:function(){console.log("success");},
+						error:function(e){console.log(e)}
+					})
+				};
+				reader.readAsBinaryString(file);
+			};
+
 			$.get( "/api/complete", function(d) {
 			  makePeriodItems(d)
 			});
+
+			$("#postButton").on("click", postCsv);
 		})($);
 	</script>
 	</body>

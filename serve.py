@@ -16,6 +16,14 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 		else:
 			super(MyHandler, self).do_GET()
 
+	def do_POST(self):
+		a = self.rfile.read (int(self.headers['Content-Length']))
+		print(a)
+		self.send_response(200)
+		self.send_header('Content-type','application/json')
+		self.end_headers()
+		self.wfile.write(b'null')
+
 	def findRoute(self, path):
 		for route in self.routes:
 			if route.handles(self.path):
