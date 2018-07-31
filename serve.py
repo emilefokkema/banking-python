@@ -2,6 +2,7 @@ import http.server
 import socketserver
 import json
 import wholeperiod
+import csvprocessor
 
 PORT = 8000
 
@@ -17,8 +18,9 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 			super(MyHandler, self).do_GET()
 
 	def do_POST(self):
-		a = self.rfile.read (int(self.headers['Content-Length']))
-		print(a)
+		a = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
+		splitA = a.splitlines()
+		csvprocessor.processCsv(splitA)
 		self.send_response(200)
 		self.send_header('Content-type','application/json')
 		self.end_headers()
