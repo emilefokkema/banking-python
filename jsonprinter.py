@@ -1,8 +1,10 @@
 from datetime import date
 import json
+import random
 class JsonPrinter(object):
 	def __init__(self):
 		self.object = {}
+		self.hasExited = False
 
 	def getObj(self):
 		return self.object
@@ -21,15 +23,24 @@ class JsonPrinter(object):
 			value = str(value)
 		self.object[key] = value
 
-class JsonFilePrinter(JsonPrinter):
-	def __init__(self, fileName):
-		super(JsonFilePrinter, self).__init__()
-		self.fileName = fileName
+	def doexit(self):
+		pass
 
 	def __enter__(self):
 		return self
 
 	def __exit__(self, a, b, c):
+		if self.hasExited:
+			return
+		self.hasExited = True
+		self.doexit()
+
+class JsonFilePrinter(JsonPrinter):
+	def __init__(self, fileName):
+		super(JsonFilePrinter, self).__init__()
+		self.fileName = fileName
+
+	def doexit(self):
 		print('saving json: '+self.fileName)
 		with open(self.fileName+'.json', 'w') as jsonFile:
 			json.dump(self.object, jsonFile)
@@ -44,10 +55,7 @@ class JsonPropertyPrinter(CompositeJsonPrinter):
 		super(JsonPropertyPrinter, self).__init__(printer)
 		self.key = key
 
-	def __enter__(self):
-		return self
-
-	def __exit__(self, a, b, c):
+	def doexit(self):
 		self.printer.writeLine(self.key, self.object)
 
 class JsonListPrinter(JsonPropertyPrinter):
@@ -70,9 +78,13 @@ class JsonListPrinter(JsonPropertyPrinter):
 class JsonListItemPrinter(CompositeJsonPrinter):
 	def __init__(self, printer):
 		super(JsonListItemPrinter, self).__init__(printer)
+		self.lineWritten = False
 
-	def __enter__(self):
-		return self
+	def doexit(self):
+		if self.lineWritten:
+			self.printer.addValue(self.object)
 
-	def __exit__(self, a, b, c):
-		self.printer.addValue(self.object)
+	def writeLine(self, key, value):
+		super(JsonListItemPrinter, self).writeLine(key, value)
+		self.lineWritten = True
+

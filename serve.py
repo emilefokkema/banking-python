@@ -3,6 +3,7 @@ import socketserver
 import json
 import wholeperiod
 import csvprocessor
+import jsonprinter
 
 PORT = 8000
 
@@ -20,11 +21,13 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def do_POST(self):
 		a = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
 		splitA = a.splitlines()
-		csvprocessor.processCsv(splitA)
+		printer = jsonprinter.JsonPrinter()
+		csvprocessor.processCsv(splitA, printer)
 		self.send_response(200)
 		self.send_header('Content-type','application/json')
 		self.end_headers()
-		self.wfile.write(b'null')
+		output = json.dumps(printer.getObj())
+		self.wfile.write(output.encode('utf-8'))
 
 	def findRoute(self, path):
 		for route in self.routes:

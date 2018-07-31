@@ -79,7 +79,8 @@
 		</style>
 	</head>
 	<body>
-		<div class="period-list"></div>
+		<div class="period-list" id="completeList"></div>
+		<div class="period-list" id="incompleteList"></div>
 		<div class="add">
 			
 			<input type="file" id="fileInput" accept=".csv" />
@@ -89,10 +90,10 @@
 		
 	<script>
 		(function($){
-			var $list = $(".period-list").first();
+			var $completeList = $("#completeList").first();
+			var $incompleteList = $("#incompleteList").first();
 
-			var makePeriodItem = function(data){
-				console.log(data)
+			var makePeriodItem = function(data, $list){
 				var $root = $("<div class=\"period-list-item\"><div>van "+data.from+" t/m "+data.through+"</div></div>");
 				$root.append(makeCategory("Bij", data.Bij, true))
 				$root.append(makeCategory("Af", data.Af, true))
@@ -129,11 +130,11 @@
 
 			var makePeriodItems = function(list){
 				if(list.length == 0){
-					$list.append($("<div class=\"empty\">no history</div>"));
+					$completeList.append($("<div class=\"empty\">no history</div>"));
 					return;
 				}
 				for(var i=0;i<list.length;i++){
-					makePeriodItem(list[i].file)
+					makePeriodItem(list[i].file, $completeList)
 				}
 			}
 
@@ -146,15 +147,24 @@
 						type:"POST",
 						url:"/",
 						data:data,
-						success:function(){console.log("success");refreshList();},
+						success:function(d){addIncompletes(d.maanden);refreshList();},
 						error:function(e){console.log(e)}
 					})
 				};
 				reader.readAsBinaryString(file);
 			};
 
+			var addIncompletes = function(data){
+				for(var i=0;i<data.length;i++){
+					var maand = data[i];
+					if(maand.hasBeginning){
+						makePeriodItem(maand, $incompleteList)
+					}
+				}
+			}
+
 			var refreshList = function(){
-				$list.html("")
+				$completeList.html("")
 				$.get( "/api/complete", function(d) {
 				  makePeriodItems(d)
 				});

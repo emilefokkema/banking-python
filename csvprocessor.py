@@ -1,8 +1,6 @@
 import csv
 import row
 import custom
-import printer
-import jsonprinter
 
 class RowImporter:
 	def __init__(self):
@@ -15,7 +13,7 @@ class RowImporter:
 	def printSelf(self, pr):
 		self.category.printSelf(pr)
 
-def processCsv(csvfile):
+def processCsv(csvfile, printer):
 	importer = RowImporter()
 	rows = []
 
@@ -34,5 +32,4 @@ def processCsv(csvfile):
 	for row1 in rows:
 		importer.importRow(row1)	
 
-	importer.printSelf(printer.Printer())
-	importer.printSelf(jsonprinter.JsonPrinter())
+	importer.printSelf(printer)

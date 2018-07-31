@@ -115,7 +115,8 @@ class AfBij(cat.MultipleRowCategoryWithLeftover):
 			printer1.writeLine('total', self.total)
 			printer1.writeLine('from',self.first.date)
 			printer1.writeLine('through',self.last.date)
-			printer1.writeLine('complete', self.hasBeginning and self.hasEnd)
+			printer1.writeLine('hasBeginning', self.hasBeginning)
+			printer1.writeLine('hasEnd', self.hasEnd)
 
 class TopCategory(cat.RepeatingCategory):
 	def __init__(self):
