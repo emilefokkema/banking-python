@@ -8,12 +8,12 @@ def getDate(str):
 class Row:
 	def __init__(self, csvRow): #fdsa
 		self.afbij = csvRow[5]
-		self.amount = float(csvRow[6].replace(',','.'))
+		self.numberOfCents = int(csvRow[6].replace(',',''))
 		self.description = csvRow[1]
 		self.info = csvRow[8]
 		self.date = getDate(csvRow[0])
 
 	def printSelf(self, printer):
-		printer.writeLine('amount', self.amount)
+		printer.writeLine('amount', self.numberOfCents)
 		printer.writeLine('date', self.date)
 		printer.writeLine('description', self.description)

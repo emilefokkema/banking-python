@@ -1,12 +1,12 @@
 class RowCategory(object):
 	def __init__(self):
-		self.total = 0;
+		self.totalCents = 0;
 		self.name = self.getName()
 		self.empty = True
 		self.parent = None
 
 	def addFromRowToTotal(self, row):
-		self.total = self.total + row.amount
+		self.totalCents = self.totalCents + row.numberOfCents
 
 	def addRow(self, row):
 		self.addFromRowToTotal(row)
@@ -31,9 +31,9 @@ class RowCategory(object):
 		return 'category'
 
 	def printSelf(self, printer):
-		if self.total == 0:
+		if self.totalCents == 0:
 			return
-		printer.writeLine(self.name, self.total)
+		printer.writeLine(self.name, self.totalCents)
 
 class NameableCategory(RowCategory):
 	def __init__(self, name):
@@ -61,7 +61,7 @@ class CollectionCategory(RowCategory):
 					with printer2.indentItem() as printer3:
 						row.printSelf(printer3)
 					
-			printer1.writeLine('total', self.total)
+			printer1.writeLine('total', self.totalCents)
 
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 30
@@ -126,7 +126,7 @@ class MultipleRowCategory(RowCategory):
 		with printer.indent(self.name) as printer1:
 			for category in self.categories:
 				category.printSelf(printer1)
-			printer1.writeLine('total', self.total)
+			printer1.writeLine('total', self.totalCents)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)

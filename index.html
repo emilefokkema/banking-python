@@ -60,11 +60,15 @@
 			}
 			.plus::before{
 				content:"+";
-				margin-left: 5px;
+				margin-right: 0.5em;
 			}
 			.minus::before{
 				content:"-";
-				margin-left: 5px;
+				margin-right: 0.5em;
+			}
+			.neither::before{
+				content:" ";
+				margin-right: 1em;
 			}
 			.row{
 				background-color: #efefef;
@@ -94,7 +98,12 @@
 			var dateString = function(date){
 				return date.toLocaleDateString("nl-NL");
 			};
-
+			var displayAmount = function(amount){
+				var cents = amount % 100;
+				var centString = (cents < 10 ? "0" : "")+cents.toString();
+				var euroString = Math.floor(amount / 100).toString();
+				return "&euro;&nbsp;"+euroString+","+centString;
+			};
 			var $completeList = $("#completeList").first();
 			var $incompleteList = $("#incompleteList").first();
 
@@ -106,13 +115,13 @@
 			};
 
 			var makeRow = function(data){
-				return $("<div class=\"row\">"+dateString(parseDate(data.date))+" "+data.description+" "+data.amount+"</div>")
+				return $("<div class=\"row\">"+dateString(parseDate(data.date))+" "+data.description+" "+displayAmount(data.amount)+"</div>")
 			}
 
 			var makeCategory = function(name, obj, top){
 				var isSimple = typeof obj === typeof 6
 				var total = isSimple ? obj : obj.total;
-				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+name+": "+total+(isSimple?"":"<span class=\"plus\"></span><span class=\"minus\"></span>")+"</span></div>");
+				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+name+": "+displayAmount(total)+"</span></div>");
 				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
 				if(!isSimple && obj.total !== undefined){
 					var $subRoot = $("<div class=\"category-set\"></div>");

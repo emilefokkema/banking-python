@@ -112,7 +112,6 @@ class AfBij(cat.MultipleRowCategoryWithLeftover):
 		with self.printHandler.getAfBijPrinter(self, printer) as printer1:
 			for category in self.categories:
 				category.printSelf(printer1)
-			printer1.writeLine('total', self.total)
 			printer1.writeLine('from',self.first.date)
 			printer1.writeLine('through',self.last.date)
 			printer1.writeLine('hasBeginning', self.hasBeginning)
