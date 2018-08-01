@@ -40,12 +40,6 @@
 				padding:5px;
 				margin: 5px;
 			}
-			.category-multiple{
-				border-bottom: 0.5px solid #ccc;
-			}
-			.category-multiple.collapsed{
-				border: none;
-			}
 			.plus{
 				display: none;
 			}
@@ -55,7 +49,10 @@
 			.collapsed > span > .plus{
 				display: initial;
 			}
-			.collapsed > .category{
+			.category-set{
+				border-left: 0.5px solid #ccc;
+			}
+			.collapsed > .category-set{
 				display: none;
 			}
 			.collapsed > .row{
@@ -90,36 +87,46 @@
 		
 	<script>
 		(function($){
+			var parseDate = function(str){
+				var match = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+				return new Date(parseInt(match[1]),parseInt(match[2])-1,parseInt(match[3]));
+			};
+			var dateString = function(date){
+				return date.toLocaleDateString("nl-NL");
+			};
+
 			var $completeList = $("#completeList").first();
 			var $incompleteList = $("#incompleteList").first();
 
 			var makePeriodItem = function(data, $list){
-				var $root = $("<div class=\"period-list-item\"><div>van "+data.from+" t/m "+data.through+"</div></div>");
+				var $root = $("<div class=\"period-list-item\"><div>van "+dateString(parseDate(data.from))+" t/m "+dateString(parseDate(data.through))+(!data.hasEnd ? " (niet compleet)":"")+"</div></div>");
 				$root.append(makeCategory("Bij", data.Bij, true))
 				$root.append(makeCategory("Af", data.Af, true))
 				$list.append($root);
 			};
 
 			var makeRow = function(data){
-				return $("<div class=\"row\">"+data.date+" "+data.description+" "+data.amount+"</div>")
+				return $("<div class=\"row\">"+dateString(parseDate(data.date))+" "+data.description+" "+data.amount+"</div>")
 			}
 
 			var makeCategory = function(name, obj, top){
 				var isSimple = typeof obj === typeof 6
 				var total = isSimple ? obj : obj.total;
-				var $root = $("<div class=\"collapsed category"+(isSimple?"":" category-multiple")+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+name+": "+total+(isSimple?"":"<span class=\"plus\"></span><span class=\"minus\"></span>")+"</span></div>");
+				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+name+": "+total+(isSimple?"":"<span class=\"plus\"></span><span class=\"minus\"></span>")+"</span></div>");
 				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
 				if(!isSimple && obj.total !== undefined){
+					var $subRoot = $("<div class=\"category-set\"></div>");
+					$root.append($subRoot);
 					for(var p in obj){
 						if(obj.hasOwnProperty(p)){
 							if(p == "rows"){
 								for(var i=0;i<obj[p].length;i++){
-									$root.append(makeRow(obj[p][i]))
+									$subRoot.append(makeRow(obj[p][i]))
 								}
 								continue;
 							}
 							if(p !== "total"){
-								$root.append(makeCategory(p, obj[p]))
+								$subRoot.append(makeCategory(p, obj[p]))
 							}
 						}
 					}
