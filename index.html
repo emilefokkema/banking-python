@@ -91,8 +91,14 @@
 		
 	<script>
 		(function($){
-			var parseDate = function(str){
-				var match = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+			var dateReviver = function(key, value){
+				if(typeof value !== "string"){
+					return value;
+				}
+				var match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+				if(!match){
+					return value;
+				}
 				return new Date(parseInt(match[1]),parseInt(match[2])-1,parseInt(match[3]));
 			};
 			var dateString = function(date){
@@ -108,14 +114,14 @@
 			var $incompleteList = $("#incompleteList").first();
 
 			var makePeriodItem = function(data, $list){
-				var $root = $("<div class=\"period-list-item\"><div>van "+dateString(parseDate(data.from))+" t/m "+dateString(parseDate(data.through))+(!data.hasEnd ? " (niet compleet)":"")+"</div></div>");
+				var $root = $("<div class=\"period-list-item\"><div>van "+dateString(data.from)+" t/m "+dateString(data.through)+(!data.hasEnd ? " (niet compleet)":"")+"</div></div>");
 				$root.append(makeCategory("Bij", data.Bij, true))
 				$root.append(makeCategory("Af", data.Af, true))
 				$list.append($root);
 			};
 
 			var makeRow = function(data){
-				return $("<div class=\"row\">"+dateString(parseDate(data.date))+" "+data.description+" "+displayAmount(data.amount)+"</div>")
+				return $("<div class=\"row\">"+dateString(data.date)+" "+data.description+" "+displayAmount(data.amount)+"</div>")
 			}
 
 			var makeCategory = function(name, obj, top){
@@ -164,7 +170,8 @@
 						url:"/",
 						data:data,
 						success:function(d){addIncompletes(d.maanden);refreshList();},
-						error:function(e){console.log(e)}
+						error:function(e){console.log(e)},
+						converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
 					})
 				};
 				reader.readAsBinaryString(file);
@@ -181,8 +188,11 @@
 
 			var refreshList = function(){
 				$completeList.html("")
-				$.get( "/api/complete", function(d) {
-				  makePeriodItems(d)
+				$.ajax({
+					type: "GET",
+					url: "/api/complete",
+					success: function(d){makePeriodItems(d)},
+					converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
 				});
 			};
 			
