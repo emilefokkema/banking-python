@@ -30,10 +30,24 @@ class RowCategory(object):
 	def getName(self):
 		return 'category'
 
+	def internalPrintSelf(self, printer):
+		printer.writeLine(self.name, self.totalCents)
+
 	def printSelf(self, printer):
 		if self.totalCents == 0:
 			return
-		printer.writeLine(self.name, self.totalCents)
+		self.internalPrintSelf(printer)
+
+class CompositeCategory(RowCategory):
+	def __init__(self):
+		super(CompositeCategory, self).__init__()
+
+	def printComposite(self, printer):
+		pass
+
+	def internalPrintSelf(self, printer):
+		with printer.indent(self.name) as printer1:
+			self.printComposite(printer1)
 
 class NameableCategory(RowCategory):
 	def __init__(self, name):
@@ -43,7 +57,7 @@ class NameableCategory(RowCategory):
 	def getName(self):
 		return self._name
 
-class CollectionCategory(RowCategory):
+class CollectionCategory(CompositeCategory):
 	def __init__(self):
 		super(CollectionCategory, self).__init__()
 		self.rows = []
@@ -52,16 +66,13 @@ class CollectionCategory(RowCategory):
 		super(CollectionCategory, self).addRow(row)
 		self.rows.append(row)
 
-	def printSelf(self,printer):
-		if len(self.rows) == 0:
-			return
-		with printer.indent(self.name) as printer1:
-			with printer1.indentList('rows') as printer2:
-				for row in self.rows:
-					with printer2.indentItem() as printer3:
-						row.printSelf(printer3)
-					
-			printer1.writeLine('total', self.totalCents)
+	def printComposite(self,printer):
+		with printer.indentList('rows') as printer1:
+			for row in self.rows:
+				with printer1.indentItem() as printer2:
+					row.printSelf(printer2)
+				
+		printer.writeLine('total', self.totalCents)
 
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 30
@@ -77,15 +88,15 @@ class LeftoverCategory(CollectionCategory):
 			self.overLimit += 1
 			self.addFromRowToTotal(row)
 
-	def printSelf(self, printer):
-		super(LeftoverCategory, self).printSelf(printer)
+	def printComposite(self, printer):
+		super(LeftoverCategory, self).printComposite(printer)
 		if self.overLimit > 0:
 			printer.writeLine('more', self.overLimit)
 
 	def getName(self):
 		return 'leftovers'
 
-class MultipleRowCategory(RowCategory):
+class MultipleRowCategory(CompositeCategory):
 	def __init__(self):
 		super(MultipleRowCategory, self).__init__()
 		self.categories = []
@@ -122,11 +133,10 @@ class MultipleRowCategory(RowCategory):
 				category.addRow(row)
 				return
 
-	def printSelf(self, printer):
-		with printer.indent(self.name) as printer1:
-			for category in self.categories:
-				category.printSelf(printer1)
-			printer1.writeLine('total', self.totalCents)
+	def printComposite(self, printer):
+		for category in self.categories:
+			category.printSelf(printer)
+		printer.writeLine('total', self.totalCents)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)

@@ -77,6 +77,10 @@
 			.toggle-collapse{
 				cursor: pointer;
 			}
+			.more{
+				padding:5px;
+				color: #bbb;
+			}
 		</style>
 	</head>
 	<body>
@@ -138,6 +142,10 @@
 								for(var i=0;i<obj[p].length;i++){
 									$subRoot.append(makeRow(obj[p][i]))
 								}
+								continue;
+							}
+							if(p == "more"){
+								$subRoot.append($("<div class=\"more\">(and "+obj[p]+" more)</div>"));
 								continue;
 							}
 							if(p !== "total"){
