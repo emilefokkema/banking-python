@@ -1,5 +1,6 @@
 import cat
 import wholeperiod
+import re
 
 class DescriptionStartCategory(cat.NameableCategory):
 	def __init__(self, name, descs):
@@ -7,18 +8,23 @@ class DescriptionStartCategory(cat.NameableCategory):
 		self.descs = descs
 
 	def acceptsRow(self, row):
+		rowlower = row.description.lower()
 		for desc in self.descs:
-			if row.description.startswith(desc):
+			if rowlower.startswith(desc.lower()):
 				return True
 		return False
 
 class InfoContainsCategory(cat.NameableCategory):
-	def __init__(self, name, substr):
+	def __init__(self, name, substrs):
 		super(InfoContainsCategory, self).__init__(name)
-		self.substr = substr
+		self.substrs = substrs
 
 	def acceptsRow(self, row):
-		return self.substr in row.info
+		rowlower = row.info.lower()
+		for sub in self.substrs:
+			if sub.lower() in rowlower:
+				return True
+		return False
 
 class Abonnementen(cat.MultipleRowCategory):
 	def getCategories(self):
@@ -26,7 +32,9 @@ class Abonnementen(cat.MultipleRowCategory):
 				DescriptionStartCategory('NRC',['NRC']),
 				DescriptionStartCategory('ING',['Kosten OranjePakket']),
 				DescriptionStartCategory('Telefoon',['T-MOBILE']),
-				InfoContainsCategory('Spotify','5VL2224Q8M5JL')]
+				InfoContainsCategory('Blendle',['Blendle']),
+				InfoContainsCategory('Spotify',['5VL2224Q8M5JL']),
+				InfoContainsCategory('De Correspondent',['De Correspondent'])]
 
 	def getName(self):
 		return 'Abonnementen'
@@ -37,6 +45,45 @@ class Pinnen(cat.CollectionCategory):
 
 	def acceptsRow(self, row):
 		return row.description.startswith('ABN-AMRO')
+
+class OnlineBankierenTransaction:
+	def __init__(self, naam, omschrijving, date, amount):
+		self.naam = naam
+		self.omschrijving = omschrijving
+		self.date = date
+		self.amount = amount
+
+	def printSelf(self, printer):
+		printer.writeLine('naam',self.naam)
+		printer.writeLine('omschrijving', self.omschrijving)
+		printer.writeLine('date', self.date)
+		printer.writeLine('amount', self.amount)
+
+class OnlineBankieren(cat.CompositeCategory):
+	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
+
+	def __init__(self):
+		super(OnlineBankieren, self).__init__()
+		self.obtransactions = []
+
+	def acceptsRow(self, row):
+		return row.soort == 'Online bankieren' and not re.search(self.infopattern, row.info) == None
+
+	def addRow(self, row):
+		super(OnlineBankieren, self).addRow(row)
+		match = re.search(self.infopattern, row.info)
+		naam = match.group(1)
+		omschrijving = match.group(2)
+		self.obtransactions.append(OnlineBankierenTransaction(naam, omschrijving, row.date, row.numberOfCents))
+
+	def printComposite(self, printer):
+		with printer.indentList('transactions') as printer1:
+			for obtransaction in self.obtransactions:
+				with printer1.indentItem() as printer2:
+					obtransaction.printSelf(printer2)
+
+	def getName(self):
+		return 'Online bankieren'
 
 class Af(cat.MultipleRowCategoryWithLeftover):
 
@@ -52,7 +99,11 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 			DescriptionStartCategory('Belastingdienst',['Belastingdienst']),
 			DescriptionStartCategory('CJIB',['CJIB']),
 			DescriptionStartCategory('DUO',['DUO']),
-			InfoContainsCategory('Toestelverzekering','Toestelverzekering')]
+			DescriptionStartCategory('Goed doel',['STG CARE']),
+			InfoContainsCategory('Toestelverzekering',['Toestelverzekering']),
+			InfoContainsCategory('Film',['Louis Hartlooper','Springhaver']),
+			InfoContainsCategory('Sparen',['Naar Bonusrenterekening']),
+			OnlineBankieren()]
 
 	def getName(self):
 		return 'Af'

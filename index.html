@@ -128,6 +128,10 @@
 				return $("<div class=\"row\">"+dateString(data.date)+" "+data.description+" "+displayAmount(data.amount)+"</div>")
 			}
 
+			var makeObTransaction = function(data){
+				return $("<div class=\"row\">"+dateString(data.date)+" "+data.naam + " " + data.omschrijving+" "+displayAmount(data.amount)+"</div>")
+			};
+
 			var makeCategory = function(name, obj, top){
 				var isSimple = typeof obj === typeof 6
 				var total = isSimple ? obj : obj.total;
@@ -141,6 +145,12 @@
 							if(p == "rows"){
 								for(var i=0;i<obj[p].length;i++){
 									$subRoot.append(makeRow(obj[p][i]))
+								}
+								continue;
+							}
+							if(p == "transactions"){
+								for(var i=0;i<obj[p].length;i++){
+									$subRoot.append(makeObTransaction(obj[p][i]))
 								}
 								continue;
 							}

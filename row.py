@@ -11,6 +11,7 @@ class Row:
 		self.numberOfCents = int(csvRow[6].replace(',',''))
 		self.description = csvRow[1]
 		self.info = csvRow[8]
+		self.soort = csvRow[7]
 		self.date = getDate(csvRow[0])
 
 	def printSelf(self, printer):

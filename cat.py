@@ -48,6 +48,7 @@ class CompositeCategory(RowCategory):
 	def internalPrintSelf(self, printer):
 		with printer.indent(self.name) as printer1:
 			self.printComposite(printer1)
+			printer1.writeLine('total', self.totalCents)
 
 class NameableCategory(RowCategory):
 	def __init__(self, name):
@@ -72,8 +73,6 @@ class CollectionCategory(CompositeCategory):
 				with printer1.indentItem() as printer2:
 					row.printSelf(printer2)
 				
-		printer.writeLine('total', self.totalCents)
-
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 30
 
@@ -136,7 +135,6 @@ class MultipleRowCategory(CompositeCategory):
 	def printComposite(self, printer):
 		for category in self.categories:
 			category.printSelf(printer)
-		printer.writeLine('total', self.totalCents)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)
