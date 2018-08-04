@@ -18,3 +18,4 @@ class Row:
 		printer.writeLine('amount', self.numberOfCents)
 		printer.writeLine('date', self.date)
 		printer.writeLine('description', self.description)
+		printer.writeLine('info', self.info)

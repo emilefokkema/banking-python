@@ -67,7 +67,7 @@ class OnlineBankieren(cat.CompositeCategory):
 		self.obtransactions = []
 
 	def acceptsRow(self, row):
-		return row.soort == 'Online bankieren' and not re.search(self.infopattern, row.info) == None
+		return (row.soort == 'Online bankieren' or row.soort == 'Incasso') and not re.search(self.infopattern, row.info) == None
 
 	def addRow(self, row):
 		super(OnlineBankieren, self).addRow(row)

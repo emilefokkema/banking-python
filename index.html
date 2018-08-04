@@ -81,6 +81,16 @@
 				padding:5px;
 				color: #bbb;
 			}
+			.amount{
+				float: right;
+				display: none;
+			}
+			.collapsed > span > .amount{
+				display: initial;
+			}
+			.row .amount{
+				display: initial;
+			}
 		</style>
 	</head>
 	<body>
@@ -125,17 +135,17 @@
 			};
 
 			var makeRow = function(data){
-				return $("<div class=\"row\">"+dateString(data.date)+" "+data.description+" "+displayAmount(data.amount)+"</div>")
+				return $("<div class=\"row\" title=\""+data.info+"\">"+dateString(data.date)+" "+data.description+" "+"<span class=\"amount\">"+displayAmount(data.amount)+"</span></div>")
 			}
 
 			var makeObTransaction = function(data){
-				return $("<div class=\"row\">"+dateString(data.date)+" "+data.naam + " " + data.omschrijving+" "+displayAmount(data.amount)+"</div>")
+				return $("<div class=\"row\">"+dateString(data.date)+" "+data.naam + " " + data.omschrijving+" "+"<span class=\"amount\">"+displayAmount(data.amount)+"</span></div>")
 			};
 
 			var makeCategory = function(name, obj, top){
 				var isSimple = typeof obj === typeof 6
 				var total = isSimple ? obj : obj.total;
-				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+name+": "+displayAmount(total)+"</span></div>");
+				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+name+": <span class=\"amount\">"+displayAmount(total)+"</span></span></div>");
 				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
 				if(!isSimple && obj.total !== undefined){
 					var $subRoot = $("<div class=\"category-set\"></div>");
