@@ -5,6 +5,8 @@
 		  src="https://code.jquery.com/jquery-3.3.1.min.js"
 		  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
 		  crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
 		<style type="text/css">
 			body{
 				margin:0px;
@@ -94,8 +96,47 @@
 		</style>
 	</head>
 	<body>
-		<div class="period-list" id="completeList"></div>
-		<div class="period-list" id="incompleteList"></div>
+		<script type="text/template" id="categoryTemplate">
+			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
+				<span v-bind:class="{'toggle-collapse':!isSimple}" v-on:click="toggleCollapse">
+					<span class="neither" v-if="isSimple"></span>
+					<template v-else>
+						<span class="plus"></span>
+						<span class="minus"></span>
+					</template>
+					{{categoryData.name}}: <amount v-bind:numberOfCents="categoryData.total"></amount>
+				</span>
+				<div class="category-set" v-if="!isSimple">
+					<category v-for="category in categories" v-bind:categoryData="category" v-bind:top="false"></category>
+					<row v-for="row in rows" v-bind:row="row"></row>
+					<transaction v-for="transaction in transactions" v-bind:transaction="transaction"></transaction>
+				</div>
+			</div>
+		</script>
+		<script type="text/template" id="periodItemTemplate">
+			<div class="period-list-item">
+				<div>van <date v-bind:date="from"></date> t/m <date v-bind:date="through"></date> <span v-if="!hasEnd">(niet compleet)</span></div>
+				<category v-bind:top="true" v-bind:categoryData="bij"></category>
+				<category v-bind:top="true" v-bind:categoryData="af"></category>
+			</div>
+		</script>
+		<script type="text/template" id="rowTemplate">
+			<div class="row" v-bind:title="row.info">
+				<date v-bind:date="row.date"></date> {{row.description}} <amount v-bind:numberOfCents="row.amount"></amount>
+			</div>
+		</script>
+		<script type="text/template" id="transactionTemplate">
+			<div class="row">
+				<date v-bind:date="transaction.date"></date> {{transaction.naam}} {{transaction.omschrijving}} <amount v-bind:numberOfCents="transaction.amount"></amount>
+			</div>
+		</script>
+		<div class="period-list" id="completeList">
+			<div class="empty" v-if="periods.length == 0">(no history)</div>
+			<period-item v-for="period in periods" v-bind:from="period.from" v-bind:through="period.through" v-bind:has-end="period.hasEnd" v-bind:af="period.Af" v-bind:bij="period.Bij"></period-item>
+		</div>
+		<div class="period-list" id="incompleteList">
+			<period-item v-for="period in periods" v-bind:from="period.from" v-bind:through="period.through" v-bind:has-end="period.hasEnd" v-bind:af="period.Af" v-bind:bij="period.Bij"></period-item>
+		</div>
 		<div class="add">
 			
 			<input type="file" id="fileInput" accept=".csv" />
@@ -105,6 +146,107 @@
 		
 	<script>
 		(function($){
+			
+			var amount = {
+				props:{
+					numberOfCents:Number
+				},
+				computed:{
+					formattedAmount:function(){
+						var cents = this.numberOfCents % 100;
+						var centString = (cents < 10 ? "0" : "")+cents.toString();
+						var euroString = Math.floor(this.numberOfCents / 100).toString();
+						return "&euro;&nbsp;"+euroString+","+centString;
+					}
+				},
+				template:'<span class="amount" v-html="formattedAmount"></span>'
+			};
+			var date = {
+				props:{
+					date:Date
+				},
+				computed:{
+					formattedDate:function(){return this.date.toLocaleDateString("nl-NL");},
+					dayOfWeek:function(){return this.date.toLocaleDateString("nl-NL",{weekday:"long"});}
+				},
+				template: '<span v-bind:title="dayOfWeek">{{formattedDate}}</span>'
+			};
+			var category = {
+				props:{
+					top:Boolean,
+					categoryData:Object
+				},
+				computed:{
+					isSimple:function(){return !this.categoryData.categories && !this.categoryData.rows && !this.categoryData.transactions;},
+					categories:function(){return this.categoryData.categories || [];},
+					transactions:function(){return this.categoryData.transactions || [];},
+					rows:function(){return this.categoryData.rows || [];}
+				},
+				methods:{
+					toggleCollapse:function(){this.collapsed = !this.collapsed;}
+				},
+				data:function(){
+					return {collapsed:true};
+				},
+				template:document.getElementById("categoryTemplate").innerHTML
+			};
+			category.components = {
+				'category': category,
+				'row':{
+					props:{
+						row:Object
+					},
+					components:{
+						'amount':amount,
+						'date':date
+					},
+					template: document.getElementById("rowTemplate").innerHTML
+				},
+				'transaction':{
+					props:{
+						transaction:Object
+					},
+					components:{
+						'amount':amount,
+						'date':date
+					},
+					template:document.getElementById("transactionTemplate").innerHTML
+				},
+				'amount':amount
+			};
+			var components = {
+				'period-item' : {
+					props:{
+						hasEnd:Boolean,
+						from:Date,
+						through:Date,
+						af:Object,
+						bij:Object
+					},
+					components:{
+						'category':category,
+						'date':date
+					},
+					template:document.getElementById("periodItemTemplate").innerHTML
+				}
+			};
+			
+			var completeList = new Vue({
+				el:"#completeList",
+				data:{
+					periods:[]
+				},
+				components:components
+			});
+
+			var incompleteList = new Vue({
+				el:"#incompleteList",
+				data:{
+					periods:[]
+				},
+				components:components
+			});
+
 			var dateReviver = function(key, value){
 				if(typeof value !== "string"){
 					return value;
@@ -115,70 +257,6 @@
 				}
 				return new Date(parseInt(match[1]),parseInt(match[2])-1,parseInt(match[3]));
 			};
-			var dateString = function(date){
-				return date.toLocaleDateString("nl-NL");
-			};
-			var displayAmount = function(amount){
-				var cents = amount % 100;
-				var centString = (cents < 10 ? "0" : "")+cents.toString();
-				var euroString = Math.floor(amount / 100).toString();
-				return "&euro;&nbsp;"+euroString+","+centString;
-			};
-			var $completeList = $("#completeList").first();
-			var $incompleteList = $("#incompleteList").first();
-
-			var makePeriodItem = function(data, $list){
-				var $root = $("<div class=\"period-list-item\"><div>van "+dateString(data.from)+" t/m "+dateString(data.through)+(!data.hasEnd ? " (niet compleet)":"")+"</div></div>");
-				$root.append(makeCategory(data.Bij, true))
-				$root.append(makeCategory(data.Af, true))
-				$list.append($root);
-			};
-
-			var makeRow = function(data){
-				return $("<div class=\"row\" title=\""+data.info+"\">"+dateString(data.date)+" "+data.description+" "+"<span class=\"amount\">"+displayAmount(data.amount)+"</span></div>")
-			}
-
-			var makeObTransaction = function(data){
-				return $("<div class=\"row\">"+dateString(data.date)+" "+data.naam + " " + data.omschrijving+" "+"<span class=\"amount\">"+displayAmount(data.amount)+"</span></div>")
-			};
-
-			var makeCategory = function(obj, top){
-				var isSimple = !obj.categories && !obj.rows && !obj.transactions;
-				var total = obj.total;
-				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+obj.name+": <span class=\"amount\">"+displayAmount(total)+"</span></span></div>");
-				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
-				if(!isSimple){
-					var $subRoot = $("<div class=\"category-set\"></div>");
-					$root.append($subRoot);
-					if(obj.categories){
-						for(var i=0;i<obj.categories.length;i++){
-							$subRoot.append(makeCategory(obj.categories[i]))
-						}
-					}
-					if(obj.transactions){
-						for(var i=0;i<obj.transactions.length;i++){
-							$subRoot.append(makeObTransaction(obj.transactions[i]))
-						}
-					}
-					if(obj.rows){
-						for(var i=0;i<obj.rows.length;i++){
-							$subRoot.append(makeRow(obj.rows[i]))
-						}
-					}
-				}
-
-				return $root;
-			}
-
-			var makePeriodItems = function(list){
-				if(list.length == 0){
-					$completeList.append($("<div class=\"empty\">no history</div>"));
-					return;
-				}
-				for(var i=0;i<list.length;i++){
-					makePeriodItem(list[i].file, $completeList)
-				}
-			}
 
 			var postCsv = function(){
 				var file = document.getElementById("fileInput").files[0];
@@ -189,7 +267,11 @@
 						type:"POST",
 						url:"/",
 						data:data,
-						success:function(d){addIncompletes(d.maanden);refreshList();},
+						success:function(d){
+							console.log(d);
+							incompleteList.periods = d.maanden.filter(function(m){return m.hasBeginning;});
+							refreshList();
+						},
 						error:function(e){console.log(e)},
 						converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
 					})
@@ -197,21 +279,14 @@
 				reader.readAsBinaryString(file);
 			};
 
-			var addIncompletes = function(data){
-				for(var i=0;i<data.length;i++){
-					var maand = data[i];
-					if(maand.hasBeginning){
-						makePeriodItem(maand, $incompleteList)
-					}
-				}
-			}
-
 			var refreshList = function(){
-				$completeList.html("")
 				$.ajax({
 					type: "GET",
 					url: "/api/complete",
-					success: function(d){makePeriodItems(d);},
+					success: function(d){
+						console.log(d);
+						completeList.periods = d.map(function(o){return o.file;});
+					},
 					converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
 				});
 			};
