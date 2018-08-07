@@ -59,7 +59,7 @@ class OnlineBankierenTransaction:
 		printer.writeLine('date', self.date)
 		printer.writeLine('amount', self.amount)
 
-class OnlineBankieren(cat.CompositeCategory):
+class OnlineBankieren(cat.RowCategory):
 	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
 
 	def __init__(self):
@@ -76,7 +76,8 @@ class OnlineBankieren(cat.CompositeCategory):
 		omschrijving = match.group(2)
 		self.obtransactions.append(OnlineBankierenTransaction(naam, omschrijving, row.date, row.numberOfCents))
 
-	def printComposite(self, printer):
+	def internalPrintSelf(self, printer):
+		super(OnlineBankieren, self).internalPrintSelf(printer)
 		with printer.indentList('transactions') as printer1:
 			for obtransaction in self.obtransactions:
 				with printer1.indentItem() as printer2:
@@ -135,8 +136,10 @@ class Bij(cat.MultipleRowCategoryWithLeftover):
 		return 'Bij'
 
 
-class AfBij(cat.MultipleRowCategoryWithLeftover):
+class AfBij(cat.MultipleRowCategory):
 	def __init__(self):
+		self.af = Af()
+		self.bij = Bij()
 		super(AfBij, self).__init__()
 		self.printHandler = wholeperiod.WholePeriodHandler()
 		self.first = None
@@ -157,12 +160,14 @@ class AfBij(cat.MultipleRowCategoryWithLeftover):
 		self.hasEnd = True
 
 	def getCategories(self):
-		return [Af(), Bij()]
+		return [self.af, self.bij]
 
 	def printSelf(self, printer):
 		with self.printHandler.getAfBijPrinter(self, printer) as printer1:
-			for category in self.categories:
-				category.printSelf(printer1)
+			with printer1.indent('Af') as printer2:
+				self.af.printSelf(printer2)
+			with printer1.indent('Bij') as printer2:
+				self.bij.printSelf(printer2)
 			printer1.writeLine('from',self.first.date)
 			printer1.writeLine('through',self.last.date)
 			printer1.writeLine('hasBeginning', self.hasBeginning)

@@ -129,8 +129,8 @@
 
 			var makePeriodItem = function(data, $list){
 				var $root = $("<div class=\"period-list-item\"><div>van "+dateString(data.from)+" t/m "+dateString(data.through)+(!data.hasEnd ? " (niet compleet)":"")+"</div></div>");
-				$root.append(makeCategory("Bij", data.Bij, true))
-				$root.append(makeCategory("Af", data.Af, true))
+				$root.append(makeCategory(data.Bij, true))
+				$root.append(makeCategory(data.Af, true))
 				$list.append($root);
 			};
 
@@ -142,35 +142,27 @@
 				return $("<div class=\"row\">"+dateString(data.date)+" "+data.naam + " " + data.omschrijving+" "+"<span class=\"amount\">"+displayAmount(data.amount)+"</span></div>")
 			};
 
-			var makeCategory = function(name, obj, top){
-				var isSimple = typeof obj === typeof 6
-				var total = isSimple ? obj : obj.total;
-				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+name+": <span class=\"amount\">"+displayAmount(total)+"</span></span></div>");
+			var makeCategory = function(obj, top){
+				var isSimple = !obj.categories && !obj.rows && !obj.transactions;
+				var total = obj.total;
+				var $root = $("<div class=\"collapsed category"+(top?" category-top":"")+"\"><span"+(isSimple?"":" class=\"toggle-collapse\"")+">"+(isSimple?"<span class=\"neither\"></span>":"<span class=\"plus\"></span><span class=\"minus\"></span>")+obj.name+": <span class=\"amount\">"+displayAmount(total)+"</span></span></div>");
 				$('.toggle-collapse', $root).click(function(){$root.toggleClass("collapsed");})
-				if(!isSimple && obj.total !== undefined){
+				if(!isSimple){
 					var $subRoot = $("<div class=\"category-set\"></div>");
 					$root.append($subRoot);
-					for(var p in obj){
-						if(obj.hasOwnProperty(p)){
-							if(p == "rows"){
-								for(var i=0;i<obj[p].length;i++){
-									$subRoot.append(makeRow(obj[p][i]))
-								}
-								continue;
-							}
-							if(p == "transactions"){
-								for(var i=0;i<obj[p].length;i++){
-									$subRoot.append(makeObTransaction(obj[p][i]))
-								}
-								continue;
-							}
-							if(p == "more"){
-								$subRoot.append($("<div class=\"more\">(and "+obj[p]+" more)</div>"));
-								continue;
-							}
-							if(p !== "total"){
-								$subRoot.append(makeCategory(p, obj[p]))
-							}
+					if(obj.categories){
+						for(var i=0;i<obj.categories.length;i++){
+							$subRoot.append(makeCategory(obj.categories[i]))
+						}
+					}
+					if(obj.transactions){
+						for(var i=0;i<obj.transactions.length;i++){
+							$subRoot.append(makeObTransaction(obj.transactions[i]))
+						}
+					}
+					if(obj.rows){
+						for(var i=0;i<obj.rows.length;i++){
+							$subRoot.append(makeRow(obj.rows[i]))
 						}
 					}
 				}
@@ -219,7 +211,7 @@
 				$.ajax({
 					type: "GET",
 					url: "/api/complete",
-					success: function(d){makePeriodItems(d)},
+					success: function(d){makePeriodItems(d);},
 					converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
 				});
 			};
