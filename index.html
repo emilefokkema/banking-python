@@ -1,10 +1,6 @@
 <html>
 	<head>
 		<title>Process my banking statements</title>
-		<script
-		  src="https://code.jquery.com/jquery-3.3.1.min.js"
-		  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-		  crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
 		<style type="text/css">
@@ -70,7 +66,7 @@
 			}
 			.neither::before{
 				content:" ";
-				margin-right: 1em;
+				margin-right: 1.5em;
 			}
 			.row{
 				background-color: #efefef;
@@ -145,7 +141,7 @@
 		</div>
 		
 	<script>
-		(function($){
+		(function(){
 			
 			var amount = {
 				props:{
@@ -263,37 +259,31 @@
 				var reader = new FileReader();
 				reader.onload = function(){
 					var data = reader.result;
-					$.ajax({
-						type:"POST",
-						url:"/",
-						data:data,
-						success:function(d){
-							console.log(d);
-							incompleteList.periods = d.maanden.filter(function(m){return m.hasBeginning;});
-							refreshList();
-						},
-						error:function(e){console.log(e)},
-						converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
-					})
+					var req = new XMLHttpRequest();
+					req.addEventListener("load",function(){
+						var responseData = JSON.parse(this.responseText, dateReviver);
+						incompleteList.periods = responseData.maanden.filter(function(m){return m.hasBeginning;});
+						refreshList();
+					});
+					req.open("POST","/");
+					req.send(data);
 				};
 				reader.readAsBinaryString(file);
 			};
 
 			var refreshList = function(){
-				$.ajax({
-					type: "GET",
-					url: "/api/complete",
-					success: function(d){
-						console.log(d);
-						completeList.periods = d.map(function(o){return o.file;});
-					},
-					converters: {"text json":function(s){return JSON.parse(s, dateReviver);}}
+				var req = new XMLHttpRequest();
+				req.addEventListener("load",function(){
+					var data = JSON.parse(this.responseText, dateReviver);
+					completeList.periods = data.map(function(o){return o.file;});
 				});
+				req.open("GET","/api/complete");
+				req.send();
 			};
 			
 			refreshList();
-			$("#postButton").on("click", postCsv);
-		})($);
+			document.getElementById("postButton").addEventListener("click",postCsv);
+		})();
 	</script>
 	</body>
 </html>
