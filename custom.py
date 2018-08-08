@@ -67,7 +67,7 @@ class OnlineBankieren(cat.RowCategory):
 		self.obtransactions = []
 
 	def acceptsRow(self, row):
-		return (row.soort == 'Online bankieren' or row.soort == 'Incasso') and not re.search(self.infopattern, row.info) == None
+		return not re.search(self.infopattern, row.info) == None
 
 	def addRow(self, row):
 		super(OnlineBankieren, self).addRow(row)
@@ -127,7 +127,8 @@ class Salaris(cat.RowCategory):
 class Bij(cat.MultipleRowCategoryWithLeftover):
 	def getCategories(self):
 		return [Salaris(),
-				DescriptionStartCategory('Van spaarrekening',['E C Fokkema'])]
+				DescriptionStartCategory('Van spaarrekening',['E C Fokkema']),
+				OnlineBankieren()]
 
 	def acceptsRow(self, row):
 		return row.afbij == 'Bij'
