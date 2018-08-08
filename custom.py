@@ -39,12 +39,42 @@ class Abonnementen(cat.MultipleRowCategory):
 	def getName(self):
 		return 'Abonnementen'
 
-class Pinnen(cat.CollectionCategory):
+class PinnenTransaction:
+	def __init__(self, name, date, amount):
+		self.name = name
+		self.date = date
+		self.amount = amount
+
+	def printSelf(self, printer):
+		printer.writeLine('naam', self.name)
+		printer.writeLine('date', self.date)
+		printer.writeLine('amount', self.amount)
+
+class Pinnen(cat.RowCategory):
+	infopattern = 'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
+
+	def __init__(self):
+		super(Pinnen, self).__init__()
+		self.pinnenTransactions = []
+
 	def getName(self):
 		return 'Pinnen'
 
 	def acceptsRow(self, row):
-		return row.description.startswith('ABN-AMRO')
+		return not re.search(self.infopattern, row.info) == None
+
+	def addRow(self, row):
+		super(Pinnen, self).addRow(row)
+		match = re.search(self.infopattern, row.info)
+		date = match.group(1)
+		self.pinnenTransactions.append(PinnenTransaction(row.description, date, row.numberOfCents))
+
+	def internalPrintSelf(self, printer):
+		super(Pinnen, self).internalPrintSelf(printer)
+		with printer.indentList('pinnenTransactions') as printer1:
+			for pinnenTransaction in self.pinnenTransactions:
+				with printer1.indentItem() as printer2:
+					pinnenTransaction.printSelf(printer2)
 
 class OnlineBankierenTransaction:
 	def __init__(self, naam, omschrijving, date, amount):
@@ -93,7 +123,6 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 			DescriptionStartCategory('Albert Heijn', ['ALBERT HEIJN']),
 			Abonnementen(),
 			DescriptionStartCategory('NS',['NS GROEP']),
-			Pinnen(),
 			DescriptionStartCategory('Zorg',['Menzis','menzis', 'PEARLE']),
 			DescriptionStartCategory('Huur',['Rijksen Beheer']),
 			DescriptionStartCategory('Boeken',['Broese Boekverkopers','BOEKHANDEL']),
@@ -104,6 +133,7 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 			InfoContainsCategory('Toestelverzekering',['Toestelverzekering']),
 			InfoContainsCategory('Film',['Louis Hartlooper','Springhaver']),
 			InfoContainsCategory('Sparen',['Naar Bonusrenterekening']),
+			Pinnen(),
 			OnlineBankieren()]
 
 	def getName(self):

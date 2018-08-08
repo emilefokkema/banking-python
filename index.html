@@ -106,6 +106,7 @@
 					<category v-for="category in categories" v-bind:categoryData="category" v-bind:top="false"></category>
 					<row v-for="row in rows" v-bind:row="row"></row>
 					<transaction v-for="transaction in transactions" v-bind:transaction="transaction"></transaction>
+					<pinnen-transaction v-for="pinnenTransaction in pinnenTransactions" v-bind:pinnenTransaction="pinnenTransaction"></pinnen-transaction>
 				</div>
 			</div>
 		</script>
@@ -124,6 +125,11 @@
 		<script type="text/template" id="transactionTemplate">
 			<div class="row">
 				<date v-bind:date="transaction.date"></date> {{transaction.naam}} {{transaction.omschrijving}} <amount v-bind:numberOfCents="transaction.amount"></amount>
+			</div>
+		</script>
+		<script type="text/template" id="pinnenTransactionTemplate">
+			<div class="row">
+				<date v-bind:date="pinnenTransaction.date"></date> {{pinnenTransaction.naam}} <amount v-bind:numberOfCents="pinnenTransaction.amount"></amount>
 			</div>
 		</script>
 		<div class="period-list" id="completeList">
@@ -162,7 +168,12 @@
 					date:Date
 				},
 				computed:{
-					formattedDate:function(){return this.date.toLocaleDateString("nl-NL");},
+					formattedDate:function(){
+						if(this.date.getHours() == 0 && this.date.getMinutes() == 0){
+							return this.date.toLocaleDateString("nl-NL",{day:"numeric",month:"numeric"});
+						}
+						return this.date.toLocaleDateString("nl-NL",{day:"numeric",month:"numeric",hour:"numeric",minute:"numeric"});
+					},
 					dayOfWeek:function(){return this.date.toLocaleDateString("nl-NL",{weekday:"long"});}
 				},
 				template: '<span v-bind:title="dayOfWeek">{{formattedDate}}</span>'
@@ -173,10 +184,11 @@
 					categoryData:Object
 				},
 				computed:{
-					isSimple:function(){return !this.categoryData.categories && !this.categoryData.rows && !this.categoryData.transactions;},
+					isSimple:function(){return !this.categoryData.categories && !this.categoryData.rows && !this.categoryData.transactions && !this.categoryData.pinnenTransactions;},
 					categories:function(){return this.categoryData.categories || [];},
 					transactions:function(){return this.categoryData.transactions || [];},
-					rows:function(){return this.categoryData.rows || [];}
+					rows:function(){return this.categoryData.rows || [];},
+					pinnenTransactions:function(){return this.categoryData.pinnenTransactions || [];}
 				},
 				methods:{
 					toggleCollapse:function(){this.collapsed = !this.collapsed;}
@@ -207,6 +219,16 @@
 						'date':date
 					},
 					template:document.getElementById("transactionTemplate").innerHTML
+				},
+				'pinnen-transaction':{
+					props:{
+						pinnenTransaction:Object
+					},
+					components:{
+						'amount':amount,
+						'date':date
+					},
+					template:document.getElementById("pinnenTransactionTemplate").innerHTML
 				},
 				'amount':amount
 			};
@@ -247,11 +269,25 @@
 				if(typeof value !== "string"){
 					return value;
 				}
-				var match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-				if(!match){
+				var match1 = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+				var match2 = value.match(/^(\d{2})-(\d{2})-(\d{4})\s+(\d{2}):(\d{2})$/)
+				if(!match1 && !match2){
 					return value;
 				}
-				return new Date(parseInt(match[1]),parseInt(match[2])-1,parseInt(match[3]));
+				if(match1){
+					var year = parseInt(match1[1]),
+						monthIndex = parseInt(match1[2])-1,
+						day = parseInt(match1[3]);
+					return new Date(year,monthIndex,day);
+				}
+				if(match2){
+					var year = parseInt(match2[3]),
+						monthIndex = parseInt(match2[2]) - 1,
+						day = parseInt(match2[1]),
+						hours = parseInt(match2[4]),
+						minutes = parseInt(match2[5]);
+					return new Date(year,monthIndex,day,hours,minutes);
+				}
 			};
 
 			var postCsv = function(){
