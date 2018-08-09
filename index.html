@@ -16,7 +16,7 @@
 						<span class="plus"></span>
 						<span class="minus"></span>
 					</template>
-					{{categoryData.name}}: <amount v-bind:numberOfCents="categoryData.total"></amount>
+					{{categoryData.name}}<expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
 				</span>
 				<div class="category-set" v-if="!isSimple">
 					<category v-for="category in categories" v-bind:categoryData="category" v-bind:top="false"></category>
@@ -32,6 +32,9 @@
 				<category v-bind:top="true" v-bind:categoryData="bij"></category>
 				<category v-bind:top="true" v-bind:categoryData="af"></category>
 			</div>
+		</script>
+		<script type="text/template" id="expectationTemplate">
+			<span class="expectation" v-bind:title="dateSummary"> ({{expectation.actual}})</span>
 		</script>
 		<script type="text/template" id="rowTemplate">
 			<div class="row" v-bind:title="row.info">

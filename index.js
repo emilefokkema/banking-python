@@ -116,7 +116,18 @@
 									},
 									template:document.getElementById("pinnenTransactionTemplate").innerHTML
 								},
-								'amount':amount
+								'amount':amount,
+								'expectation':{
+									props:{
+										expectation:Object
+									},
+									computed:{
+										dateSummary:function(){
+											return this.expectation.dates.map(function(d){return d.toLocaleDateString("nl-NL",{day:"numeric",month:"long"});}).join(', ');
+										}
+									},
+									template:document.getElementById("expectationTemplate").innerHTML
+								}
 							},
 							data:function(){
 								return {collapsed:true};

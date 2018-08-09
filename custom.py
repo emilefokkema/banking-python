@@ -28,12 +28,12 @@ class InfoContainsCategory(cat.NameableCategory):
 
 class Abonnementen(cat.MultipleRowCategory):
 	def getCategories(self):
-		return [DescriptionStartCategory('Netflix',['NETFLIX']),
-				DescriptionStartCategory('NRC',['NRC']),
+		return [DescriptionStartCategory('Netflix',['NETFLIX']).expect(1),
+				DescriptionStartCategory('NRC',['NRC']).expect(1),
 				DescriptionStartCategory('ING',['Kosten OranjePakket']),
-				DescriptionStartCategory('Telefoon',['T-MOBILE']),
+				DescriptionStartCategory('Telefoon',['T-MOBILE']).expect(1),
 				InfoContainsCategory('Blendle',['Blendle']),
-				InfoContainsCategory('Spotify',['5VL2224Q8M5JL']),
+				InfoContainsCategory('Spotify',['5VL2224Q8M5JL']).expect(1),
 				InfoContainsCategory('De Correspondent',['De Correspondent'])]
 
 	def getName(self):

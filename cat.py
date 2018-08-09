@@ -1,16 +1,38 @@
+class RowNumberExpectation:
+	def __init__(self, expectedNumber):
+		self.expectedNumber = expectedNumber
+		self.dates = []
+
+	def addRow(self, row):
+		self.dates.append(row.date)
+
+	def printSelf(self, printer):
+		actualNumber = len(self.dates)
+		if not actualNumber == self.expectedNumber:
+			printer.writeLine('expected',self.expectedNumber)
+			printer.writeLine('actual', actualNumber)
+			with printer.indentList('dates') as printer1:
+				for date in self.dates:
+					printer1.addValue(date)
+
+
 class RowCategory(object):
 	def __init__(self):
 		self.totalCents = 0;
 		self.name = self.getName()
 		self.empty = True
 		self.parent = None
-
-	def addFromRowToTotal(self, row):
-		self.totalCents = self.totalCents + row.numberOfCents
+		self.expectation = None
 
 	def addRow(self, row):
-		self.addFromRowToTotal(row)
+		self.totalCents = self.totalCents + row.numberOfCents
+		if not self.expectation == None:
+			self.expectation.addRow(row)
 		self.empty = False
+
+	def expect(self, numberOfRows):
+		self.expectation = RowNumberExpectation(numberOfRows)
+		return self
 
 	def isRecursivelyEmpty(self):
 		return self.empty and (self.parent == None or self.parent.isRecursivelyEmpty())
@@ -33,6 +55,9 @@ class RowCategory(object):
 	def internalPrintSelf(self, printer):
 		printer.writeLine('name',self.name)
 		printer.writeLine('total', self.totalCents)
+		if not self.expectation == None:
+			with printer.indent('expectation') as printer1:
+				self.expectation.printSelf(printer1)
 
 	def printSelf(self, printer):
 		if self.totalCents == 0:
@@ -53,9 +78,12 @@ class CollectionCategory(RowCategory):
 		super(CollectionCategory, self).__init__()
 		self.rows = []
 
+	def addRowToList(self, row):
+		self.rows.append(row)
+
 	def addRow(self, row):
 		super(CollectionCategory, self).addRow(row)
-		self.rows.append(row)
+		self.addRowToList(row)
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
@@ -71,12 +99,11 @@ class LeftoverCategory(CollectionCategory):
 		super(LeftoverCategory, self).__init__()
 		self.overLimit = 0
 
-	def addRow(self, row):
+	def addRowToList(self, row):
 		if len(self.rows) < self.displayLimit:
-			super(LeftoverCategory, self).addRow(row)
+			self.rows.append(row)
 		else:
 			self.overLimit += 1
-			self.addFromRowToTotal(row)
 
 	def internalPrintSelf(self, printer):
 		super(LeftoverCategory, self).internalPrintSelf(printer)

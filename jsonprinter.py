@@ -18,10 +18,13 @@ class JsonPrinter(object):
 	def startFile(self, fileName):
 		return JsonFilePrinter(fileName)
 
-	def writeLine(self, key, value):
+	def sanitizeValue(self, value):
 		if isinstance(value, date):
-			value = str(value)
-		self.object[key] = value
+			return str(value)
+		return value
+
+	def writeLine(self, key, value):
+		self.object[key] = self.sanitizeValue(value)
 
 	def doexit(self):
 		pass
@@ -49,13 +52,25 @@ class CompositeJsonPrinter(JsonPrinter):
 	def __init__(self, printer):
 		super(CompositeJsonPrinter, self).__init__()
 		self.printer = printer
+		self.lineWritten = False
+
+	def printToParent(self):
+		pass
+
+	def writeLine(self, key, value):
+		super(CompositeJsonPrinter, self).writeLine(key, value)
+		self.lineWritten = True
+
+	def doexit(self):
+		if self.lineWritten:
+			self.printToParent()
 
 class JsonPropertyPrinter(CompositeJsonPrinter):
 	def __init__(self, printer, key):
 		super(JsonPropertyPrinter, self).__init__(printer)
 		self.key = key
 
-	def doexit(self):
+	def printToParent(self):
 		self.printer.writeLine(self.key, self.object)
 
 class JsonListPrinter(JsonPropertyPrinter):
@@ -64,7 +79,7 @@ class JsonListPrinter(JsonPropertyPrinter):
 		self.object = []
 
 	def addValue(self, obj):
-		self.object.append(obj)
+		self.object.append(self.sanitizeValue(obj))
 
 	def indentItem(self):
 		return JsonListItemPrinter(self)
@@ -75,16 +90,11 @@ class JsonListPrinter(JsonPropertyPrinter):
 	def indent(self, key):
 		raise Exception('list writer cannot')
 
-class JsonListItemPrinter(CompositeJsonPrinter):
-	def __init__(self, printer):
-		super(JsonListItemPrinter, self).__init__(printer)
-		self.lineWritten = False
-
 	def doexit(self):
-		if self.lineWritten:
-			self.printer.addValue(self.object)
+		self.printToParent()
 
-	def writeLine(self, key, value):
-		super(JsonListItemPrinter, self).writeLine(key, value)
-		self.lineWritten = True
+class JsonListItemPrinter(CompositeJsonPrinter):
+
+	def printToParent(self):
+		self.printer.addValue(self.object)
 
