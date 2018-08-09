@@ -1,0 +1,76 @@
+body{
+	margin:0px;
+	padding: 0px;
+}
+#app{
+	margin: 20px;
+}
+.empty{
+	color:#ccc;
+}
+.period-list-item{
+	padding: 10px;
+	font-family: monospace;
+	margin-bottom: 10px;
+	border: 0.5px solid #ccc;
+}
+.category-top{
+	display: inline-block;
+	width: 40%;
+	vertical-align: top;
+}
+.category{
+	padding:5px;
+	margin: 5px;
+}
+.plus{
+	display: none;
+}
+.collapsed > span > .minus{
+	display: none;
+}
+.collapsed > span > .plus{
+	display: initial;
+}
+.category-set{
+	border-left: 0.5px solid #ccc;
+}
+.collapsed > .category-set{
+	display: none;
+}
+.collapsed > .row{
+	display: none;
+}
+.plus::before{
+	content:"+";
+	margin-right: 0.5em;
+}
+.minus::before{
+	content:"-";
+	margin-right: 0.5em;
+}
+.neither::before{
+	content:" ";
+	margin-right: 1.5em;
+}
+.row{
+	background-color: #efefef;
+	padding:5px;
+}
+.toggle-collapse{
+	cursor: pointer;
+}
+.more{
+	padding:5px;
+	color: #bbb;
+}
+.amount{
+	float: right;
+	display: none;
+}
+.collapsed > span > .amount{
+	display: initial;
+}
+.row .amount{
+	display: initial;
+}
