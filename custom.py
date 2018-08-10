@@ -50,12 +50,8 @@ class PinnenTransaction:
 		printer.writeLine('date', self.date)
 		printer.writeLine('amount', self.amount)
 
-class Pinnen(cat.RowCategory):
+class Pinnen(cat.CollectionCategory):
 	infopattern = 'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
-
-	def __init__(self):
-		super(Pinnen, self).__init__()
-		self.pinnenTransactions = []
 
 	def getName(self):
 		return 'Pinnen'
@@ -63,18 +59,13 @@ class Pinnen(cat.RowCategory):
 	def acceptsRow(self, row):
 		return not re.search(self.infopattern, row.info) == None
 
-	def addRow(self, row):
-		super(Pinnen, self).addRow(row)
+	def transformRow(self, row):
 		match = re.search(self.infopattern, row.info)
 		date = match.group(1)
-		self.pinnenTransactions.append(PinnenTransaction(row.description, date, row.numberOfCents))
+		return PinnenTransaction(row.description, date, row.numberOfCents)
 
-	def internalPrintSelf(self, printer):
-		super(Pinnen, self).internalPrintSelf(printer)
-		with printer.indentList('pinnenTransactions') as printer1:
-			for pinnenTransaction in self.pinnenTransactions:
-				with printer1.indentItem() as printer2:
-					pinnenTransaction.printSelf(printer2)
+	def getCollectionName(self):
+		return 'pinnenTransactions'
 
 class OnlineBankierenTransaction:
 	def __init__(self, naam, omschrijving, date, amount):
@@ -89,29 +80,20 @@ class OnlineBankierenTransaction:
 		printer.writeLine('date', self.date)
 		printer.writeLine('amount', self.amount)
 
-class OnlineBankieren(cat.RowCategory):
+class OnlineBankieren(cat.CollectionCategory):
 	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
-
-	def __init__(self):
-		super(OnlineBankieren, self).__init__()
-		self.obtransactions = []
 
 	def acceptsRow(self, row):
 		return not re.search(self.infopattern, row.info) == None
 
-	def addRow(self, row):
-		super(OnlineBankieren, self).addRow(row)
+	def transformRow(self, row):
 		match = re.search(self.infopattern, row.info)
 		naam = match.group(1)
 		omschrijving = match.group(2)
-		self.obtransactions.append(OnlineBankierenTransaction(naam, omschrijving, row.date, row.numberOfCents))
+		return OnlineBankierenTransaction(naam, omschrijving, row.date, row.numberOfCents)
 
-	def internalPrintSelf(self, printer):
-		super(OnlineBankieren, self).internalPrintSelf(printer)
-		with printer.indentList('transactions') as printer1:
-			for obtransaction in self.obtransactions:
-				with printer1.indentItem() as printer2:
-					obtransaction.printSelf(printer2)
+	def getCollectionName(self):
+		return 'transactions'
 
 	def getName(self):
 		return 'Online bankieren'

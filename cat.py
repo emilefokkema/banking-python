@@ -83,11 +83,17 @@ class CollectionCategory(RowCategory):
 
 	def addRow(self, row):
 		super(CollectionCategory, self).addRow(row)
-		self.addRowToList(row)
+		self.addRowToList(self.transformRow(row))
+
+	def transformRow(self, row):
+		return row
+
+	def getCollectionName(self):
+		return 'rows'
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
-		with printer.indentList('rows') as printer1:
+		with printer.indentList(self.getCollectionName()) as printer1:
 			for row in self.rows:
 				with printer1.indentItem() as printer2:
 					row.printSelf(printer2)
