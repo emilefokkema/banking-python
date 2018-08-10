@@ -66,9 +66,13 @@ class RowCategory(object):
 
 
 class NameableCategory(RowCategory):
-	def __init__(self, name):
+	def __init__(self, name, rowChecker):
 		self._name = name
 		super(NameableCategory, self).__init__()
+		self.rowChecker = rowChecker
+
+	def acceptsRow(self, row):
+		return self.rowChecker.checkRow(row)
 
 	def getName(self):
 		return self._name

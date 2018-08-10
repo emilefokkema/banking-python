@@ -1,40 +1,21 @@
 import cat
 import wholeperiod
+import rowchecker
 import re
 
-class DescriptionStartCategory(cat.NameableCategory):
-	def __init__(self, name, descs):
-		super(DescriptionStartCategory, self).__init__(name)
-		self.descs = descs
-
-	def acceptsRow(self, row):
-		rowlower = row.description.lower()
-		for desc in self.descs:
-			if rowlower.startswith(desc.lower()):
-				return True
-		return False
-
-class InfoContainsCategory(cat.NameableCategory):
-	def __init__(self, name, substrs):
-		super(InfoContainsCategory, self).__init__(name)
-		self.substrs = substrs
-
-	def acceptsRow(self, row):
-		rowlower = row.info.lower()
-		for sub in self.substrs:
-			if sub.lower() in rowlower:
-				return True
-		return False
+propcon = rowchecker.RowPropertyContainsChecker
 
 class Abonnementen(cat.MultipleRowCategory):
 	def getCategories(self):
-		return [DescriptionStartCategory('Netflix',['NETFLIX']).expect(1),
-				DescriptionStartCategory('NRC',['NRC']).expect(1),
-				DescriptionStartCategory('ING',['Kosten OranjePakket']),
-				DescriptionStartCategory('Telefoon',['T-MOBILE']).expect(1),
-				InfoContainsCategory('Blendle',['Blendle']),
-				InfoContainsCategory('Spotify',['5VL2224Q8M5JL']).expect(1),
-				InfoContainsCategory('De Correspondent',['De Correspondent'])]
+		description = lambda r:r.description
+		info = lambda r:r.info
+		return [cat.NameableCategory('Netflix',propcon(description, ['NETFLIX'])).expect(1),
+				cat.NameableCategory('NRC',propcon(description, ['NRC'])).expect(1),
+				cat.NameableCategory('ING',propcon(description, ['Kosten OranjePakket'])),
+				cat.NameableCategory('Telefoon',propcon(description, ['T-MOBILE'])).expect(1),
+				cat.NameableCategory('Blendle',propcon(info, ['Blendle'])),
+				cat.NameableCategory('Spotify',propcon(info, ['5VL2224Q8M5JL'])).expect(1),
+				cat.NameableCategory('De Correspondent',propcon(info, ['De Correspondent']))]
 
 	def getName(self):
 		return 'Abonnementen'
@@ -101,20 +82,22 @@ class OnlineBankieren(cat.CollectionCategory):
 class Af(cat.MultipleRowCategoryWithLeftover):
 
 	def getCategories(self):
+		description = lambda r:r.description
+		info = lambda r:r.info
 		return [
-			DescriptionStartCategory('Albert Heijn', ['ALBERT HEIJN']),
+			cat.NameableCategory('Albert Heijn',propcon(description, ['ALBERT HEIJN'])),
 			Abonnementen(),
-			DescriptionStartCategory('NS',['NS GROEP']),
-			DescriptionStartCategory('Zorg',['Menzis','menzis', 'PEARLE']),
-			DescriptionStartCategory('Huur',['Rijksen Beheer']),
-			DescriptionStartCategory('Boeken',['Broese Boekverkopers','BOEKHANDEL']),
-			DescriptionStartCategory('Belastingdienst',['Belastingdienst']),
-			DescriptionStartCategory('CJIB',['CJIB']),
-			DescriptionStartCategory('DUO',['DUO']),
-			DescriptionStartCategory('Goed doel',['STG CARE']),
-			InfoContainsCategory('Toestelverzekering',['Toestelverzekering']),
-			InfoContainsCategory('Film',['Louis Hartlooper','Springhaver']),
-			InfoContainsCategory('Sparen',['Naar Bonusrenterekening']),
+			cat.NameableCategory('NS',propcon(description, ['NS GROEP'])),
+			cat.NameableCategory('Zorg',propcon(description, ['menzis', 'PEARLE'])),
+			cat.NameableCategory('Huur',propcon(description, ['Rijksen Beheer'])),
+			cat.NameableCategory('Boeken',propcon(description, ['Broese Boekverkopers','BOEKHANDEL'])),
+			cat.NameableCategory('Belastingdienst',propcon(description, ['Belastingdienst'])),
+			cat.NameableCategory('CJIB',propcon(description, ['CJIB'])),
+			cat.NameableCategory('DUO',propcon(description, ['DUO'])),
+			cat.NameableCategory('Goed doel',propcon(description, ['STG CARE'])),
+			cat.NameableCategory('Toestelverzekering',propcon(info, ['Toestelverzekering'])),
+			cat.NameableCategory('Film',propcon(info, ['Louis Hartlooper','Springhaver'])),
+			cat.NameableCategory('Sparen',propcon(info, ['Naar Bonusrenterekening'])),
 			Pinnen(),
 			OnlineBankieren()]
 
@@ -139,7 +122,7 @@ class Salaris(cat.RowCategory):
 class Bij(cat.MultipleRowCategoryWithLeftover):
 	def getCategories(self):
 		return [Salaris(),
-				DescriptionStartCategory('Van spaarrekening',['E C Fokkema']),
+				cat.NameableCategory('Van spaarrekening',propcon(lambda r:r.info, ['Van Bonusrenterekening'])),
 				OnlineBankieren()]
 
 	def acceptsRow(self, row):
