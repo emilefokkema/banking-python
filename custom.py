@@ -20,17 +20,6 @@ class Abonnementen(cat.MultipleRowCategory):
 	def getName(self):
 		return 'Abonnementen'
 
-class PinnenTransaction:
-	def __init__(self, name, date, amount):
-		self.name = name
-		self.date = date
-		self.amount = amount
-
-	def printSelf(self, printer):
-		printer.writeLine('naam', self.name)
-		printer.writeLine('date', self.date)
-		printer.writeLine('amount', self.amount)
-
 class Pinnen(cat.CollectionCategory):
 	infopattern = 'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
 
@@ -43,23 +32,7 @@ class Pinnen(cat.CollectionCategory):
 	def transformRow(self, row):
 		match = re.search(self.infopattern, row.info)
 		date = match.group(1)
-		return PinnenTransaction(row.description, date, row.numberOfCents)
-
-	def getCollectionName(self):
-		return 'pinnenTransactions'
-
-class OnlineBankierenTransaction:
-	def __init__(self, naam, omschrijving, date, amount):
-		self.naam = naam
-		self.omschrijving = omschrijving
-		self.date = date
-		self.amount = amount
-
-	def printSelf(self, printer):
-		printer.writeLine('naam',self.naam)
-		printer.writeLine('omschrijving', self.omschrijving)
-		printer.writeLine('date', self.date)
-		printer.writeLine('amount', self.amount)
+		return cat.OutputRow(row.description, None, date, row.numberOfCents)
 
 class OnlineBankieren(cat.CollectionCategory):
 	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
@@ -71,10 +44,7 @@ class OnlineBankieren(cat.CollectionCategory):
 		match = re.search(self.infopattern, row.info)
 		naam = match.group(1)
 		omschrijving = match.group(2)
-		return OnlineBankierenTransaction(naam, omschrijving, row.date, row.numberOfCents)
-
-	def getCollectionName(self):
-		return 'transactions'
+		return cat.OutputRow(naam, omschrijving, row.date, row.numberOfCents)
 
 	def getName(self):
 		return 'Online bankieren'

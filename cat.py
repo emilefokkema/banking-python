@@ -15,6 +15,19 @@ class RowNumberExpectation:
 				for date in self.dates:
 					printer1.addValue(date)
 
+class OutputRow:
+	def __init__(self, name, description, date, amount):
+		self.name = name
+		self.description = description
+		self.date = date
+		self.amount = amount
+
+	def printSelf(self, printer):
+		printer.writeLine('name', self.name)
+		printer.writeLine('description', self.description)
+		printer.writeLine('date', self.date)
+		printer.writeLine('amount', self.amount)
+
 
 class RowCategory(object):
 	def __init__(self):
@@ -90,20 +103,17 @@ class CollectionCategory(RowCategory):
 		self.addRowToList(self.transformRow(row))
 
 	def transformRow(self, row):
-		return row
-
-	def getCollectionName(self):
-		return 'rows'
+		return OutputRow(row.description, row.info, row.date, row.numberOfCents)
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
-		with printer.indentList(self.getCollectionName()) as printer1:
+		with printer.indentList('rows') as printer1:
 			for row in self.rows:
 				with printer1.indentItem() as printer2:
 					row.printSelf(printer2)
 				
 class LeftoverCategory(CollectionCategory):
-	displayLimit = 30
+	displayLimit = 5
 
 	def __init__(self):
 		super(LeftoverCategory, self).__init__()

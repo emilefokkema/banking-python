@@ -13,9 +13,3 @@ class Row:
 		self.info = csvRow[8]
 		self.soort = csvRow[7]
 		self.date = getDate(csvRow[0])
-
-	def printSelf(self, printer):
-		printer.writeLine('amount', self.numberOfCents)
-		printer.writeLine('date', self.date)
-		printer.writeLine('description', self.description)
-		printer.writeLine('info', self.info)

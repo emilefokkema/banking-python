@@ -21,8 +21,7 @@
 				<div class="category-set" v-if="!isSimple">
 					<category v-for="category in categories" v-bind:categoryData="category" v-bind:top="false"></category>
 					<row v-for="row in rows" v-bind:row="row"></row>
-					<transaction v-for="transaction in transactions" v-bind:transaction="transaction"></transaction>
-					<pinnen-transaction v-for="pinnenTransaction in pinnenTransactions" v-bind:pinnenTransaction="pinnenTransaction"></pinnen-transaction>
+					<span class="more" v-if="categoryData.more">(en nog {{categoryData.more}})</span>
 				</div>
 			</div>
 		</script>
@@ -38,17 +37,7 @@
 		</script>
 		<script type="text/template" id="rowTemplate">
 			<div class="row" v-bind:title="row.info">
-				<date v-bind:date="row.date"></date> {{row.description}} <amount v-bind:numberOfCents="row.amount"></amount>
-			</div>
-		</script>
-		<script type="text/template" id="transactionTemplate">
-			<div class="row">
-				<date v-bind:date="transaction.date"></date> {{transaction.naam}} {{transaction.omschrijving}} <amount v-bind:numberOfCents="transaction.amount"></amount>
-			</div>
-		</script>
-		<script type="text/template" id="pinnenTransactionTemplate">
-			<div class="row">
-				<date v-bind:date="pinnenTransaction.date"></date> {{pinnenTransaction.naam}} <amount v-bind:numberOfCents="pinnenTransaction.amount"></amount>
+				<date v-bind:date="row.date"></date> {{row.name}} {{row.description}} <amount v-bind:numberOfCents="row.amount"></amount>
 			</div>
 		</script>
 		<div id="app">

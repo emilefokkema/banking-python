@@ -76,11 +76,9 @@
 								categoryData:Object
 							},
 							computed:{
-								isSimple:function(){return !this.categoryData.categories && !this.categoryData.rows && !this.categoryData.transactions && !this.categoryData.pinnenTransactions;},
+								isSimple:function(){return !this.categoryData.rows && !this.categoryData.categories;},
 								categories:function(){return this.categoryData.categories || [];},
-								transactions:function(){return this.categoryData.transactions || [];},
-								rows:function(){return this.categoryData.rows || [];},
-								pinnenTransactions:function(){return this.categoryData.pinnenTransactions || [];}
+								rows:function(){return this.categoryData.rows || [];}
 							},
 							methods:{
 								toggleCollapse:function(){this.collapsed = !this.collapsed;}
@@ -95,26 +93,6 @@
 										'date':date
 									},
 									template: document.getElementById("rowTemplate").innerHTML
-								},
-								'transaction':{
-									props:{
-										transaction:Object
-									},
-									components:{
-										'amount':amount,
-										'date':date
-									},
-									template:document.getElementById("transactionTemplate").innerHTML
-								},
-								'pinnen-transaction':{
-									props:{
-										pinnenTransaction:Object
-									},
-									components:{
-										'amount':amount,
-										'date':date
-									},
-									template:document.getElementById("pinnenTransactionTemplate").innerHTML
 								},
 								'amount':amount,
 								'expectation':{
