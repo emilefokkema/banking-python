@@ -2,6 +2,7 @@ import cat
 import wholeperiod
 import rowchecker
 import re
+import outputrow
 
 propcon = rowchecker.RowPropertyContainsChecker
 
@@ -32,7 +33,7 @@ class Pinnen(cat.CollectionCategory):
 	def transformRow(self, row):
 		match = re.search(self.infopattern, row.info)
 		date = match.group(1)
-		return cat.OutputRow(row.description, None, date, row.numberOfCents)
+		return outputrow.OutputRow(row.description, None, date, row.numberOfCents)
 
 class OnlineBankieren(cat.CollectionCategory):
 	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
@@ -44,7 +45,7 @@ class OnlineBankieren(cat.CollectionCategory):
 		match = re.search(self.infopattern, row.info)
 		naam = match.group(1)
 		omschrijving = match.group(2)
-		return cat.OutputRow(naam, omschrijving, row.date, row.numberOfCents)
+		return outputrow.OutputRow(naam, omschrijving, row.date, row.numberOfCents)
 
 	def getName(self):
 		return 'Online bankieren'

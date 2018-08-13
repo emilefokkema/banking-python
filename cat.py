@@ -1,33 +1,5 @@
-class RowNumberExpectation:
-	def __init__(self, expectedNumber):
-		self.expectedNumber = expectedNumber
-		self.dates = []
-
-	def addRow(self, row):
-		self.dates.append(row.date)
-
-	def printSelf(self, printer):
-		actualNumber = len(self.dates)
-		if not actualNumber == self.expectedNumber:
-			printer.writeLine('expected',self.expectedNumber)
-			printer.writeLine('actual', actualNumber)
-			with printer.indentList('dates') as printer1:
-				for date in self.dates:
-					printer1.addValue(date)
-
-class OutputRow:
-	def __init__(self, name, description, date, amount):
-		self.name = name
-		self.description = description
-		self.date = date
-		self.amount = amount
-
-	def printSelf(self, printer):
-		printer.writeLine('name', self.name)
-		printer.writeLine('description', self.description)
-		printer.writeLine('date', self.date)
-		printer.writeLine('amount', self.amount)
-
+import expectation
+import outputrow
 
 class RowCategory(object):
 	def __init__(self):
@@ -44,7 +16,7 @@ class RowCategory(object):
 		self.empty = False
 
 	def expect(self, numberOfRows):
-		self.expectation = RowNumberExpectation(numberOfRows)
+		self.expectation = expectation.RowNumberExpectation(numberOfRows)
 		return self
 
 	def isRecursivelyEmpty(self):
@@ -90,6 +62,7 @@ class NameableCategory(RowCategory):
 	def getName(self):
 		return self._name
 
+
 class CollectionCategory(RowCategory):
 	def __init__(self):
 		super(CollectionCategory, self).__init__()
@@ -103,7 +76,7 @@ class CollectionCategory(RowCategory):
 		self.addRowToList(self.transformRow(row))
 
 	def transformRow(self, row):
-		return OutputRow(row.description, row.info, row.date, row.numberOfCents)
+		return outputrow.OutputRow(row.description, row.info, row.date, row.numberOfCents)
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
