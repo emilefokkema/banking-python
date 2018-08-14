@@ -14,10 +14,18 @@ class JsonPrinter(object):
 		return self.object
 
 	def indent(self, key):
-		return JsonPrinter(lambda obj,written:self.writeLine(key,obj) if written else 0)
+		return JsonPrinter(lambda obj,written:self.endIndent(key, obj, written))
 
-	def indentList(self, key):
-		return JsonListPrinter(lambda obj,written:self.writeLine(key,obj))
+	def endIndent(self, key, obj, written):
+		if written:
+			self.writeLine(key, obj)
+
+	def startList(self):
+		return JsonListPrinter(lambda obj,written:self.endList(obj))
+
+	def endList(self, obj):
+		self.written = True
+		self.object = obj
 
 	def writeToFile(self, obj, fileName):
 		print('saving json: '+fileName)
@@ -61,4 +69,3 @@ class JsonListPrinter(JsonPrinter):
 
 	def indent(self, key):
 		raise Exception('list writer cannot')
-

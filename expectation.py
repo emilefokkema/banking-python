@@ -11,6 +11,7 @@ class RowNumberExpectation:
 		if not actualNumber == self.expectedNumber:
 			printer.writeLine('expected',self.expectedNumber)
 			printer.writeLine('actual', actualNumber)
-			with printer.indentList('dates') as printer1:
-				for date in self.dates:
-					printer1.addValue(date)
+			with printer.indent('dates') as printer1:
+				with printer1.startList() as printer2:
+					for date in self.dates:
+						printer2.addValue(date)

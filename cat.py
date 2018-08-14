@@ -80,10 +80,11 @@ class CollectionCategory(RowCategory):
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
-		with printer.indentList('rows') as printer1:
-			for row in self.rows:
-				with printer1.indentItem() as printer2:
-					row.printSelf(printer2)
+		with printer.indent('rows') as printer1:
+			with printer1.startList() as printer2:
+				for row in self.rows:
+					with printer2.indentItem() as printer3:
+						row.printSelf(printer3)
 				
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 5
@@ -145,10 +146,11 @@ class MultipleRowCategory(RowCategory):
 
 	def internalPrintSelf(self, printer):
 		super(MultipleRowCategory, self).internalPrintSelf(printer)
-		with printer.indentList('categories') as printer1:
-			for category in self.categories:
-				with printer1.indentItem() as printer2:
-					category.printSelf(printer2)
+		with printer.indent('categories') as printer1:
+			with printer1.startList() as printer2:
+				for category in self.categories:
+					with printer2.indentItem() as printer3:
+						category.printSelf(printer3)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)
@@ -180,10 +182,11 @@ class RepeatingCategory(RowCategory):
 		self.currentCategory.addRow(row)
 
 	def printSelf(self, printer):
-		with printer.indentList(self.name) as printer1:
-			for category in self.categories:
-				with printer1.indentItem() as printer2:
-					category.printSelf(printer2)
+		with printer.indent(self.name) as printer1:
+			with printer1.startList() as printer2:
+				for category in self.categories:
+					with printer2.indentItem() as printer3:
+						category.printSelf(printer3)
 
 
 
