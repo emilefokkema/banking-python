@@ -10,13 +10,38 @@ class Abonnementen(cat.MultipleRowCategory):
 	def getCategories(self):
 		description = lambda r:r.description
 		info = lambda r:r.info
-		return [cat.NameableCategory('Netflix',propcon(description, ['NETFLIX'])).expect(1),
-				cat.NameableCategory('NRC',propcon(description, ['NRC'])).expect(1),
-				cat.NameableCategory('ING',propcon(description, ['Kosten OranjePakket'])),
-				cat.NameableCategory('Telefoon',propcon(description, ['T-MOBILE'])).expect(1),
-				cat.NameableCategory('Blendle',propcon(info, ['Blendle'])),
-				cat.NameableCategory('Spotify',propcon(info, ['5VL2224Q8M5JL'])).expect(1),
-				cat.NameableCategory('De Correspondent',propcon(info, ['De Correspondent']))]
+		return [cat.OptionableCategory({
+					'name':'Netflix',
+					'acceptRow':propcon(description, ['NETFLIX']),
+					'expect':1
+				}),
+				cat.OptionableCategory({
+					'name':'NRC',
+					'acceptRow':propcon(description, ['NRC']),
+					'expect':1
+				}),
+				cat.OptionableCategory({
+					'name':'ING',
+					'acceptRow':propcon(description, ['Kosten OranjePakket'])
+				}),
+				cat.OptionableCategory({
+					'name':'Telefoon',
+					'acceptRow':propcon(description, ['T-MOBILE']),
+					'expect':1
+				}),
+				cat.OptionableCategory({
+					'name':'Blendle',
+					'acceptRow':propcon(info, ['Blendle'])
+				}),
+				cat.OptionableCategory({
+					'name':'Spotify',
+					'acceptRow':propcon(info, ['5VL2224Q8M5JL']),
+					'expect':1
+				}),
+				cat.OptionableCategory({
+					'name':'De Correspondent',
+					'acceptRow':propcon(info, ['De Correspondent'])
+				})]
 
 	def getName(self):
 		return 'Abonnementen'
@@ -56,19 +81,55 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 		description = lambda r:r.description
 		info = lambda r:r.info
 		return [
-			cat.NameableCategory('Albert Heijn',propcon(description, ['ALBERT HEIJN'])),
+			cat.OptionableCategory({
+				'name':'Albert Heijn',
+				'acceptRow':propcon(description, ['ALBERT HEIJN'])
+			}),
 			Abonnementen(),
-			cat.NameableCategory('NS',propcon(description, ['NS GROEP'])),
-			cat.NameableCategory('Zorg',propcon(description, ['menzis', 'PEARLE'])),
-			cat.NameableCategory('Huur',propcon(description, ['Rijksen Beheer'])),
-			cat.NameableCategory('Boeken',propcon(description, ['Broese Boekverkopers','BOEKHANDEL'])),
-			cat.NameableCategory('Belastingdienst',propcon(description, ['Belastingdienst'])),
-			cat.NameableCategory('CJIB',propcon(description, ['CJIB'])),
-			cat.NameableCategory('DUO',propcon(description, ['DUO'])),
-			cat.NameableCategory('Goed doel',propcon(description, ['STG CARE'])),
-			cat.NameableCategory('Toestelverzekering',propcon(info, ['Toestelverzekering'])),
-			cat.NameableCategory('Film',propcon(info, ['Louis Hartlooper','Springhaver'])),
-			cat.NameableCategory('Sparen',propcon(info, ['Naar Bonusrenterekening'])),
+			cat.OptionableCategory({
+				'name':'NS',
+				'acceptRow':propcon(description, ['NS GROEP'])
+			}),
+			cat.OptionableCategory({
+				'name':'Zorg',
+				'acceptRow':propcon(description, ['menzis', 'PEARLE'])
+			}),
+			cat.OptionableCategory({
+				'name':'Huur',
+				'acceptRow':propcon(description, ['Rijksen Beheer'])
+			}),
+			cat.OptionableCategory({
+				'name':'Boeken',
+				'acceptRow':propcon(description, ['Broese Boekverkopers','BOEKHANDEL'])
+			}),
+			cat.OptionableCategory({
+				'name':'Belastingdienst',
+				'acceptRow':propcon(description, ['Belastingdienst'])
+			}),
+			cat.OptionableCategory({
+				'name':'CJIB',
+				'acceptRow':propcon(description, ['CJIB'])
+			}),
+			cat.OptionableCategory({
+				'name':'DUO',
+				'acceptRow':propcon(description, ['DUO'])
+			}),
+			cat.OptionableCategory({
+				'name':'Goed doel',
+				'acceptRow':propcon(description, ['STG CARE'])
+			}),
+			cat.OptionableCategory({
+				'name':'Toestelverzekering',
+				'acceptRow':propcon(info, ['Toestelverzekering'])
+			}),
+			cat.OptionableCategory({
+				'name':'Film',
+				'acceptRow':propcon(info, ['Louis Hartlooper','Springhaver'])
+			}),
+			cat.OptionableCategory({
+				'name':'Sparen',
+				'acceptRow':propcon(info, ['Naar Bonusrenterekening'])
+			}),
 			Pinnen(),
 			OnlineBankieren()]
 
@@ -93,7 +154,10 @@ class Salaris(cat.RowCategory):
 class Bij(cat.MultipleRowCategoryWithLeftover):
 	def getCategories(self):
 		return [Salaris(),
-				cat.NameableCategory('Van spaarrekening',propcon(lambda r:r.info, ['Van Bonusrenterekening'])),
+				cat.OptionableCategory({
+					'name':'Van spaarrekening',
+					'acceptRow':propcon(lambda r:r.info, ['Van Bonusrenterekening'])
+				}),
 				OnlineBankieren()]
 
 	def acceptsRow(self, row):

@@ -17,10 +17,6 @@ class RowCategory(object):
 			self.expectation.addRow(row)
 		self.empty = False
 
-	def expect(self, numberOfRows):
-		self.expectation = expectation.RowNumberExpectation(numberOfRows)
-		return self
-
 	def isRecursivelyEmpty(self):
 		return self.empty and (self.parent == None or self.parent.isRecursivelyEmpty())
 
@@ -52,11 +48,13 @@ class RowCategory(object):
 		self.internalPrintSelf(printer)
 
 
-class NameableCategory(RowCategory):
-	def __init__(self, name, rowChecker):
-		self._name = name
-		super(NameableCategory, self).__init__()
-		self.rowChecker = rowChecker
+class OptionableCategory(RowCategory):
+	def __init__(self, options):
+		self._name = options['name']
+		super(OptionableCategory, self).__init__()
+		self.rowChecker = options['acceptRow']
+		if 'expect' in options:
+			self.expectation = expectation.RowNumberExpectation(options['expect'])
 
 	def acceptsRow(self, row):
 		return self.rowChecker.checkRow(row)
