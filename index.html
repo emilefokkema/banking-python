@@ -2,8 +2,9 @@
 	<head>
 		<title>Process my banking statements</title>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-		<script src="index.js"></script>
 		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+		<script src="index.js"></script>
+		
 		<link rel="stylesheet" type="text/css" href="index.css">
 	</head>
 	<body>
@@ -18,11 +19,16 @@
 					</template>
 					{{categoryData.name}}<expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
 				</span>
-				<div class="category-set" v-if="!isSimple">
-					<category v-for="category in categories" v-bind:categoryData="category" v-bind:top="false"></category>
-					<row v-for="row in rows" v-bind:row="row"></row>
-					<span class="more" v-if="categoryData.more">(en nog {{categoryData.more}})</span>
+				<div class="category-set" v-if="categoryData.categories">
+					<category v-for="category in categoryData.categories" v-bind:categoryData="category" v-bind:top="false"></category>
 				</div>
+				<row-collection v-if="categoryData.rows" v-bind:data="categoryData.rows"></row-collection>
+			</div>
+		</script>
+		<script type="text/template" id="rowCollectionTemplate">
+			<div class="category-set">
+				<row v-for="row in data.items" v-bind:row="row"></row>
+				<span class="more" v-if="data.more">(en nog {{data.more}})</span>
 			</div>
 		</script>
 		<script type="text/template" id="periodItemTemplate">

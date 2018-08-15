@@ -1,6 +1,7 @@
 import expectation
 import outputrow
 import printablelist
+import rowcollection
 
 class RowCategory(object):
 	def __init__(self):
@@ -66,14 +67,11 @@ class NameableCategory(RowCategory):
 class CollectionCategory(RowCategory):
 	def __init__(self):
 		super(CollectionCategory, self).__init__()
-		self.rows = printablelist.PrintableList([])
-
-	def addRowToList(self, row):
-		self.rows.append(row)
+		self.rows = rowcollection.RowCollection()
 
 	def addRow(self, row):
 		super(CollectionCategory, self).addRow(row)
-		self.addRowToList(self.transformRow(row))
+		self.rows.addRow(self.transformRow(row))
 
 	def transformRow(self, row):
 		return outputrow.OutputRow(row.description, row.info, row.date, row.numberOfCents)
@@ -84,22 +82,9 @@ class CollectionCategory(RowCategory):
 			self.rows.printSelf(printer1)
 				
 class LeftoverCategory(CollectionCategory):
-	displayLimit = 5
-
 	def __init__(self):
 		super(LeftoverCategory, self).__init__()
-		self.overLimit = 0
-
-	def addRowToList(self, row):
-		if len(self.rows) < self.displayLimit:
-			self.rows.append(row)
-		else:
-			self.overLimit += 1
-
-	def internalPrintSelf(self, printer):
-		super(LeftoverCategory, self).internalPrintSelf(printer)
-		if self.overLimit > 0:
-			printer.writeLine('more', self.overLimit)
+		self.rows = rowcollection.RowCollection(5)
 
 	def getName(self):
 		return 'leftovers'

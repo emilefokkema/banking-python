@@ -76,23 +76,29 @@
 								categoryData:Object
 							},
 							computed:{
-								isSimple:function(){return !this.categoryData.rows && !this.categoryData.categories;},
-								categories:function(){return this.categoryData.categories || [];},
-								rows:function(){return this.categoryData.rows || [];}
+								isSimple:function(){return !this.categoryData.rows && !this.categoryData.categories;}
 							},
 							methods:{
 								toggleCollapse:function(){this.collapsed = !this.collapsed;}
 							},
 							components: {
-								'row':{
+								'row-collection':{
 									props:{
-										row:Object
+										data:Object
 									},
 									components:{
-										'amount':amount,
-										'date':date
+										'row':{
+											props:{
+												row:Object
+											},
+											components:{
+												'amount':amount,
+												'date':date
+											},
+											template: document.getElementById("rowTemplate").innerHTML
+										}
 									},
-									template: document.getElementById("rowTemplate").innerHTML
+									template:document.getElementById("rowCollectionTemplate").innerHTML
 								},
 								'amount':amount,
 								'expectation':{
