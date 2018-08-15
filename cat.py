@@ -1,5 +1,6 @@
 import expectation
 import outputrow
+import printablelist
 
 class RowCategory(object):
 	def __init__(self):
@@ -62,11 +63,10 @@ class NameableCategory(RowCategory):
 	def getName(self):
 		return self._name
 
-
 class CollectionCategory(RowCategory):
 	def __init__(self):
 		super(CollectionCategory, self).__init__()
-		self.rows = []
+		self.rows = printablelist.PrintableList([])
 
 	def addRowToList(self, row):
 		self.rows.append(row)
@@ -81,10 +81,7 @@ class CollectionCategory(RowCategory):
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
 		with printer.indent('rows') as printer1:
-			with printer1.startList() as printer2:
-				for row in self.rows:
-					with printer2.indentItem() as printer3:
-						row.printSelf(printer3)
+			self.rows.printSelf(printer1)
 				
 class LeftoverCategory(CollectionCategory):
 	displayLimit = 5
@@ -110,7 +107,7 @@ class LeftoverCategory(CollectionCategory):
 class MultipleRowCategory(RowCategory):
 	def __init__(self):
 		super(MultipleRowCategory, self).__init__()
-		self.categories = []
+		self.categories = printablelist.PrintableList([])
 		for category in self.getCategories():
 			self.addCategory(category)
 			category.setParent(self)
@@ -147,10 +144,7 @@ class MultipleRowCategory(RowCategory):
 	def internalPrintSelf(self, printer):
 		super(MultipleRowCategory, self).internalPrintSelf(printer)
 		with printer.indent('categories') as printer1:
-			with printer1.startList() as printer2:
-				for category in self.categories:
-					with printer2.indentItem() as printer3:
-						category.printSelf(printer3)
+			self.categories.printSelf(printer1)
 
 	def addCategory(self, cat):
 		self.categories.append(cat)
@@ -166,7 +160,7 @@ class RepeatingCategory(RowCategory):
 		super(RepeatingCategory, self).__init__()
 		currentCategory = self.renewCategory(None)
 		self.currentCategory = currentCategory
-		self.categories = [currentCategory]
+		self.categories = printablelist.PrintableList([currentCategory])
 
 	def renewCategory(self, oldCategory):
 		return RowCategory()
@@ -183,10 +177,4 @@ class RepeatingCategory(RowCategory):
 
 	def printSelf(self, printer):
 		with printer.indent(self.name) as printer1:
-			with printer1.startList() as printer2:
-				for category in self.categories:
-					with printer2.indentItem() as printer3:
-						category.printSelf(printer3)
-
-
-
+			self.categories.printSelf(printer1)
