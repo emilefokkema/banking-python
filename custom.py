@@ -6,46 +6,6 @@ import outputrow
 
 propcon = rowchecker.RowPropertyContainsChecker
 
-class Abonnementen(cat.MultipleRowCategory):
-	def getCategories(self):
-		description = lambda r:r.description
-		info = lambda r:r.info
-		return [cat.OptionableCategory({
-					'name':'Netflix',
-					'acceptRow':propcon(description, ['NETFLIX']),
-					'expect':1
-				}),
-				cat.OptionableCategory({
-					'name':'NRC',
-					'acceptRow':propcon(description, ['NRC']),
-					'expect':1
-				}),
-				cat.OptionableCategory({
-					'name':'ING',
-					'acceptRow':propcon(description, ['Kosten OranjePakket'])
-				}),
-				cat.OptionableCategory({
-					'name':'Telefoon',
-					'acceptRow':propcon(description, ['T-MOBILE']),
-					'expect':1
-				}),
-				cat.OptionableCategory({
-					'name':'Blendle',
-					'acceptRow':propcon(info, ['Blendle'])
-				}),
-				cat.OptionableCategory({
-					'name':'Spotify',
-					'acceptRow':propcon(info, ['5VL2224Q8M5JL']),
-					'expect':1
-				}),
-				cat.OptionableCategory({
-					'name':'De Correspondent',
-					'acceptRow':propcon(info, ['De Correspondent'])
-				})]
-
-	def getName(self):
-		return 'Abonnementen'
-
 class Pinnen(cat.CollectionCategory):
 	infopattern = 'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
 
@@ -85,7 +45,43 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 				'name':'Albert Heijn',
 				'acceptRow':propcon(description, ['ALBERT HEIJN'])
 			}),
-			Abonnementen(),
+			cat.OptionableCategory({
+				'name':'Abonnementen',
+				'categories':[
+					{
+						'name':'Netflix',
+						'acceptRow':propcon(description, ['NETFLIX']),
+						'expect':1
+					},
+					{
+						'name':'NRC',
+						'acceptRow':propcon(description, ['NRC']),
+						'expect':1
+					},
+					{
+						'name':'ING',
+						'acceptRow':propcon(description, ['Kosten OranjePakket'])
+					},
+					{
+						'name':'Telefoon',
+						'acceptRow':propcon(description, ['T-MOBILE']),
+						'expect':1
+					},
+					{
+						'name':'Blendle',
+						'acceptRow':propcon(info, ['Blendle'])
+					},
+					{
+						'name':'Spotify',
+						'acceptRow':propcon(info, ['5VL2224Q8M5JL']),
+						'expect':1
+					},
+					{
+						'name':'De Correspondent',
+						'acceptRow':propcon(info, ['De Correspondent'])
+					}
+				]
+			}),
 			cat.OptionableCategory({
 				'name':'NS',
 				'acceptRow':propcon(description, ['NS GROEP'])

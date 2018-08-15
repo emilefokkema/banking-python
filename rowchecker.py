@@ -1,5 +1,9 @@
 import re
 
+class AcceptingRowChecker:
+	def checkRow(self, row):
+		return True
+
 class RegexRowChecker:
 	def __init__(self, pattern, getStringProperty):
 		self.pattern = pattern

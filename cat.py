@@ -2,6 +2,7 @@ import expectation
 import outputrow
 import printablelist
 import rowcollection
+import rowchecker
 
 class RowCategory(object):
 	def __init__(self):
@@ -52,12 +53,44 @@ class OptionableCategory(RowCategory):
 	def __init__(self, options):
 		self._name = options['name']
 		super(OptionableCategory, self).__init__()
-		self.rowChecker = options['acceptRow']
+		self.categories = printablelist.PrintableList([])
+		self.hasCategories = False
+		if 'categories' in options:
+			self.hasCategories = True
+			for categoryOptions in options['categories']:
+				newCategory = OptionableCategory(categoryOptions)
+				self.categories.append(newCategory)
+				newCategory.setParent(self)
+		if 'acceptRow' in options:
+			self.rowChecker = options['acceptRow']
+		else:
+			self.rowChecker = rowchecker.AcceptingRowChecker()
 		if 'expect' in options:
 			self.expectation = expectation.RowNumberExpectation(options['expect'])
 
-	def acceptsRow(self, row):
-		return self.rowChecker.checkRow(row)
+	def canAddRow(self, row):
+		if not self.rowChecker.checkRow(row):
+			return False
+		if not self.hasCategories:
+			return True
+		for category in self.categories:
+			if category.canAddRow(row):
+				return True
+		return False
+
+	def addRow(self, row):
+		super(OptionableCategory, self).addRow(row)
+		if self.hasCategories:
+			for category in self.categories:
+				if category.canAddRow(row):
+					category.addRow(row)
+					return
+
+	def internalPrintSelf(self, printer):
+		super(OptionableCategory, self).internalPrintSelf(printer)
+		if self.hasCategories:
+			with printer.indent('categories') as printer1:
+				self.categories.printSelf(printer1)
 
 	def getName(self):
 		return self._name
