@@ -1,11 +1,12 @@
 <html>
 	<head>
 		<title>Process my banking statements</title>
-		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<script src="index.js"></script>
 		
 		<link rel="stylesheet" type="text/css" href="index.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 	</head>
 	<body>
 
@@ -25,6 +26,9 @@
 				<row-collection v-if="categoryData.rows" v-bind:data="categoryData.rows"></row-collection>
 			</div>
 		</script>
+		<script type="text/template" id="removeButtonTemplate">
+			<span class="fas fa-times remove-button" v-on:click="click"></span>
+		</script>
 		<script type="text/template" id="rowCollectionTemplate">
 			<div class="category-set">
 				<row v-for="row in data.items" v-bind:row="row"></row>
@@ -32,10 +36,10 @@
 			</div>
 		</script>
 		<script type="text/template" id="periodItemTemplate">
-			<div class="period-list-item">
-				<div>van <date v-bind:date="from"></date> t/m <date v-bind:date="through"></date> <span v-if="!hasEnd">(niet compleet)</span></div>
-				<category v-bind:top="true" v-bind:categoryData="bij"></category>
-				<category v-bind:top="true" v-bind:categoryData="af"></category>
+			<div class="period-list-item" v-bind:class="{'removing':isRemoving}">
+				<div>van <date v-bind:date="data.from"></date> t/m <date v-bind:date="data.through"></date> <span v-if="!data.hasEnd">(niet compleet)</span><remove-button v-if="data.hasEnd" v-on:click="remove"></remove-button></div>
+				<category v-bind:top="true" v-bind:categoryData="data.Bij"></category>
+				<category v-bind:top="true" v-bind:categoryData="data.Af"></category>
 			</div>
 		</script>
 		<script type="text/template" id="expectationTemplate">
@@ -49,10 +53,10 @@
 		<div id="app">
 			<div>
 				<div class="period-list-item empty" v-if="completePeriods.length == 0">(no history)</div>
-				<period-item v-for="period in completePeriods" v-bind:from="period.from" v-bind:through="period.through" v-bind:has-end="period.hasEnd" v-bind:af="period.Af" v-bind:bij="period.Bij"></period-item>
+				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete"></period-item>
 			</div>
 			<div>
-				<period-item v-for="period in incompletePeriods" v-bind:from="period.from" v-bind:through="period.through" v-bind:has-end="period.hasEnd" v-bind:af="period.Af" v-bind:bij="period.Bij"></period-item>
+				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div>
 				<input type="file" ref="file" accept=".csv" />

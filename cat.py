@@ -192,5 +192,4 @@ class RepeatingCategory(RowCategory):
 		self.currentCategory.addRow(row)
 
 	def printSelf(self, printer):
-		with printer.indent(self.name) as printer1:
-			self.categories.printSelf(printer1)
+		self.categories.printSelf(printer)

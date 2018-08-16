@@ -62,11 +62,24 @@
 			components:{
 				'period-item' : {
 					props:{
-						hasEnd:Boolean,
-						from:Date,
-						through:Date,
-						af:Object,
-						bij:Object
+						data:Object,
+						fileName:String
+					},
+					data:function(){
+						return {isRemoving:false}
+					},
+					methods:{
+						remove:function(){
+							var self=this;
+							this.isRemoving = true;
+							console.log("removing "+this.fileName);
+							var req = new XMLHttpRequest();
+							req.addEventListener("load",function(){
+								self.$emit("removal");
+							});
+							req.open("POST","api/delete");
+							req.send(this.fileName)
+						}
 					},
 					components:{
 						'category':{
@@ -118,7 +131,15 @@
 							},
 							template:document.getElementById("categoryTemplate").innerHTML
 						},
-						'date':date
+						'date':date,
+						'remove-button':{
+							methods:{
+								click:function(){
+									this.$emit("click");
+								}
+							},
+							template:document.getElementById("removeButtonTemplate").innerHTML
+						}
 					},
 					template:document.getElementById("periodItemTemplate").innerHTML
 				}
@@ -132,7 +153,7 @@
 					var req = new XMLHttpRequest();
 					req.addEventListener("load",function(){
 						var data = JSON.parse(this.responseText, dateReviver);
-						self.completePeriods = data.map(function(o){return o.file;});
+						self.completePeriods = data;
 					});
 					req.open("GET","/api/complete");
 					req.send();
@@ -148,11 +169,13 @@
 						var req = new XMLHttpRequest();
 						req.addEventListener("load",function(){
 							var responseData = JSON.parse(this.responseText, dateReviver);
-							self.incompletePeriods = responseData.maanden.filter(function(m){return m.hasBeginning;});
+							self.incompletePeriods = responseData
+								.filter(function(m){return m.hasBeginning;})
+								.map(function(m){return {file:m};});
 							self.refreshComplete();
 							self.$refs.file.value = "";
 						});
-						req.open("POST","/");
+						req.open("POST","/api/csv");
 						req.send(data);
 					};
 					reader.readAsBinaryString(file);

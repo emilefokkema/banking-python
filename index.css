@@ -2,6 +2,10 @@ body{
 	margin:0px;
 	padding: 0px;
 }
+.remove-button{
+	cursor: pointer;
+	float: right;
+}
 #app{
 	margin: 20px;
 }
@@ -13,6 +17,9 @@ body{
 	font-family: monospace;
 	margin-bottom: 10px;
 	border: 0.5px solid #ccc;
+}
+.period-list-item.removing{
+	color:#ddd;
 }
 .category-top{
 	display: inline-block;
