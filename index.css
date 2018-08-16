@@ -66,6 +66,8 @@ body{
 }
 .amount{
 	float: right;
+}
+span.toggle-collapse > .amount{
 	display: none;
 }
 .collapsed > span > .amount{
