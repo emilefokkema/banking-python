@@ -53,7 +53,7 @@
 		<div id="app">
 			<div>
 				<div class="period-list-item empty" v-if="completePeriods.length == 0">(no history)</div>
-				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete"></period-item>
+				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" :key="period.fileName"></period-item>
 			</div>
 			<div>
 				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
