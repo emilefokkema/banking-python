@@ -105,7 +105,8 @@ class CollectionCategory(RowCategory):
 		self.rows.addRow(self.transformRow(row))
 
 	def transformRow(self, row):
-		return outputrow.OutputRow(row.description, row.info, row.date, row.numberOfCents)
+		description = row.getDescription()
+		return outputrow.OutputRow(description, row.date, row.numberOfCents)
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)

@@ -1,5 +1,5 @@
 import csv
-import row
+import rowfactory
 import custom
 
 class RowImporter:
@@ -13,10 +13,10 @@ class RowImporter:
 	def printSelf(self, pr):
 		self.category.printSelf(pr)
 
-def processCsv(csvfile, printer):
+def processCsv(csvfile, rowDefinition, printer):
 	importer = RowImporter()
 	rows = []
-
+	factory = rowfactory.RowFactory(rowDefinition)
 
 	reader = csv.reader(csvfile, delimiter=',')
 	counter = 0
@@ -24,7 +24,7 @@ def processCsv(csvfile, printer):
 		if counter == 0:
 			counter += 1
 			continue
-		rows.append(row.Row(csvRow))
+		rows.append(factory.createRow(csvRow))
 		counter += 1
 
 	rows.sort(key=lambda r:r.date)

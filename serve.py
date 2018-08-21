@@ -76,10 +76,15 @@ class PostCsvRoute(ApiPostRoute):
 	def handles(self, path):
 		return path == '/api/csv'
 
+	def getRowDefinition(self):
+		with open('row-definition.json','r') as rowdefinitionfile:
+			return json.load(rowdefinitionfile)
+
 	def handle(self, data):
 		splitA = data.splitlines()
 		printer = jsonprinter.JsonPrinter()
-		csvprocessor.processCsv(splitA, printer)
+		rowdefinition = self.getRowDefinition()
+		csvprocessor.processCsv(splitA, rowdefinition, printer)
 		return printer.getObj()
 
 class DeleteJsonRoute(ApiPostRoute):

@@ -3,34 +3,35 @@ import wholeperiod
 import rowchecker
 import re
 import outputrow
+from direction import Direction
 
 propcon = rowchecker.RowPropertyContainsChecker
 
 class Pinnen(cat.CollectionCategory):
-	infopattern = 'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
+	infopattern = r'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
 
 	def getName(self):
 		return 'Pinnen'
 
 	def acceptsRow(self, row):
-		return not re.search(self.infopattern, row.info) == None
+		return not re.search(self.infopattern, row.additional['info']) == None
 
 	def transformRow(self, row):
-		match = re.search(self.infopattern, row.info)
+		match = re.search(self.infopattern, row.additional['info'])
 		date = match.group(1)
-		return outputrow.OutputRow(row.description, None, date, row.numberOfCents)
+		return outputrow.OutputRow(row.additional['description'], date, row.numberOfCents)
 
 class OnlineBankieren(cat.CollectionCategory):
 	infopattern = 'Naam:(.*?)Omschrijving:(.*?)IBAN'
 
 	def acceptsRow(self, row):
-		return not re.search(self.infopattern, row.info) == None
+		return not re.search(self.infopattern, row.additional['info']) == None
 
 	def transformRow(self, row):
-		match = re.search(self.infopattern, row.info)
+		match = re.search(self.infopattern, row.additional['info'])
 		naam = match.group(1)
 		omschrijving = match.group(2)
-		return outputrow.OutputRow(naam, omschrijving, row.date, row.numberOfCents)
+		return outputrow.OutputRow(naam + ' ' + omschrijving, row.date, row.numberOfCents)
 
 	def getName(self):
 		return 'Online bankieren'
@@ -38,8 +39,8 @@ class OnlineBankieren(cat.CollectionCategory):
 class Af(cat.MultipleRowCategoryWithLeftover):
 
 	def getCategories(self):
-		description = lambda r:r.description
-		info = lambda r:r.info
+		description = lambda r:r.additional['description']
+		info = lambda r:r.additional['info']
 		return [
 			cat.OptionableCategory({
 				'name':'Albert Heijn',
@@ -133,15 +134,15 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 		return 'Af'
 
 	def acceptsRow(self, row):
-		return row.afbij == 'Af'
+		return row.direction == Direction.OUTGOING
 
 class Salaris(cat.RowCategory):
 
 	def acceptsRow(self, row):
-		return row.description.startswith('T-MOBILE')
+		return row.additional['description'].startswith('T-MOBILE')
 
 	def acceptsRowInDuplicate(self, row):
-		return not self.isRecursivelyEmpty() and row.description.startswith('T-MOBILE')
+		return not self.isRecursivelyEmpty() and row.additional['description'].startswith('T-MOBILE')
 
 	def getName(self):
 		return 'Salaris'
@@ -152,12 +153,12 @@ class Bij(cat.MultipleRowCategoryWithLeftover):
 		return [Salaris(),
 				cat.OptionableCategory({
 					'name':'Van spaarrekening',
-					'acceptRow':propcon(lambda r:r.info, ['Van Bonusrenterekening'])
+					'acceptRow':propcon(lambda r:r.additional['info'], ['Van Bonusrenterekening'])
 				}),
 				OnlineBankieren()]
 
 	def acceptsRow(self, row):
-		return row.afbij == 'Bij'
+		return row.direction == Direction.INCOMING
 
 	def getName(self):
 		return 'Bij'

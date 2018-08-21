@@ -1,0 +1,28 @@
+{
+	"amount":{
+		"columnIndex":6
+	},
+	"date":{
+		"columnIndex":0,
+		"pattern":"yyyymmdd"
+	},
+	"direction":{
+		"columnIndex":5,
+		"incoming":"Bij",
+		"outgoing":"Af"
+	},
+	"additional":[
+		{
+			"name":"description",
+			"columnIndex":1
+		},
+		{
+			"name":"info",
+			"columnIndex":8
+		},
+		{
+			"name":"soort",
+			"columnIndex":7
+		}
+	]
+}
