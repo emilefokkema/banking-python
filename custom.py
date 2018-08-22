@@ -229,17 +229,6 @@ class Af(cat.MultipleRowCategoryWithLeftover):
 	def acceptsRow(self, row):
 		return row.direction == Direction.OUTGOING
 
-class Salaris(cat.RowCategory):
-
-	def acceptsRow(self, row):
-		return row.additional['description'].startswith('T-MOBILE')
-
-	def acceptsRowInDuplicate(self, row):
-		return not self.isRecursivelyEmpty() and row.additional['description'].startswith('T-MOBILE')
-
-	def getName(self):
-		return 'Salaris'
-
 
 class Bij(cat.MultipleRowCategoryWithLeftover):
 	def __init__(self, rowCheckerFactory):
@@ -247,7 +236,16 @@ class Bij(cat.MultipleRowCategoryWithLeftover):
 		super(Bij, self).__init__()
 
 	def getCategories(self):
-		return [Salaris(),
+		return [cat.OptionableCategory({
+					'name':'Salaris',
+					'acceptRow':{
+						'propertyContains':{
+							'name':'description',
+							'values':['T-MOBILE']
+						}
+					},
+					'oncePerPeriod':True
+				}, self.rowCheckerFactory),
 				cat.OptionableCategory({
 					'name':'Van spaarrekening',
 					'acceptRow':{

@@ -63,6 +63,7 @@ class OptionableCategory(RowCategory):
 		self.rowChecker = rowCheckerFactory.getRowChecker(options['acceptRow'] if 'acceptRow' in options else None)
 		if 'expect' in options:
 			self.expectation = expectation.RowNumberExpectation(options['expect'])
+		self.oncePerPeriod = (options['oncePerPeriod'] == True) if 'oncePerPeriod' in options else False
 
 	def canAddRow(self, row):
 		if not self.rowChecker.checkRow(row):
@@ -71,6 +72,16 @@ class OptionableCategory(RowCategory):
 			return True
 		for category in self.categories:
 			if category.canAddRow(row):
+				return True
+		return False
+
+	def acceptsRowInDuplicate(self, row):
+		if not self.rowChecker.checkRow(row):
+			return False
+		if not self.hasCategories:
+			return self.oncePerPeriod and not self.isRecursivelyEmpty()
+		for category in self.categories:
+			if category.acceptsRowInDuplicate(row):
 				return True
 		return False
 
