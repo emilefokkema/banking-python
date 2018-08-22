@@ -69,6 +69,20 @@ class RowFactory:
 			self.hasAdditional = True
 			self.namedParsers = [NamedRowPropertyParser(_ops) for _ops in options['additional']]
 
+	def getProperty(self, name):
+		if name == 'direction':
+			return lambda r:r.direction
+		if name == 'numberOfCents':
+			return lambda r:r.numberOfCents
+		if name == 'date':
+			return lambda r:r.date
+		if not self.hasAdditional:
+			raise Exception('unknown property name '+name)
+		for namedParser in self.namedParsers:
+			if namedParser.name == name:
+				return lambda r:r.additional[name]
+		raise Exception('unknown property name '+name)
+
 	def createRow(self, csvRow):
 		date = self.rowDateParser.getValue(csvRow)
 		direction = self.rowDirectionParser.getValue(csvRow)

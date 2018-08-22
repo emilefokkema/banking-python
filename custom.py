@@ -1,11 +1,8 @@
 import cat
 import wholeperiod
-import rowchecker
 import re
 import outputrow
 from direction import Direction
-
-propcon = rowchecker.RowPropertyContainsChecker
 
 class Pinnen(cat.CollectionCategory):
 	infopattern = r'Pasvolgnr:\d+\s+(\d{2}-\d{2}-\d{4}\s+\d{2}:\d{2})\s+Transactie:.*?Term:'
@@ -37,96 +34,192 @@ class OnlineBankieren(cat.CollectionCategory):
 		return 'Online bankieren'
 
 class Af(cat.MultipleRowCategoryWithLeftover):
+	def __init__(self, rowCheckerFactory):
+		self.rowCheckerFactory = rowCheckerFactory
+		super(Af, self).__init__()
 
 	def getCategories(self):
-		description = lambda r:r.additional['description']
-		info = lambda r:r.additional['info']
 		return [
 			cat.OptionableCategory({
 				'name':'Albert Heijn',
-				'acceptRow':propcon(description, ['ALBERT HEIJN'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['ALBERT HEIJN']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Abonnementen',
 				'categories':[
 					{
 						'name':'Netflix',
-						'acceptRow':propcon(description, ['NETFLIX']),
+						'acceptRow':{
+							'propertyContains':{
+								'name':'description',
+								'values':['NETFLIX']
+							}
+						},
 						'expect':1
 					},
 					{
 						'name':'NRC',
-						'acceptRow':propcon(description, ['NRC']),
+						'acceptRow':{
+							'propertyContains':{
+								'name':'description',
+								'values':['NRC']
+							}
+						},
 						'expect':1
 					},
 					{
 						'name':'ING',
-						'acceptRow':propcon(description, ['Kosten OranjePakket'])
+						'acceptRow':{
+							'propertyContains':{
+								'name':'description',
+								'values':['Kosten OranjePakket']
+							}
+						}
 					},
 					{
 						'name':'Telefoon',
-						'acceptRow':propcon(description, ['T-MOBILE']),
+						'acceptRow':{
+							'propertyContains':{
+								'name':'description',
+								'values':['T-MOBILE']
+							}
+						},
 						'expect':1
 					},
 					{
 						'name':'Blendle',
-						'acceptRow':propcon(info, ['Blendle'])
+						'acceptRow':{
+							'propertyContains':{
+								'name':'info',
+								'values':['Blendle']
+							}
+						}
 					},
 					{
 						'name':'Spotify',
-						'acceptRow':propcon(info, ['5VL2224Q8M5JL']),
+						'acceptRow':{
+							'propertyContains':{
+								'name':'info',
+								'values':['5VL2224Q8M5JL']
+							}
+						},
 						'expect':1
 					},
 					{
 						'name':'De Correspondent',
-						'acceptRow':propcon(info, ['De Correspondent'])
+						'acceptRow':{
+							'propertyContains':{
+								'name':'info',
+								'values':['De Correspondent']
+							}
+						}
 					}
 				]
-			}),
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'NS',
-				'acceptRow':propcon(description, ['NS GROEP'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['NS GROEP']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Zorg',
-				'acceptRow':propcon(description, ['menzis', 'PEARLE'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['menzis', 'PEARLE']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Huur',
-				'acceptRow':propcon(description, ['Rijksen Beheer'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['Rijksen Beheer']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Boeken',
-				'acceptRow':propcon(description, ['Broese Boekverkopers','BOEKHANDEL'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['Broese Boekverkopers','BOEKHANDEL']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Belastingdienst',
-				'acceptRow':propcon(description, ['Belastingdienst'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['Belastingdienst']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'CJIB',
-				'acceptRow':propcon(description, ['CJIB'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['CJIB']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'DUO',
-				'acceptRow':propcon(description, ['DUO'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['DUO']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Goed doel',
-				'acceptRow':propcon(description, ['STG CARE'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'description',
+						'values':['STG CARE']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Toestelverzekering',
-				'acceptRow':propcon(info, ['Toestelverzekering'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'info',
+						'values':['Toestelverzekering']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Film',
-				'acceptRow':propcon(info, ['Louis Hartlooper','Springhaver'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'info',
+						'values':['Louis Hartlooper','Springhaver']
+					}
+				}
+			}, self.rowCheckerFactory),
 			cat.OptionableCategory({
 				'name':'Sparen',
-				'acceptRow':propcon(info, ['Naar Bonusrenterekening'])
-			}),
+				'acceptRow':{
+					'propertyContains':{
+						'name':'info',
+						'values':['Naar Bonusrenterekening']
+					}
+				}
+			}, self.rowCheckerFactory),
 			Pinnen(),
 			OnlineBankieren()]
 
@@ -149,12 +242,21 @@ class Salaris(cat.RowCategory):
 
 
 class Bij(cat.MultipleRowCategoryWithLeftover):
+	def __init__(self, rowCheckerFactory):
+		self.rowCheckerFactory = rowCheckerFactory
+		super(Bij, self).__init__()
+
 	def getCategories(self):
 		return [Salaris(),
 				cat.OptionableCategory({
 					'name':'Van spaarrekening',
-					'acceptRow':propcon(lambda r:r.additional['info'], ['Van Bonusrenterekening'])
-				}),
+					'acceptRow':{
+						'propertyContains':{
+							'name':'info',
+							'values':['Van Bonusrenterekening']
+						}
+					}
+				}, self.rowCheckerFactory),
 				OnlineBankieren()]
 
 	def acceptsRow(self, row):
@@ -165,9 +267,9 @@ class Bij(cat.MultipleRowCategoryWithLeftover):
 
 
 class AfBij(cat.MultipleRowCategory):
-	def __init__(self):
-		self.af = Af()
-		self.bij = Bij()
+	def __init__(self, rowCheckerFactory):
+		self.af = Af(rowCheckerFactory)
+		self.bij = Bij(rowCheckerFactory)
 		super(AfBij, self).__init__()
 		self.printHandler = wholeperiod.WholePeriodHandler()
 		self.first = None
@@ -202,11 +304,12 @@ class AfBij(cat.MultipleRowCategory):
 			printer1.writeLine('hasEnd', self.hasEnd)
 
 class TopCategory(cat.RepeatingCategory):
-	def __init__(self):
+	def __init__(self, rowCheckerFactory):
+		self.rowCheckerFactory = rowCheckerFactory
 		super(TopCategory, self).__init__()
 
 	def renewCategory(self, oldCategory):
-		newCategory = AfBij()
+		newCategory = AfBij(self.rowCheckerFactory)
 		if not oldCategory == None:
 			oldCategory.end()
 			newCategory.begin()

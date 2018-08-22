@@ -2,7 +2,6 @@ import expectation
 import outputrow
 import printablelist
 import rowcollection
-import rowchecker
 
 class RowCategory(object):
 	def __init__(self):
@@ -50,7 +49,7 @@ class RowCategory(object):
 
 
 class OptionableCategory(RowCategory):
-	def __init__(self, options):
+	def __init__(self, options, rowCheckerFactory):
 		self._name = options['name']
 		super(OptionableCategory, self).__init__()
 		self.categories = printablelist.PrintableList([])
@@ -58,13 +57,10 @@ class OptionableCategory(RowCategory):
 		if 'categories' in options:
 			self.hasCategories = True
 			for categoryOptions in options['categories']:
-				newCategory = OptionableCategory(categoryOptions)
+				newCategory = OptionableCategory(categoryOptions, rowCheckerFactory)
 				self.categories.append(newCategory)
 				newCategory.setParent(self)
-		if 'acceptRow' in options:
-			self.rowChecker = options['acceptRow']
-		else:
-			self.rowChecker = rowchecker.AcceptingRowChecker()
+		self.rowChecker = rowCheckerFactory.getRowChecker(options['acceptRow'] if 'acceptRow' in options else None)
 		if 'expect' in options:
 			self.expectation = expectation.RowNumberExpectation(options['expect'])
 

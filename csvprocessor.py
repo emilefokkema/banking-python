@@ -1,10 +1,11 @@
 import csv
-import rowfactory
+from rowfactory import RowFactory
 import custom
+from rowcheckerfactory import RowCheckerFactory
 
 class RowImporter:
-	def __init__(self):
-		self.category = custom.TopCategory()
+	def __init__(self, rowCheckerFactory):
+		self.category = custom.TopCategory(rowCheckerFactory)
 
 	def importRow(self, row):
 		self.category.addRow(row)
@@ -14,9 +15,10 @@ class RowImporter:
 		self.category.printSelf(pr)
 
 def processCsv(csvfile, rowDefinition, printer):
-	importer = RowImporter()
 	rows = []
-	factory = rowfactory.RowFactory(rowDefinition)
+	rowFactory = RowFactory(rowDefinition)
+	rowCheckerFactory = RowCheckerFactory(rowFactory)
+	importer = RowImporter(rowCheckerFactory)
 
 	reader = csv.reader(csvfile, delimiter=',')
 	counter = 0
@@ -24,7 +26,7 @@ def processCsv(csvfile, rowDefinition, printer):
 		if counter == 0:
 			counter += 1
 			continue
-		rows.append(factory.createRow(csvRow))
+		rows.append(rowFactory.createRow(csvRow))
 		counter += 1
 
 	rows.sort(key=lambda r:r.date)
