@@ -1,9 +1,10 @@
 import http.server
 import socketserver
 import json
-import wholeperiod
-import csvprocessor
+from csvprocessor import CsvProcessor
 import jsonprinter
+from dataprovider import DataProvider
+from periodhistory import PeriodHistory
 import os
 
 PORT = 8000
@@ -59,14 +60,18 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 		return
 
 class ApiRoute:
-	pass
+	def __init__(self):
+		self.dataProvider = DataProvider()
+		self.history = PeriodHistory(self.dataProvider)
 
 class ApiGetRoute(ApiRoute):
 	def __init__(self):
+		super(ApiGetRoute, self).__init__()
 		self.method = 'GET'
 
 class ApiPostRoute(ApiRoute):
 	def __init__(self):
+		super(ApiPostRoute, self).__init__()
 		self.method = 'POST'
 
 class PostCsvRoute(ApiPostRoute):
@@ -76,41 +81,29 @@ class PostCsvRoute(ApiPostRoute):
 	def handles(self, path):
 		return path == '/api/csv'
 
-	def getRowDefinition(self):
-		with open('row-definition.json','r') as rowdefinitionfile:
-			return json.load(rowdefinitionfile)
-
-	def getCategoriesDefinition(self):
-		with open('categories.json','r') as categoriesdefinitionfile:
-			return json.load(categoriesdefinitionfile)
-
 	def handle(self, data):
-		splitA = data.splitlines()
-		printer = jsonprinter.JsonPrinter()
-		rowdefinition = self.getRowDefinition()
-		categoriesDefinition = self.getCategoriesDefinition()
-		csvprocessor.processCsv(splitA, rowdefinition, categoriesDefinition, printer)
-		return printer.getObj()
+		return CsvProcessor(self.dataProvider, self.history).processCsv(data.splitlines())
 
 class DeleteJsonRoute(ApiPostRoute):
+	def __init__(self):
+		super(DeleteJsonRoute, self).__init__()
+
 	def handles(self, path):
 		return path == '/api/delete'
 
 	def handle(self, data):
-		if os.path.exists(data):
-			os.remove(data)
+		self.history.removeItem(data)
 		return 'OK'
 
 class CompletePeriodsRoute(ApiGetRoute):
 	def __init__(self):
 		super(CompletePeriodsRoute, self).__init__()
-		self.periodFileFinder = wholeperiod.WholePeriodHandler()
 
 	def handles(self, path):
 		return path == '/api/complete'
 
 	def handle(self, path):
-		return self.periodFileFinder.findPeriodFiles()
+		return self.history.getAll()
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("serving at port", PORT)

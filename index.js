@@ -171,8 +171,7 @@
 						req.addEventListener("load",function(){
 							var responseData = JSON.parse(this.responseText, dateReviver);
 							self.incompletePeriods = responseData
-								.filter(function(m){return m.hasBeginning;})
-								.map(function(m){return {file:m};});
+								.filter(function(m){return m.file.hasBeginning;});
 							self.refreshComplete();
 							self.$refs.file.value = "";
 						});

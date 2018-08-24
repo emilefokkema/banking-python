@@ -1,6 +1,4 @@
 from datetime import datetime
-import json
-import random
 from enum import Enum
 class JsonPrinter(object):
 	def __init__(self, doexit = None):
@@ -27,14 +25,6 @@ class JsonPrinter(object):
 	def endList(self, obj):
 		self.written = True
 		self.object = obj
-
-	def writeToFile(self, obj, fileName):
-		print('saving json: '+fileName)
-		with open(fileName+'.json', 'w') as jsonFile:
-			json.dump(obj, jsonFile)
-
-	def startFile(self, fileName):
-		return JsonPrinter(lambda obj,written:self.writeToFile(obj, fileName))
 
 	def sanitizeValue(self, value):
 		if isinstance(value, datetime):

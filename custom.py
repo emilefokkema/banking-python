@@ -1,5 +1,5 @@
 import cat
-import wholeperiod
+from printablelist import PrintableList
 import re
 from direction import Direction
 
@@ -26,7 +26,6 @@ class AfBij(cat.OptionableCategory):
 		super(AfBij, self).__init__(options, rowCheckerFactory, rowCollectionFactory)
 		self.af = self.categories[0]
 		self.bij = self.categories[1]
-		self.printHandler = wholeperiod.WholePeriodHandler()
 		self.first = None
 		self.last = None
 		self.hasBeginning = False
@@ -41,34 +40,64 @@ class AfBij(cat.OptionableCategory):
 	def begin(self):
 		self.hasBeginning = True
 
+	def isComplete(self):
+		return self.hasBeginning and self.hasEnd
+
 	def end(self):
 		self.hasEnd = True
 
-	def printSelf(self, printer):
-		with self.printHandler.getAfBijPrinter(self, printer) as printer1:
-			with printer1.indent('Af') as printer2:
-				self.af.printSelf(printer2)
-			with printer1.indent('Bij') as printer2:
-				self.bij.printSelf(printer2)
-			printer1.writeLine('from',self.first['date'])
-			printer1.writeLine('through',self.last['date'])
-			printer1.writeLine('hasBeginning', self.hasBeginning)
-			printer1.writeLine('hasEnd', self.hasEnd)
+	def makeFileName(self):
+		return self.first['date'].strftime(r'%Y-%m-%d')+self.last['date'].strftime(r'%Y-%m-%d')
 
-class TopCategory(cat.RepeatingCategory):
+	def printSelf(self, printer):
+		with printer.indent('Af') as printer1:
+			self.af.printSelf(printer1)
+		with printer.indent('Bij') as printer1:
+			self.bij.printSelf(printer1)
+		printer.writeLine('from',self.first['date'])
+		printer.writeLine('through',self.last['date'])
+		printer.writeLine('hasBeginning', self.hasBeginning)
+		printer.writeLine('hasEnd', self.hasEnd)
+
+class PeriodFile:
+	def __init__(self, period):
+		self.period = period
+
+	def printSelf(self, printer):
+		printer.writeLine('fileName', self.period.makeFileName())
+		with printer.indent('file') as printer1:
+			self.period.printSelf(printer1)
+
+class TopCategory:
 	def __init__(self, rowCheckerFactory, rowCollectionFactory, categoriesDefinition):
 		self.categoriesDefinition = getExtendedCategoriesDefinition(categoriesDefinition)
 		self.rowCheckerFactory = rowCheckerFactory
 		self.rowCollectionFactory = rowCollectionFactory
-		super(TopCategory, self).__init__()
+		currentCategory = self.getNewPeriod()
+		self.currentCategory = currentCategory
+		self.categories = PrintableList([currentCategory])
 
-	def renewCategory(self, oldCategory):
-		newCategory = AfBij(self.categoriesDefinition, self.rowCheckerFactory, self.rowCollectionFactory)
-		if not oldCategory == None:
-			oldCategory.end()
-			newCategory.begin()
-		
-		return newCategory
+	def getNewPeriod(self):
+		return AfBij(self.categoriesDefinition, self.rowCheckerFactory, self.rowCollectionFactory)
 
-	def getName(self):
-		return 'maanden'
+	def renewCategory(self):
+		self.currentCategory.end()
+		newCategory = self.getNewPeriod()
+		newCategory.begin()
+		self.currentCategory = newCategory
+		self.categories.append(self.currentCategory)
+
+	def getComplete(self):
+		return PrintableList([PeriodFile(cat) for cat in self.categories if cat.isComplete()])
+
+	def getIncomplete(self):
+		return PrintableList([PeriodFile(cat) for cat in self.categories if not cat.isComplete()])
+
+	def addRow(self, row):
+		if self.currentCategory.acceptsRowInDuplicate(row):
+			self.renewCategory()
+
+		self.currentCategory.addRow(row)
+
+	def printSelf(self, printer):
+		self.categories.printSelf(printer)

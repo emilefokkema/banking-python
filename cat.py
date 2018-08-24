@@ -3,9 +3,9 @@ import printablelist
 from rowcollection import RowCollection
 
 class RowCategory(object):
-	def __init__(self):
+	def __init__(self, name='name'):
 		self.totalCents = 0;
-		self.name = self.getName()
+		self.name = name
 		self.empty = True
 		self.parent = None
 		self.expectation = None
@@ -31,9 +31,6 @@ class RowCategory(object):
 	def acceptsRowInDuplicate(self, row):
 		return False
 
-	def getName(self):
-		return 'category'
-
 	def internalPrintSelf(self, printer):
 		printer.writeLine('name',self.name)
 		printer.writeLine('total', self.totalCents)
@@ -49,8 +46,7 @@ class RowCategory(object):
 
 class OptionableCategory(RowCategory):
 	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
-		self._name = options['name'] if 'name' in options else 'name'
-		super(OptionableCategory, self).__init__()
+		super(OptionableCategory, self).__init__(options['name'] if 'name' in options else 'name')
 		self.categories = printablelist.PrintableList([])
 		self.hasCategories = False
 		self.rowCollection = None
@@ -108,29 +104,3 @@ class OptionableCategory(RowCategory):
 		if self.collectsRows:
 			with printer.indent('rows') as printer1:
 				self.rowCollection.printSelf(printer1)
-
-	def getName(self):
-		return self._name
-
-class RepeatingCategory(RowCategory):
-	def __init__(self):
-		super(RepeatingCategory, self).__init__()
-		currentCategory = self.renewCategory(None)
-		self.currentCategory = currentCategory
-		self.categories = printablelist.PrintableList([currentCategory])
-
-	def renewCategory(self, oldCategory):
-		return RowCategory()
-
-	def canAddRow(self, row):
-		return self.currentCategory.canAddRow(row) or self.currentCategory.acceptsRowInDuplicate(row)
-
-	def addRow(self, row):
-		if self.currentCategory.acceptsRowInDuplicate(row):
-			self.currentCategory = self.renewCategory(self.currentCategory)
-			self.categories.append(self.currentCategory)
-
-		self.currentCategory.addRow(row)
-
-	def printSelf(self, printer):
-		self.categories.printSelf(printer)
