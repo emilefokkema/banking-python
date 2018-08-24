@@ -49,7 +49,7 @@ class RowCategory(object):
 
 class OptionableCategory(RowCategory):
 	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
-		self._name = options['name']
+		self._name = options['name'] if 'name' in options else 'name'
 		super(OptionableCategory, self).__init__()
 		self.categories = printablelist.PrintableList([])
 		self.hasCategories = False
@@ -111,88 +111,6 @@ class OptionableCategory(RowCategory):
 
 	def getName(self):
 		return self._name
-
-class CollectionCategory(RowCategory):
-	def __init__(self, rowCollectionFactory):
-		super(CollectionCategory, self).__init__()
-		self.rows = self.getRowCollection(rowCollectionFactory)
-
-	def getRowCollection(self, rowCollectionFactory):
-		return rowCollectionFactory.getDefault({
-			'default':True
-		})
-
-	def addRow(self, row):
-		super(CollectionCategory, self).addRow(row)
-		self.rows.addRow(row)
-
-	def internalPrintSelf(self,printer):
-		super(CollectionCategory, self).internalPrintSelf(printer)
-		with printer.indent('rows') as printer1:
-			self.rows.printSelf(printer1)
-				
-class LeftoverCategory(CollectionCategory):
-
-	def getRowCollection(self, rowCollectionFactory):
-		return rowCollectionFactory.getDefault({
-			'displayLimit':5,
-			'default':True
-		})
-
-	def getName(self):
-		return 'leftovers'
-
-class MultipleRowCategory(RowCategory):
-	def __init__(self):
-		super(MultipleRowCategory, self).__init__()
-		self.categories = printablelist.PrintableList([])
-		for category in self.getCategories():
-			self.addCategory(category)
-			category.setParent(self)
-
-	def canAddRow(self, row):
-		if not self.acceptsRow(row):
-			return False
-		for category in self.categories:
-			if category.canAddRow(row):
-				return True
-		return False
-
-	def acceptsRowInDuplicate(self, row):
-		if not self.acceptsRow(row):
-			return False
-		for category in self.categories:
-			if category.acceptsRowInDuplicate(row):
-				return True
-		return False
-
-	def getName(self):
-		return 'Multiple category'
-
-	def getCategories(self):
-		return []
-
-	def addRow(self, row):
-		super(MultipleRowCategory, self).addRow(row)
-		for category in self.categories:
-			if category.canAddRow(row):
-				category.addRow(row)
-				return
-
-	def internalPrintSelf(self, printer):
-		super(MultipleRowCategory, self).internalPrintSelf(printer)
-		with printer.indent('categories') as printer1:
-			self.categories.printSelf(printer1)
-
-	def addCategory(self, cat):
-		self.categories.append(cat)
-
-class MultipleRowCategoryWithLeftover(MultipleRowCategory):
-	def __init__(self, rowCollectionFactory):
-		self.rowCollectionFactory = rowCollectionFactory
-		super(MultipleRowCategoryWithLeftover, self).__init__()
-		self.addCategory(LeftoverCategory(rowCollectionFactory))
-
 
 class RepeatingCategory(RowCategory):
 	def __init__(self):

@@ -3,11 +3,29 @@ import wholeperiod
 import re
 from direction import Direction
 
-class AfBij(cat.MultipleRowCategory):
-	def __init__(self, rowCheckerFactory, rowCollectionFactory, incomingOptions, outgoingOptions):
-		self.af = cat.OptionableCategory(outgoingOptions, rowCheckerFactory, rowCollectionFactory)
-		self.bij = cat.OptionableCategory(incomingOptions, rowCheckerFactory, rowCollectionFactory)
-		super(AfBij, self).__init__()
+def getExtendedCategoriesDefinition(categoriesDefinition):
+	incomingOptions = categoriesDefinition['incoming']
+	outgoingOptions = categoriesDefinition['outgoing']
+	return {
+		'categories':[
+			{
+				'name':outgoingOptions['name'],
+				'acceptRow': {'outgoing':True},
+				'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+			},
+			{
+				'name':incomingOptions['name'],
+				'acceptRow':{'incoming':True},
+				'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+			}
+		]
+	}
+
+class AfBij(cat.OptionableCategory):
+	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
+		super(AfBij, self).__init__(options, rowCheckerFactory, rowCollectionFactory)
+		self.af = self.categories[0]
+		self.bij = self.categories[1]
 		self.printHandler = wholeperiod.WholePeriodHandler()
 		self.first = None
 		self.last = None
@@ -26,9 +44,6 @@ class AfBij(cat.MultipleRowCategory):
 	def end(self):
 		self.hasEnd = True
 
-	def getCategories(self):
-		return [self.af, self.bij]
-
 	def printSelf(self, printer):
 		with self.printHandler.getAfBijPrinter(self, printer) as printer1:
 			with printer1.indent('Af') as printer2:
@@ -42,25 +57,13 @@ class AfBij(cat.MultipleRowCategory):
 
 class TopCategory(cat.RepeatingCategory):
 	def __init__(self, rowCheckerFactory, rowCollectionFactory, categoriesDefinition):
-		incomingOptions = categoriesDefinition['incoming']
-		outgoingOptions = categoriesDefinition['outgoing']
-		self.extendDirectionOptions(incomingOptions, 'incoming')
-		self.extendDirectionOptions(outgoingOptions, 'outgoing')
-		self.incomingOptions = incomingOptions
-		self.outgoingOptions = outgoingOptions
+		self.categoriesDefinition = getExtendedCategoriesDefinition(categoriesDefinition)
 		self.rowCheckerFactory = rowCheckerFactory
 		self.rowCollectionFactory = rowCollectionFactory
 		super(TopCategory, self).__init__()
 
-	def extendDirectionOptions(self, options, directionName):
-		options['acceptRow'] = {directionName:True}
-		options['categories'].append({
-			'name':'leftovers',
-			'rowCollection':{'displayLimit':5,'default':True}
-		})
-
 	def renewCategory(self, oldCategory):
-		newCategory = AfBij(self.rowCheckerFactory, self.rowCollectionFactory, self.incomingOptions, self.outgoingOptions)
+		newCategory = AfBij(self.categoriesDefinition, self.rowCheckerFactory, self.rowCollectionFactory)
 		if not oldCategory == None:
 			oldCategory.end()
 			newCategory.begin()

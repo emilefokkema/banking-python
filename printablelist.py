@@ -8,6 +8,9 @@ class PrintableList:
 	def __iter__(self):
 		return iter(self.items)
 
+	def __getitem__(self, key):
+		return self.items[key]
+
 	def append(self, obj):
 		self.items.append(obj)
 
