@@ -4,13 +4,23 @@ import custom
 from rowcheckerfactory import RowCheckerFactory
 from rowcollection import RowCollectionFactory
 import jsonprinter
+from domainexception import DomainException
 
 class CsvProcessor:
 	def __init__(self, dataProvider, history):
-		self.rowFactory = RowFactory(dataProvider.getItem('row-definition'))
+		try:
+			rowDefinition = dataProvider.getItem('row-definition')
+		except FileNotFoundError:
+			raise DomainException('Please provide a row definition before processing a csv')
+		
+		self.rowFactory = RowFactory(rowDefinition)
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
-		self.categoriesDefinition = dataProvider.getItem('categories')
+		try:
+			self.categoriesDefinition = dataProvider.getItem('categories')
+		except FileNotFoundError:
+			raise DomainException('Please provide categories before processing a csv')
+
 		self.dataProvider = dataProvider
 		self.history = history
 

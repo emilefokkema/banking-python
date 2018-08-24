@@ -5,7 +5,9 @@ from csvprocessor import CsvProcessor
 import jsonprinter
 from dataprovider import DataProvider
 from periodhistory import PeriodHistory
+import traceback
 import os
+from domainexception import DomainException
 
 PORT = 8000
 
@@ -20,22 +22,35 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 		else:
 			super(MyHandler, self).do_GET()
 
+	def no_route_found(self):
+		print('no route found, sending 404')
+		self.sendCode(404)
+		self.return_json(None)
+
+	def sendCode(self, code):
+		self.send_response(code)
+		self.send_header('Content-type','application/json')
+		self.end_headers()
+
+	def return_json(self, obj):
+		self.wfile.write(json.dumps(obj).encode('utf-8'))
+
 	def do_POST(self):
 		route = self.findRoute(self.path, 'POST')
 		if route == None:
-			print('no route found, sending 404')
-			self.send_response(404)
-			self.send_header('Content-type','application/json')
-			self.end_headers()
-			self.wfile.write(b'null')
-			return
-		self.send_response(200)
-		self.send_header('Content-type','application/json')
-		self.end_headers()
-		data = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
-		output = json.dumps(route.handle(data))
-		self.wfile.write(output.encode('utf-8'))
-		return
+			return self.no_route_found()
+		try:
+			data = self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8')
+			result = route.handle(data)
+			self.sendCode(200)
+			return self.return_json(result)
+		except DomainException as d:
+			self.sendCode(500)
+			return self.return_json(d.message)
+		except Exception as e:
+			traceback.print_exc()
+			self.sendCode(500)
+			return self.return_json(None)
 
 	def findRoute(self, path, method):
 		for route in self.routes:
@@ -46,18 +61,9 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def do_api_GET(self):
 		route = self.findRoute(self.path, 'GET')
 		if route == None:
-			print('no route found, sending 404')
-			self.send_response(404)
-			self.send_header('Content-type','application/json')
-			self.end_headers()
-			self.wfile.write(b'null')
-			return
-		self.send_response(200)
-		self.send_header('Content-type','application/json')
-		self.end_headers()
-		output = json.dumps(route.handle(self.path))
-		self.wfile.write(output.encode('utf-8'))
-		return
+			return self.no_route_found()
+		self.sendCode(200)
+		return self.return_json(route.handle(self.path))
 
 class ApiRoute:
 	def __init__(self):

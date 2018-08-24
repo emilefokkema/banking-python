@@ -2,6 +2,12 @@ body{
 	margin:0px;
 	padding: 0px;
 }
+.error{
+	color: #a00;
+	padding: 5px;
+	margin-top: 5px;
+	font-family: monospace;
+}
 .remove-button{
 	cursor: pointer;
 	float: right;

@@ -23,6 +23,18 @@
 			return new Date(year,monthIndex,day,hours,minutes);
 		}
 	};
+	var onRequestLoaded = function(req, dataCallback, errorCallback){
+		req.addEventListener("load",function(){
+			var data = JSON.parse(this.responseText, dateReviver);
+			if(this.status != 200){
+				if(errorCallback){
+					errorCallback(data);
+				}
+			}else{
+				dataCallback(data);
+			}
+		});
+	};
 	document.addEventListener("DOMContentLoaded",function(){
 		var amount = {
 			props:{
@@ -57,7 +69,8 @@
 			el:"#app",
 			data:{
 				completePeriods: [],
-				incompletePeriods: []
+				incompletePeriods: [],
+				errorMessage:undefined
 			},
 			components:{
 				'period-item' : {
@@ -74,8 +87,10 @@
 							this.isRemoving = true;
 							console.log("removing "+this.fileName);
 							var req = new XMLHttpRequest();
-							req.addEventListener("load",function(){
+							onRequestLoaded(req, function(){
 								self.$emit("removal");
+							},function(msg){
+								self.$emit("error", msg)
 							});
 							req.open("POST","api/delete");
 							req.send(this.fileName)
@@ -151,13 +166,17 @@
 				refreshComplete:function(){
 					var self = this;
 					var req = new XMLHttpRequest();
-					req.addEventListener("load",function(){
-						var data = JSON.parse(this.responseText, dateReviver);
+					onRequestLoaded(req, function(data){
 						console.log(data);
 						self.completePeriods = data;
+					},function(msg){
+						self.displayError(msg);
 					});
 					req.open("GET","/api/complete");
 					req.send();
+				},
+				displayError:function(msg){
+					this.errorMessage = msg || "Internal Server Error";
 				},
 				postCsv:function(){
 					var files = this.$refs.file.files;
@@ -168,12 +187,13 @@
 					reader.onload = function(){
 						var data = reader.result;
 						var req = new XMLHttpRequest();
-						req.addEventListener("load",function(){
-							var responseData = JSON.parse(this.responseText, dateReviver);
-							self.incompletePeriods = responseData
+						onRequestLoaded(req, function(data){
+							self.incompletePeriods = data
 								.filter(function(m){return m.file.hasBeginning;});
 							self.refreshComplete();
 							self.$refs.file.value = "";
+						},function(msg){
+							self.displayError(msg);
 						});
 						req.open("POST","/api/csv");
 						req.send(data);
