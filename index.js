@@ -153,6 +153,7 @@
 					var req = new XMLHttpRequest();
 					req.addEventListener("load",function(){
 						var data = JSON.parse(this.responseText, dateReviver);
+						console.log(data);
 						self.completePeriods = data;
 					});
 					req.open("GET","/api/complete");

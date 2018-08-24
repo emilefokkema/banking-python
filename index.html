@@ -1,8 +1,8 @@
 <html>
 	<head>
 		<title>Process my banking statements</title>
-		<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
-		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
 		<script src="index.js"></script>
 		
 		<link rel="stylesheet" type="text/css" href="index.css">
@@ -47,7 +47,11 @@
 		</script>
 		<script type="text/template" id="rowTemplate">
 			<div class="row" v-bind:title="row.info">
-				<date v-bind:date="row.date"></date> {{row.name}} {{row.description}} <amount v-bind:numberOfCents="row.amount"></amount>
+				<template v-for="prop in row">
+					<template v-if="prop.type == 'string'">{{prop.value}}</template>
+					<date v-bind:date="prop.value" v-if="prop.type=='date'"></date>
+					<amount v-bind:numberOfCents="prop.value" v-if="prop.type=='amount'"></amount>
+				</template>
 			</div>
 		</script>
 		<div id="app">

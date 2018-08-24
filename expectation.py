@@ -4,7 +4,7 @@ class RowNumberExpectation:
 		self.dates = []
 
 	def addRow(self, row):
-		self.dates.append(row.date)
+		self.dates.append(row['date'])
 
 	def printSelf(self, printer):
 		actualNumber = len(self.dates)

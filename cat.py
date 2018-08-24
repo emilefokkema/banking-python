@@ -1,7 +1,6 @@
 import expectation
-import outputrow
 import printablelist
-import rowcollection
+from rowcollection import RowCollection
 
 class RowCategory(object):
 	def __init__(self):
@@ -12,7 +11,7 @@ class RowCategory(object):
 		self.expectation = None
 
 	def addRow(self, row):
-		self.totalCents = self.totalCents + row.numberOfCents
+		self.totalCents = self.totalCents + row['amount']
 		if not self.expectation == None:
 			self.expectation.addRow(row)
 		self.empty = False
@@ -49,20 +48,26 @@ class RowCategory(object):
 
 
 class OptionableCategory(RowCategory):
-	def __init__(self, options, rowCheckerFactory):
+	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
 		self._name = options['name']
 		super(OptionableCategory, self).__init__()
 		self.categories = printablelist.PrintableList([])
 		self.hasCategories = False
+		self.rowCollection = None
+		self.collectsRows = False
+		if 'rowCollection' in options:
+			self.collectsRows = True
+			self.rowCollection = rowCollectionFactory.getDefault(options['rowCollection'])
 		if 'categories' in options:
 			self.hasCategories = True
 			for categoryOptions in options['categories']:
-				newCategory = OptionableCategory(categoryOptions, rowCheckerFactory)
+				newCategory = OptionableCategory(categoryOptions, rowCheckerFactory, rowCollectionFactory)
 				self.categories.append(newCategory)
 				newCategory.setParent(self)
 		self.rowChecker = rowCheckerFactory.getRowChecker(options['acceptRow'] if 'acceptRow' in options else None)
 		if 'expect' in options:
 			self.expectation = expectation.RowNumberExpectation(options['expect'])
+
 		self.oncePerPeriod = (options['oncePerPeriod'] == True) if 'oncePerPeriod' in options else False
 
 	def canAddRow(self, row):
@@ -91,29 +96,35 @@ class OptionableCategory(RowCategory):
 			for category in self.categories:
 				if category.canAddRow(row):
 					category.addRow(row)
-					return
+					break
+		if self.collectsRows:
+			self.rowCollection.addRow(row)
 
 	def internalPrintSelf(self, printer):
 		super(OptionableCategory, self).internalPrintSelf(printer)
 		if self.hasCategories:
 			with printer.indent('categories') as printer1:
 				self.categories.printSelf(printer1)
+		if self.collectsRows:
+			with printer.indent('rows') as printer1:
+				self.rowCollection.printSelf(printer1)
 
 	def getName(self):
 		return self._name
 
 class CollectionCategory(RowCategory):
-	def __init__(self):
+	def __init__(self, rowCollectionFactory):
 		super(CollectionCategory, self).__init__()
-		self.rows = rowcollection.RowCollection()
+		self.rows = self.getRowCollection(rowCollectionFactory)
+
+	def getRowCollection(self, rowCollectionFactory):
+		return rowCollectionFactory.getDefault({
+			'default':True
+		})
 
 	def addRow(self, row):
 		super(CollectionCategory, self).addRow(row)
-		self.rows.addRow(self.transformRow(row))
-
-	def transformRow(self, row):
-		description = row.getDescription()
-		return outputrow.OutputRow(description, row.date, row.numberOfCents)
+		self.rows.addRow(row)
 
 	def internalPrintSelf(self,printer):
 		super(CollectionCategory, self).internalPrintSelf(printer)
@@ -121,9 +132,12 @@ class CollectionCategory(RowCategory):
 			self.rows.printSelf(printer1)
 				
 class LeftoverCategory(CollectionCategory):
-	def __init__(self):
-		super(LeftoverCategory, self).__init__()
-		self.rows = rowcollection.RowCollection(5)
+
+	def getRowCollection(self, rowCollectionFactory):
+		return rowCollectionFactory.getDefault({
+			'displayLimit':5,
+			'default':True
+		})
 
 	def getName(self):
 		return 'leftovers'
@@ -174,9 +188,10 @@ class MultipleRowCategory(RowCategory):
 		self.categories.append(cat)
 
 class MultipleRowCategoryWithLeftover(MultipleRowCategory):
-	def __init__(self):
+	def __init__(self, rowCollectionFactory):
+		self.rowCollectionFactory = rowCollectionFactory
 		super(MultipleRowCategoryWithLeftover, self).__init__()
-		self.addCategory(LeftoverCategory())
+		self.addCategory(LeftoverCategory(rowCollectionFactory))
 
 
 class RepeatingCategory(RowCategory):

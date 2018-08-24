@@ -7,7 +7,7 @@ class WholePeriodHandler:
 		return not re.search('^\d{4}-\d{2}-\d{6}-\d{2}-\d{2}\.json$',name) == None
 
 	def makePeriodFileName(self, afbijCategory):
-		return str(afbijCategory.first.date)+str(afbijCategory.last.date)
+		return afbijCategory.first['date'].strftime(r'%Y-%m-%d')+afbijCategory.last['date'].strftime(r'%Y-%m-%d')
 
 	def getAfBijPrinter(self, afbijCategory, printer):
 		if afbijCategory.hasBeginning and afbijCategory.hasEnd:

@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import datetime
 import json
 import random
+from enum import Enum
 class JsonPrinter(object):
 	def __init__(self, doexit = None):
 		self.object = {}
@@ -36,8 +37,10 @@ class JsonPrinter(object):
 		return JsonPrinter(lambda obj,written:self.writeToFile(obj, fileName))
 
 	def sanitizeValue(self, value):
-		if isinstance(value, date):
-			return str(value)
+		if isinstance(value, datetime):
+			return value.strftime(r'%d-%m-%Y %H:%M')
+		if isinstance(value, Enum):
+			return value.value
 		return value
 
 	def writeLine(self, key, value):

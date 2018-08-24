@@ -4,7 +4,7 @@
 	},
 	"date":{
 		"columnIndex":0,
-		"pattern":"yyyymmdd"
+		"pattern":"%Y%m%d"
 	},
 	"direction":{
 		"columnIndex":5,

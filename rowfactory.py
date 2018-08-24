@@ -1,40 +1,42 @@
-from datepattern import DatePattern
+from datetime import datetime
 from direction import Direction
+from rowpropertytype import RowPropertyType
 import re
 
 class RowPropertyParser:
-	def __init__(self, options):
+	def __init__(self, name, _type, options):
 		self.columnIndex = options['columnIndex']
-
-	def getValue(self, csvRow):
-		return self.parseValue(csvRow[self.columnIndex])
+		self.name = name
+		self.type = _type
 
 	def parseValue(self, csvRowValue):
 		return csvRowValue
 
-class NamedRowPropertyParser(RowPropertyParser):
-	def __init__(self, options):
-		super(NamedRowPropertyParser, self).__init__(options)
-		self.name = options['name']
+	def setValue(self, row, csvRow):
+		row[self.name] = self.parseValue(csvRow[self.columnIndex])
+
+	def getValue(self, row):
+		return row[self.name]
+
 
 class RowDateParser(RowPropertyParser):
 	def __init__(self, options):
-		super(RowDateParser, self).__init__(options)
-		self.pattern = DatePattern(options['pattern'])
+		super(RowDateParser, self).__init__('date', RowPropertyType.DATE, options)
+		self.pattern = options['pattern']
 
 	def parseValue(self, csvRowValue):
-		return self.pattern.parse(csvRowValue)
+		return datetime.strptime(csvRowValue, self.pattern)
 
 class RowNumberOfCentsParser(RowPropertyParser):
 	def __init__(self, options):
-		super(RowNumberOfCentsParser, self).__init__(options)
+		super(RowNumberOfCentsParser, self).__init__('amount', RowPropertyType.AMOUNT, options)
 
 	def parseValue(self, csvRowValue):
 		return int(''.join(re.findall(r'\d+', csvRowValue)))
 
 class RowDirectionParser(RowPropertyParser):
 	def __init__(self, options):
-		super(RowDirectionParser, self).__init__(options)
+		super(RowDirectionParser, self).__init__('direction', RowPropertyType.DIRECTION, options)
 		self.incomingValue = options['incoming']
 		self.outgoingValue = options['outgoing']
 
@@ -43,54 +45,23 @@ class RowDirectionParser(RowPropertyParser):
 			return Direction.INCOMING
 		return Direction.OUTGOING
 
-
-
-class Row:
-	def __init__(self, date, direction, numberOfCents, additional):
-		self.direction = direction
-		self.numberOfCents = numberOfCents
-		self.date = date
-		self.additional = additional
-
-	def getDescription(self):
-		if not self.additional == None:
-			return ' '.join([self.additional[p] for p in self.additional])
-		return 'description'
-
-
 class RowFactory:
 	def __init__(self, options):
-		self.rowDirectionParser = RowDirectionParser(options['direction'])
-		self.rowDateParser = RowDateParser(options['date'])
-		self.rowNumberOfCentsParser = RowNumberOfCentsParser(options['amount'])
-		self.namedParsers = []
-		self.hasAdditional = False
-		if options['additional']:
-			self.hasAdditional = True
-			self.namedParsers = [NamedRowPropertyParser(_ops) for _ops in options['additional']]
+		self.properties = [
+			RowDirectionParser(options['direction']),
+			RowDateParser(options['date']),
+			RowNumberOfCentsParser(options['amount'])] + ([RowPropertyParser(_ops['name'], RowPropertyType.STRING, _ops) for _ops in options['additional']] if 'additional' in options else [])
+
 
 	def getProperty(self, name):
-		if name == 'direction':
-			return lambda r:r.direction
-		if name == 'numberOfCents':
-			return lambda r:r.numberOfCents
-		if name == 'date':
-			return lambda r:r.date
-		if not self.hasAdditional:
-			raise Exception('unknown property name '+name)
-		for namedParser in self.namedParsers:
-			if namedParser.name == name:
-				return lambda r:r.additional[name]
+		for prop in self.properties:
+			if prop.name == name:
+				return prop
 		raise Exception('unknown property name '+name)
 
 	def createRow(self, csvRow):
-		date = self.rowDateParser.getValue(csvRow)
-		direction = self.rowDirectionParser.getValue(csvRow)
-		numberOfCents = self.rowNumberOfCentsParser.getValue(csvRow)
-		additional = None
-		if self.hasAdditional:
-			additional = {}
-			for namedParser in self.namedParsers:
-				additional[namedParser.name] = namedParser.getValue(csvRow)
-		return Row(date, direction, numberOfCents, additional)
+		result = {}
+		for prop in self.properties:
+			prop.setValue(result, csvRow)
+		return result
 

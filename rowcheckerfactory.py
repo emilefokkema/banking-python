@@ -1,4 +1,5 @@
 import re
+from direction import Direction
 
 class AcceptingRowChecker:
 	def checkRow(self, row):
@@ -10,12 +11,19 @@ class RegexRowChecker:
 		self.getStringProperty = getStringProperty
 
 	def checkRow(self, row):
-		return not re.search(self.pattern, self.getStringProperty(row).lower()) == None
+		return not re.search(self.pattern, self.getStringProperty(row), re.I) == None
 
 class RowPropertyContainsChecker(RegexRowChecker):
 	def __init__(self, getStringProperty, substrs):
-		pattern = '(?:'+'|'.join([s.lower() for s in substrs])+')'
+		pattern = '(?:'+'|'.join(substrs)+')'
 		super(RowPropertyContainsChecker, self).__init__(pattern, getStringProperty)
+
+class DirectionChecker:
+	def __init__(self, direction):
+		self.direction = direction
+
+	def checkRow(self, row):
+		return row['direction'] == self.direction
 
 class RowCheckerFactory:
 	def __init__(self, rowFactory):
@@ -28,6 +36,15 @@ class RowCheckerFactory:
 			return options
 		if 'propertyContains' in options:
 			containsOptions = options['propertyContains']
-			getStringProperty = self.rowFactory.getProperty(containsOptions['name'])
+			rowproperty = self.rowFactory.getProperty(containsOptions['name'])
 			values = containsOptions['values']
-			return RowPropertyContainsChecker(getStringProperty, values)
+			return RowPropertyContainsChecker(lambda r:rowproperty.getValue(r), values)
+		if 'propertyMatches' in options:
+			matchesOptions = options['propertyMatches']
+			rowproperty = self.rowFactory.getProperty(matchesOptions['name'])
+			pattern = matchesOptions['pattern']
+			return RegexRowChecker(pattern, lambda r:rowproperty.getValue(r))
+		if 'incoming' in options and options['incoming'] == True:
+			return DirectionChecker(Direction.INCOMING)
+		if 'outgoing' in options and options['outgoing'] == True:
+			return DirectionChecker(Direction.OUTGOING)
