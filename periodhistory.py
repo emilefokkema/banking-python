@@ -5,9 +5,8 @@ class PeriodHistory:
 		self.dataProvider = dataProvider
 
 	def getHistory(self):
-		if self.dataProvider.itemExists(self.historyKey):
-			return self.dataProvider.getItem(self.historyKey)
-		return []
+		history = self.dataProvider.getItem(self.historyKey)
+		return [] if history == None else history
 
 	def addItem(self, key, file):
 		history = self.getHistory()

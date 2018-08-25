@@ -5,14 +5,11 @@ class Configuration:
 		self.dataProvider = dataProvider
 
 	def getRowDefinition(self):
-		if not self.dataProvider.itemExists('row-definition'):
-			raise DomainException('Please provide a row definition before processing a csv')
 		return self.dataProvider.getItem('row-definition')
 
 	def getCategories(self):
-		if not self.dataProvider.itemExists('categories'):
-			raise DomainException('Please provide categories before processing a csv')
-		return self.getExtendedCategoriesDefinition(self.dataProvider.getItem('categories'))
+		categoriesDefinition = self.dataProvider.getItem('categories')
+		return None if categoriesDefinition == None else self.getExtendedCategoriesDefinition(categoriesDefinition)
 
 	def getExtendedCategoriesDefinition(self, categoriesDefinition):
 		incomingOptions = categoriesDefinition['incoming']

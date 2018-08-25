@@ -9,10 +9,14 @@ from domainexception import DomainException
 class CsvProcessor:
 	def __init__(self, configuration, history):
 		rowDefinition = configuration.getRowDefinition()
+		if rowDefinition == None:
+			raise DomainException('Please provide a row definition before processing a csv')
 		self.rowFactory = RowFactory(rowDefinition)
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
 		self.categoriesDefinition = configuration.getCategories()
+		if self.categoriesDefinition == None:
+			raise DomainException('Please provide categories before processing a csv')
 		self.history = history
 
 	def getPrintedList(self, printableList):
