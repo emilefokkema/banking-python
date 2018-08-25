@@ -79,7 +79,8 @@
 			data:{
 				completePeriods: [],
 				incompletePeriods: [],
-				errorMessage:undefined
+				errorMessage:undefined,
+				settings:undefined
 			},
 			components:{
 				'period-item' : {
@@ -88,7 +89,10 @@
 						fileName:String
 					},
 					data:function(){
-						return {isRemoving:false}
+						return {
+							isRemoving:false,
+							collapsed:true
+						}
 					},
 					computed:{
 						periodDescription:function(){
@@ -108,6 +112,9 @@
 							});
 							req.open("POST","api/delete");
 							req.send(this.fileName)
+						},
+						toggleCollapse:function(){
+							this.collapsed = !this.collapsed
 						}
 					},
 					components:{
@@ -182,22 +189,49 @@
 						}
 					},
 					template:document.getElementById("periodItemTemplate").innerHTML
+				},
+				'settings':{
+					props:{
+						data:Object
+					},
+					data:function(){
+						return {
+							collapsed:true
+						};
+					},
+					methods:{
+						toggleCollapse:function(){
+							this.collapsed = !this.collapsed
+						}
+					},
+					template: document.getElementById("settingsTemplate").innerHTML
 				}
 			},
 			mounted:function(){
 				this.refreshComplete();
+				this.getSettings();
 			},
 			methods:{
 				refreshComplete:function(){
 					var self = this;
-					var req = new XMLHttpRequest();
-					onRequestLoaded(req, function(data){
+					this.doGet("/api/complete",function(data){
 						console.log(data);
 						self.completePeriods = data;
-					},function(msg){
+					});
+				},
+				getSettings:function(){
+					var self = this;
+					this.doGet("/api/settings",function(data){
+						console.log(data);
+					});
+				},
+				doGet:function(url, dataCallback){
+					var self = this;
+					var req = new XMLHttpRequest();
+					onRequestLoaded(req, dataCallback,function(msg){
 						self.displayError(msg);
 					});
-					req.open("GET","/api/complete");
+					req.open("GET",url);
 					req.send();
 				},
 				displayError:function(msg){

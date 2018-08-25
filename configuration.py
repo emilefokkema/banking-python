@@ -8,8 +8,11 @@ class Configuration:
 		return self.dataProvider.getItem('row-definition')
 
 	def getCategories(self):
-		categoriesDefinition = self.dataProvider.getItem('categories')
+		categoriesDefinition = self.getCategoryConfiguration()
 		return None if categoriesDefinition == None else self.getExtendedCategoriesDefinition(categoriesDefinition)
+
+	def getCategoryConfiguration(self):
+		return self.dataProvider.getItem('categories')
 
 	def getExtendedCategoriesDefinition(self, categoriesDefinition):
 		incomingOptions = categoriesDefinition['incoming']

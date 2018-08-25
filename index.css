@@ -26,16 +26,34 @@ body{
 #app{
 	margin: 20px;
 }
+.panel{
+	border: 0.5px solid #bbb;
+	font-family: sans-serif;
+	margin-bottom: 10px;
+}
+.panel-title{
+	cursor: pointer;
+}
+.collapsed .panel-header{
+	border-bottom: none;
+}
+.panel-header{
+	padding: 8px;
+	border-bottom: 0.5px solid #eee;
+}
+.panel-body{
+	padding: 8px;
+}
+.collapsed .panel-body{
+	display: none;
+}
 .empty{
 	color:#ccc;
 	padding: 8px;
-	border: 0.5px solid #bbb;
 }
 .period-list-item{
-	font-family: sans-serif;
-	margin-bottom: 10px;
-	border-left: 0.5px solid #bbb;
-	border-right: 0.5px solid #bbb;
+	border-top: none;
+	border-bottom: none;
 }
 .period-list-item.with-beginning{
 	border-top: 0.5px solid #bbb;
@@ -46,13 +64,7 @@ body{
 .period-list-item.removing{
 	color:#ddd;
 }
-.period-header{
-	padding: 8px;
-	border-bottom: 0.5px solid #eee;
-}
-.period-body{
-	padding: 8px;
-}
+
 .category-top{
 	display: inline-block;
 	width: 40%;

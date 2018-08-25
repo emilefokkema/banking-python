@@ -36,9 +36,9 @@
 			</div>
 		</script>
 		<script type="text/template" id="periodItemTemplate">
-			<div class="period-list-item" v-bind:class="{'removing':isRemoving,'with-end':data.hasEnd, 'with-beginning':data.hasBeginning}">
-				<div class="period-header">{{periodDescription}} <remove-button v-if="data.hasEnd" v-on:click="remove"></remove-button></div>
-				<div class="period-body">
+			<div class="panel period-list-item" v-bind:class="{'removing':isRemoving,'with-end':data.hasEnd, 'with-beginning':data.hasBeginning, 'collapsed':collapsed}">
+				<div class="panel-header"><span class="panel-title" v-on:click="toggleCollapse">{{periodDescription}}</span> <remove-button v-if="data.hasEnd" v-on:click="remove"></remove-button></div>
+				<div class="panel-body">
 					<category v-bind:top="true" v-bind:categoryData="data.Bij"></category>
 					<category v-bind:top="true" v-bind:categoryData="data.Af"></category>
 				</div>
@@ -56,9 +56,18 @@
 				<amount v-bind:numberOfCents="amountProperty.value" v-if="amountProperty" class="row-part"></amount>
 			</div>
 		</script>
+		<script type="text/template" id="settingsTemplate">
+			<div class="panel" v-bind:class="{'collapsed':collapsed}">
+				<div class="panel-header"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div>
+				<div class="panel-body">
+					hello
+				</div>
+			</div>
+		</script>
 		<div id="app">
+			<settings v-bind:data="settings"></settings>
 			<div>
-				<div class="period-list-item empty" v-if="completePeriods.length == 0">(no history)</div>
+				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>
 			</div>
 			<div>

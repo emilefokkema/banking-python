@@ -13,7 +13,7 @@ PORT = 8000
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, request, client_address, server):
-		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute()]
+		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute(), GetSettingsRoute()]
 		super(MyHandler, self).__init__(request, client_address, server)
 
 	def do_GET(self):
@@ -82,8 +82,6 @@ class ApiPostRoute(ApiRoute):
 		self.method = 'POST'
 
 class PostCsvRoute(ApiPostRoute):
-	def __init__(self):
-		super(PostCsvRoute, self).__init__()
 
 	def handles(self, path):
 		return path == '/api/csv'
@@ -92,8 +90,6 @@ class PostCsvRoute(ApiPostRoute):
 		return CsvProcessor(self.configuration, self.history).processCsv(data.splitlines())
 
 class DeleteJsonRoute(ApiPostRoute):
-	def __init__(self):
-		super(DeleteJsonRoute, self).__init__()
 
 	def handles(self, path):
 		return path == '/api/delete'
@@ -103,14 +99,20 @@ class DeleteJsonRoute(ApiPostRoute):
 		return 'OK'
 
 class CompletePeriodsRoute(ApiGetRoute):
-	def __init__(self):
-		super(CompletePeriodsRoute, self).__init__()
 
 	def handles(self, path):
 		return path == '/api/complete'
 
 	def handle(self, path):
 		return self.history.getAll()
+
+class GetSettingsRoute(ApiGetRoute):
+	
+	def handles(self, path):
+		return path == '/api/settings'
+
+	def handle(self, path):
+		return {'rowDefinition':self.configuration.getRowDefinition(),'categories':self.configuration.getCategoryConfiguration()}
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("serving at port", PORT)
