@@ -36,22 +36,24 @@
 			</div>
 		</script>
 		<script type="text/template" id="periodItemTemplate">
-			<div class="period-list-item" v-bind:class="{'removing':isRemoving}">
-				<div>van <date v-bind:date="data.from"></date> t/m <date v-bind:date="data.through"></date> <span v-if="!data.hasEnd">(niet compleet)</span><remove-button v-if="data.hasEnd" v-on:click="remove"></remove-button></div>
-				<category v-bind:top="true" v-bind:categoryData="data.Bij"></category>
-				<category v-bind:top="true" v-bind:categoryData="data.Af"></category>
+			<div class="period-list-item" v-bind:class="{'removing':isRemoving,'with-end':data.hasEnd, 'with-beginning':data.hasBeginning}">
+				<div class="period-header">{{periodDescription}} <remove-button v-if="data.hasEnd" v-on:click="remove"></remove-button></div>
+				<div class="period-body">
+					<category v-bind:top="true" v-bind:categoryData="data.Bij"></category>
+					<category v-bind:top="true" v-bind:categoryData="data.Af"></category>
+				</div>
 			</div>
 		</script>
 		<script type="text/template" id="expectationTemplate">
 			<span class="expectation" v-bind:title="dateSummary"> ({{expectation.actual}})</span>
 		</script>
 		<script type="text/template" id="rowTemplate">
-			<div class="row" v-bind:title="row.info">
-				<template v-for="prop in row">
-					<template v-if="prop.type == 'string'">{{prop.value}}</template>
-					<date v-bind:date="prop.value" v-if="prop.type=='date'"></date>
-					<amount v-bind:numberOfCents="prop.value" v-if="prop.type=='amount'"></amount>
-				</template>
+			<div class="row">
+				<date v-bind:date="dateProperty.value" v-if="dateProperty" class="row-part"></date>
+				<div class="row-part">
+					<div class="string-property" v-for="prop in stringProperties"><span class="string-property-name" v-if="stringProperties.length > 1">{{prop.name}}:&nbsp;</span>{{prop.value}}</div>
+				</div>
+				<amount v-bind:numberOfCents="amountProperty.value" v-if="amountProperty" class="row-part"></amount>
 			</div>
 		</script>
 		<div id="app">

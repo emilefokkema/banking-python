@@ -1,13 +1,24 @@
 body{
 	margin:0px;
 	padding: 0px;
+	font-size: 16px;
+	color: #222;
 }
 .error{
 	color: #a00;
 	padding: 5px;
 	margin-top: 5px;
-	font-family: monospace;
+	font-family: sans-serif;
 }
+
+.date{
+	border-radius: 4px;
+	background-color: #efefef;
+	font-size: 14px;
+	padding: 2px;
+	color:#777;
+}
+
 .remove-button{
 	cursor: pointer;
 	float: right;
@@ -17,15 +28,30 @@ body{
 }
 .empty{
 	color:#ccc;
+	padding: 8px;
+	border: 0.5px solid #bbb;
 }
 .period-list-item{
-	padding: 10px;
-	font-family: monospace;
+	font-family: sans-serif;
 	margin-bottom: 10px;
-	border: 0.5px solid #ccc;
+	border-left: 0.5px solid #bbb;
+	border-right: 0.5px solid #bbb;
+}
+.period-list-item.with-beginning{
+	border-top: 0.5px solid #bbb;
+}
+.period-list-item.with-end{
+	border-bottom: 0.5px solid #bbb;
 }
 .period-list-item.removing{
 	color:#ddd;
+}
+.period-header{
+	padding: 8px;
+	border-bottom: 0.5px solid #eee;
+}
+.period-body{
+	padding: 8px;
 }
 .category-top{
 	display: inline-block;
@@ -33,8 +59,8 @@ body{
 	vertical-align: top;
 }
 .category{
-	padding:5px;
-	margin: 5px;
+	padding:5px 0px 5px 0px;
+	margin: 5px 0px 5px 1.5em;
 }
 .plus{
 	display: none;
@@ -46,7 +72,7 @@ body{
 	display: initial;
 }
 .category-set{
-	border-left: 0.5px solid #ccc;
+	/*border-left: 0.5px solid #ccc;*/
 }
 .collapsed > .category-set{
 	display: none;
@@ -56,19 +82,33 @@ body{
 }
 .plus::before{
 	content:"+";
+	font-family: monospace;
 	margin-right: 0.5em;
 }
 .minus::before{
 	content:"-";
+	font-family: monospace;
 	margin-right: 0.5em;
 }
 .neither::before{
-	content:" ";
-	margin-right: 1.5em;
+	content:"+";
+	font-family: monospace;
+	color: #fff;
+	margin-right: 0.5em;
 }
 .row{
-	background-color: #efefef;
-	padding:5px;
+	padding:8px 0px 8px 0px;
+	margin-left: 1.5em;
+	border-bottom: 0.5px solid #ddd;
+	display: block;
+}
+.string-property-name{
+	color:#999;
+}
+.row-part{
+	max-width: calc(100% - 7em);
+	display: inline-block;
+	vertical-align: top;
 }
 .toggle-collapse{
 	cursor: pointer;

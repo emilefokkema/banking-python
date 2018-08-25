@@ -1,4 +1,11 @@
 (function(){
+	var zeroPadded = function(n, l){
+		var result = n.toString();
+		while(result.length < l){
+			result = "0" + result;
+		}
+		return result;
+	};
 	var dateReviver = function(key, value){
 		if(typeof value !== "string"){
 			return value;
@@ -42,10 +49,7 @@
 			},
 			computed:{
 				formattedAmount:function(){
-					var cents = this.numberOfCents % 100;
-					var centString = (cents < 10 ? "0" : "")+cents.toString();
-					var euroString = Math.floor(this.numberOfCents / 100).toString();
-					return "&euro;&nbsp;"+euroString+","+centString;
+					return (this.numberOfCents/100).toLocaleString("nl-NL",{style:"currency",currency:"EUR"})
 				}
 			},
 			template:'<span class="amount" v-html="formattedAmount"></span>'
@@ -56,14 +60,19 @@
 			},
 			computed:{
 				formattedDate:function(){
-					if(this.date.getHours() == 0 && this.date.getMinutes() == 0){
-						return this.date.toLocaleDateString("nl-NL",{day:"numeric",month:"numeric"});
-					}
-					return this.date.toLocaleDateString("nl-NL",{day:"numeric",month:"numeric",hour:"numeric",minute:"numeric"});
+					return this.date.toLocaleDateString("nl-NL",{day:"numeric",month:"numeric"});
 				},
-				dayOfWeek:function(){return this.date.toLocaleDateString("nl-NL",{weekday:"long"});}
+				title:function(){
+					var result = this.date.toLocaleDateString("nl-NL",{weekday:"long"});
+					var hours = this.date.getHours();
+					var minutes = this.date.getMinutes();
+					if(hours != 0 || minutes != 0){
+						result += ", "+zeroPadded(hours, 2) + ":" + zeroPadded(minutes, 2);
+					}
+					return result;
+				}
 			},
-			template: '<span v-bind:title="dayOfWeek">{{formattedDate}}</span>'
+			template: '<span v-bind:title="title" class="date">{{formattedDate}}</span>'
 		};
 		new Vue({
 			el:"#app",
@@ -80,6 +89,11 @@
 					},
 					data:function(){
 						return {isRemoving:false}
+					},
+					computed:{
+						periodDescription:function(){
+							return this.data.from.toLocaleDateString("nl-NL",{day:"numeric",month:"long"}) + " - " + this.data.through.toLocaleDateString("nl-NL",{day:"numeric",month:"long"});
+						}
 					},
 					methods:{
 						remove:function(){
@@ -117,7 +131,18 @@
 									components:{
 										'row':{
 											props:{
-												row:Object
+												row:Array
+											},
+											computed:{
+												dateProperty:function(){
+													return this.row.find(function(p){return p.type == 'date';})
+												},
+												amountProperty:function(){
+													return this.row.find(function(p){return p.type == 'amount';})
+												},
+												stringProperties:function(){
+													return this.row.filter(function(p){return p.type == 'string';})
+												}
 											},
 											components:{
 												'amount':amount,
