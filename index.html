@@ -60,12 +60,33 @@
 			<div class="panel" v-bind:class="{'collapsed':collapsed}">
 				<div class="panel-header"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div>
 				<div class="panel-body">
-					hello
+					<div class="column-slots">
+						<column-slot v-for="slot in slots" v-bind:data="slot"></column-slot>
+					</div>
 				</div>
 			</div>
 		</script>
+		<script type="text/template" id="columnSlotTemplate">
+			<div class="column-slot">
+				<div class="slot-index">{{data.index}}<div>
+				<template v-if="data.type == 'date'">
+					<span class="fas fa-calendar-alt"></span><input class="input" v-model="data.definition.pattern"/>
+				</template>
+				<template v-if="data.type == 'direction'">
+					<div>
+						<span class="fas fa-plus"></span><input class="input" v-model="data.definition.incoming"/>
+					</div>
+					<div>
+						<span class="fas fa-minus"></span><input class="input" v-model="data.definition.outgoing"/>
+					</div>
+				</template>
+				<span v-if="!data.type"><input class="input" v-model="data.newName" placeholder="?" /></span>
+				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" /></span>
+				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
+			</div>
+		</script>
 		<div id="app">
-			<settings v-bind:data="settings"></settings>
+			<settings v-bind:data="settings" ref="settings"></settings>
 			<div>
 				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>
@@ -74,8 +95,8 @@
 				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div>
-				<input type="file" ref="file" accept=".csv" />
-				<input type="button" value="submit" v-on:click="postCsv" />
+				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
+				<input type="button" class="input" value="submit" v-on:click="postCsv" />
 			</div>
 			<div class="error" v-if="errorMessage">{{errorMessage}}</div>
 		</div>

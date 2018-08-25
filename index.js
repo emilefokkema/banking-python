@@ -80,7 +80,8 @@
 				completePeriods: [],
 				incompletePeriods: [],
 				errorMessage:undefined,
-				settings:undefined
+				settings:undefined,
+				fileName:undefined
 			},
 			components:{
 				'period-item' : {
@@ -196,12 +197,59 @@
 					},
 					data:function(){
 						return {
-							collapsed:true
+							collapsed:true,
+							slots:[]
 						};
+					},
+					components:{
+						'column-slot':{
+							props:{
+								data:Object
+							},
+							updated:function(){console.log("slot updated");},
+							template:document.getElementById("columnSlotTemplate").innerHTML
+						}
+					},
+					updated:function(){
+						console.log("settings updated",this.data);
+					},
+					watch:{
+						data:function(v){
+							var self = this;
+							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
+							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
+						}
+					},
+					computed:{
+						definitions:function(){
+							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional);
+						}
 					},
 					methods:{
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
+						},
+						makeSlotData:function(index){
+							var definition = this.definitions.find(function(d){return d.columnIndex == index;});
+							var type = undefined;
+							if(definition == this.data.rowDefinition.amount){
+								type = "amount";
+							}
+							else if(definition == this.data.rowDefinition.date){
+								type = "date";
+							}
+							else if(definition == this.data.rowDefinition.direction){
+								type = "direction";
+							}
+							else if(definition){
+								type = "string";
+							}
+							return {
+								index:index + 1,
+								type:type,
+								newName:undefined,
+								definition:definition
+							};
 						}
 					},
 					template: document.getElementById("settingsTemplate").innerHTML
@@ -212,17 +260,19 @@
 				this.getSettings();
 			},
 			methods:{
+				fileNameChange:function(){
+					this.fileName = this.$refs.file.files[0].name;
+				},
 				refreshComplete:function(){
 					var self = this;
 					this.doGet("/api/complete",function(data){
-						console.log(data);
 						self.completePeriods = data;
 					});
 				},
 				getSettings:function(){
 					var self = this;
 					this.doGet("/api/settings",function(data){
-						console.log(data);
+						self.settings = data;
 					});
 				},
 				doGet:function(url, dataCallback){
@@ -251,6 +301,7 @@
 								.filter(function(m){return m.file.hasBeginning;});
 							self.refreshComplete();
 							self.$refs.file.value = "";
+							self.fileName = "";
 						},function(msg){
 							self.displayError(msg);
 						});

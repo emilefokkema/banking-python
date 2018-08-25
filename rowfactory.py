@@ -1,6 +1,7 @@
 from datetime import datetime
 from direction import Direction
 from rowpropertytype import RowPropertyType
+from domainexception import DomainException
 import re
 
 class RowPropertyParser:
@@ -22,10 +23,22 @@ class RowPropertyParser:
 class RowDateParser(RowPropertyParser):
 	def __init__(self, options):
 		super(RowDateParser, self).__init__('date', RowPropertyType.DATE, options)
-		self.pattern = options['pattern']
+		self.originalPattern = options['pattern']
+		self.cleanedPattern = self.cleanPattern(self.originalPattern)
+
+	def cleanPattern(self, originalPattern):
+		result = re.sub('yyyy',r'%Y', originalPattern, 0, re.I)
+		result = re.sub('yy',r'%y', result, 0, re.I)
+		result = re.sub('mm',r'%m', result, 0, re.I)
+		result = re.sub('dd',r'%d', result, 0, re.I)
+		return result
 
 	def parseValue(self, csvRowValue):
-		return datetime.strptime(csvRowValue, self.pattern)
+		try:
+			return datetime.strptime(csvRowValue, self.cleanedPattern)
+		except ValueError as e:
+			msg = '\''+csvRowValue+'\' does not match pattern \''+self.originalPattern+'\'. Please make sure the date column is the correct one and that the correct pattern was configured.'
+			raise DomainException(msg)
 
 class RowNumberOfCentsParser(RowPropertyParser):
 	def __init__(self, options):
