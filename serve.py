@@ -6,8 +6,8 @@ import jsonprinter
 from dataprovider import DataProvider
 from periodhistory import PeriodHistory
 import traceback
-import os
 from domainexception import DomainException
+from configuration import Configuration
 
 PORT = 8000
 
@@ -69,6 +69,7 @@ class ApiRoute:
 	def __init__(self):
 		self.dataProvider = DataProvider()
 		self.history = PeriodHistory(self.dataProvider)
+		self.configuration = Configuration(self.dataProvider)
 
 class ApiGetRoute(ApiRoute):
 	def __init__(self):
@@ -88,7 +89,7 @@ class PostCsvRoute(ApiPostRoute):
 		return path == '/api/csv'
 
 	def handle(self, data):
-		return CsvProcessor(self.dataProvider, self.history).processCsv(data.splitlines())
+		return CsvProcessor(self.configuration, self.history).processCsv(data.splitlines())
 
 class DeleteJsonRoute(ApiPostRoute):
 	def __init__(self):

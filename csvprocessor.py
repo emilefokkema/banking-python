@@ -7,21 +7,12 @@ import jsonprinter
 from domainexception import DomainException
 
 class CsvProcessor:
-	def __init__(self, dataProvider, history):
-		try:
-			rowDefinition = dataProvider.getItem('row-definition')
-		except FileNotFoundError:
-			raise DomainException('Please provide a row definition before processing a csv')
-		
+	def __init__(self, configuration, history):
+		rowDefinition = configuration.getRowDefinition()
 		self.rowFactory = RowFactory(rowDefinition)
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
-		try:
-			self.categoriesDefinition = dataProvider.getItem('categories')
-		except FileNotFoundError:
-			raise DomainException('Please provide categories before processing a csv')
-
-		self.dataProvider = dataProvider
+		self.categoriesDefinition = configuration.getCategories()
 		self.history = history
 
 	def getPrintedList(self, printableList):

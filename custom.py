@@ -3,24 +3,6 @@ from printablelist import PrintableList
 import re
 from direction import Direction
 
-def getExtendedCategoriesDefinition(categoriesDefinition):
-	incomingOptions = categoriesDefinition['incoming']
-	outgoingOptions = categoriesDefinition['outgoing']
-	return {
-		'categories':[
-			{
-				'name':outgoingOptions['name'],
-				'acceptRow': {'outgoing':True},
-				'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
-			},
-			{
-				'name':incomingOptions['name'],
-				'acceptRow':{'incoming':True},
-				'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
-			}
-		]
-	}
-
 class AfBij(cat.OptionableCategory):
 	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
 		super(AfBij, self).__init__(options, rowCheckerFactory, rowCollectionFactory)
@@ -69,8 +51,8 @@ class PeriodFile:
 			self.period.printSelf(printer1)
 
 class TopCategory:
-	def __init__(self, rowCheckerFactory, rowCollectionFactory, categoriesDefinition):
-		self.categoriesDefinition = getExtendedCategoriesDefinition(categoriesDefinition)
+	def __init__(self, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration):
+		self.categoriesConfiguration = categoriesConfiguration
 		self.rowCheckerFactory = rowCheckerFactory
 		self.rowCollectionFactory = rowCollectionFactory
 		currentCategory = self.getNewPeriod()
@@ -78,7 +60,7 @@ class TopCategory:
 		self.categories = PrintableList([currentCategory])
 
 	def getNewPeriod(self):
-		return AfBij(self.categoriesDefinition, self.rowCheckerFactory, self.rowCollectionFactory)
+		return AfBij(self.categoriesConfiguration, self.rowCheckerFactory, self.rowCollectionFactory)
 
 	def renewCategory(self):
 		self.currentCategory.end()
