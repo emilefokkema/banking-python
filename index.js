@@ -206,18 +206,25 @@
 							props:{
 								data:Object
 							},
-							updated:function(){console.log("slot updated");},
+							computed:{
+								name:function(){return this.data.definition.name;}
+							},
+							watch:{
+								name:function(v){
+									if(v && !this.data.definitionExists){
+										this.$emit("definitioncreated", this.data.definition);
+									}
+									if(!v && this.data.definitionExists){
+										this.$emit("definitionremoved",this.data.definition);
+									}
+								}
+							},
 							template:document.getElementById("columnSlotTemplate").innerHTML
 						}
 					},
-					updated:function(){
-						console.log("settings updated",this.data);
-					},
 					watch:{
 						data:function(v){
-							var self = this;
-							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
-							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
+							this.createSlots();
 						}
 					},
 					computed:{
@@ -226,15 +233,44 @@
 						}
 					},
 					methods:{
+						onDefinitionCreated:function(d){
+							console.log("definition crated");
+							this.data.rowDefinition.additional.push(d);
+							this.createSlots();
+						},
+						onDefinitionRemoved:function(d){
+							console.log("definition removed");
+							var index = this.data.rowDefinition.additional.indexOf(d);
+							this.data.rowDefinition.additional.splice(index, 1);
+							this.createSlots();
+						},
+						addNewSlot:function(){
+							this.slots.push(this.makeSlotData(this.slots.length));
+						},
+						createSlots:function(){
+							var self = this;
+							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
+							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
+						},
 						save:function(){
 							console.log("saving "+JSON.stringify(this.data.rowDefinition));
 						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
 						},
+						makeNewSlotData:function(index){
+							return {
+								definitionExists:false,
+								type:"string",
+								definition:{name:undefined,columnIndex:index}
+							};
+						},
 						makeSlotData:function(index){
 							var definition = this.definitions.find(function(d){return d.columnIndex == index;});
-							var type = undefined;
+							if(!definition){
+								return this.makeNewSlotData(index);
+							}
+							var type;
 							if(definition == this.data.rowDefinition.amount){
 								type = "amount";
 							}
@@ -244,13 +280,12 @@
 							else if(definition == this.data.rowDefinition.direction){
 								type = "direction";
 							}
-							else if(definition){
+							else{
 								type = "string";
 							}
 							return {
-								index:index + 1,
+								definitionExists:true,
 								type:type,
-								newName:undefined,
 								definition:definition
 							};
 						}

@@ -61,7 +61,8 @@
 				<div class="panel-header"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div>
 				<div class="panel-body">
 					<div class="column-slots">
-						<column-slot v-for="slot in slots" v-bind:data="slot"></column-slot>
+						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved"></column-slot>
+						<span class="fas fa-plus add-slot-button" v-on:click="addNewSlot"></span>
 					</div>
 				</div>
 				<div class="panel-footer">
@@ -71,7 +72,7 @@
 		</script>
 		<script type="text/template" id="columnSlotTemplate">
 			<div class="column-slot">
-				<div class="slot-index">{{data.index}}<div>
+				<div class="slot-index">#{{data.definition.columnIndex + 1}}<div>
 				<template v-if="data.type == 'date'">
 					<span class="fas fa-calendar-alt"></span><input class="input" v-model="data.definition.pattern"/>
 				</template>
@@ -83,8 +84,7 @@
 						<span class="fas fa-minus"></span><input class="input" v-model="data.definition.outgoing"/>
 					</div>
 				</template>
-				<span v-if="!data.type"><input class="input" v-model="data.newName" placeholder="?" /></span>
-				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" /></span>
+				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" placeholder="?" /></span>
 				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
 			</div>
 		</script>

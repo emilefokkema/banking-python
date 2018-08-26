@@ -170,6 +170,9 @@ span.toggle-collapse > .amount{
 	border: 0.5px solid #bbb;
 	min-width: 7em;
 }
+.add-slot-button{
+	cursor: pointer;
+}
 .save-button{
 	display: inline-block;
 	float: right;
