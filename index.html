@@ -64,6 +64,9 @@
 						<column-slot v-for="slot in slots" v-bind:data="slot"></column-slot>
 					</div>
 				</div>
+				<div class="panel-footer">
+					<span class="fas fa-save save-button" v-on:click="save"></span>
+				</div>
 			</div>
 		</script>
 		<script type="text/template" id="columnSlotTemplate">

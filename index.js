@@ -226,6 +226,9 @@
 						}
 					},
 					methods:{
+						save:function(){
+							console.log("saving "+JSON.stringify(this.data.rowDefinition));
+						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
 						},
