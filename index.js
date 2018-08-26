@@ -198,7 +198,8 @@
 					data:function(){
 						return {
 							collapsed:true,
-							slots:[]
+							slots:[],
+							selectedSlots:[]
 						};
 					},
 					components:{
@@ -207,7 +208,19 @@
 								data:Object
 							},
 							computed:{
-								name:function(){return this.data.definition.name;}
+								name:function(){return this.data.definition.name;},
+								index:function(){return this.data.definition.columnIndex;}
+							},
+							methods:{
+								onClick:function(e){
+									if(e.target.nodeName.toLowerCase() !== "input"){
+										if(!this.data.selected){
+											this.$emit("selected", this.index);
+										}else{
+											this.$emit("deselected", this.index);
+										}
+									}
+								}
 							},
 							watch:{
 								name:function(v){
@@ -230,9 +243,33 @@
 					computed:{
 						definitions:function(){
 							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional);
+						},
+						canSwitch:function(){
+							return this.selectedSlots.length == 2;
 						}
 					},
 					methods:{
+						doSlotSwitch:function(){
+							var self = this;
+							var slot1 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[0];});
+							var slot2 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[1];});
+							slot1.definition.columnIndex = this.selectedSlots[1];
+							slot2.definition.columnIndex = this.selectedSlots[0];
+							this.createSlots();
+						},
+						onSlotSelected:function(i){
+							if(this.selectedSlots.length < 2){
+								this.selectedSlots.push(i);
+							}else{
+								this.slots[this.selectedSlots[0]].selected = false;
+								this.selectedSlots[0] = i;
+							}
+							this.slots[i].selected = true;
+						},
+						onSlotDeselected:function(i){
+							this.selectedSlots.splice(this.selectedSlots.indexOf(i), 1);
+							this.slots[i].selected = false;
+						},
 						onDefinitionCreated:function(d){
 							console.log("definition crated");
 							this.data.rowDefinition.additional.push(d);
@@ -248,6 +285,7 @@
 							this.slots.push(this.makeSlotData(this.slots.length));
 						},
 						createSlots:function(){
+							this.selectedSlots = [];
 							var self = this;
 							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
@@ -261,6 +299,7 @@
 						makeNewSlotData:function(index){
 							return {
 								definitionExists:false,
+								selected:false,
 								type:"string",
 								definition:{name:undefined,columnIndex:index}
 							};
@@ -286,7 +325,8 @@
 							return {
 								definitionExists:true,
 								type:type,
-								definition:definition
+								definition:definition,
+								selected:false
 							};
 						}
 					},

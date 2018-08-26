@@ -169,8 +169,16 @@ span.toggle-collapse > .amount{
 	margin: 5px;
 	border: 0.5px solid #bbb;
 	min-width: 7em;
+	cursor: pointer;
+}
+.column-slot.selected{
+	background-color: #bbb;
+	color:#fff;
 }
 .add-slot-button{
+	cursor: pointer;
+}
+.slot-switch-button{
 	cursor: pointer;
 }
 .save-button{
