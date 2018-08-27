@@ -202,7 +202,8 @@
 							data: undefined,
 							collapsed:true,
 							slots:[],
-							selectedSlots:[]
+							selectedSlots:[],
+							dirty:false
 						};
 					},
 					mounted:function(){
@@ -261,10 +262,12 @@
 								if(data){
 									self.data = data;
 									self.$emit("settingssaved");
+									self.dirty = false;
 								}else{
 									self.collapsed = false;
 									doGet("/api/settings/default", function(data){
 										self.data = data;
+										self.dirty = true;
 									}, function(msg){self.$emit("error",msg);})
 								}
 							},function(msg){self.$emit("error",msg);});
@@ -275,6 +278,9 @@
 							var slot2 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[1];});
 							slot1.definition.columnIndex = this.selectedSlots[1];
 							slot2.definition.columnIndex = this.selectedSlots[0];
+							if(this.definitions.indexOf(slot1.definition) != -1 || this.definitions.indexOf(slot2.definition) != -1){
+								this.dirty = true;
+							}
 							this.createSlots();
 						},
 						onSlotSelected:function(i){
@@ -294,12 +300,14 @@
 							console.log("definition crated");
 							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
+							this.dirty = true;
 						},
 						onDefinitionRemoved:function(d){
 							console.log("definition removed");
 							var index = this.data.rowDefinition.additional.indexOf(d);
 							this.data.rowDefinition.additional.splice(index, 1);
 							this.createSlots();
+							this.dirty = true;
 						},
 						addNewSlot:function(){
 							this.slots.push(this.makeSlotData(this.slots.length));
@@ -311,10 +319,13 @@
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
 						},
 						save:function(){
-							console.log("saving "+JSON.stringify(this.data.rowDefinition));
+							var self = this;
+							doPost("/api/settings", JSON.stringify(this.data), function(){
+								self.getSettings();
+							}, function(msg){self.$emit("error",msg);});
 						},
 						toggleCollapse:function(){
-							this.collapsed = !this.collapsed
+							this.collapsed = !this.collapsed;
 						},
 						makeNewSlotData:function(index){
 							return {

@@ -13,7 +13,7 @@ PORT = 8000
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, request, client_address, server):
-		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute(), GetSettingsRoute(), GetDefaultSettingsRoute()]
+		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute(), GetSettingsRoute(), GetDefaultSettingsRoute(), SaveSettingsRoute()]
 		super(MyHandler, self).__init__(request, client_address, server)
 
 	def do_GET(self):
@@ -90,6 +90,16 @@ class PostCsvRoute(ApiPostRoute):
 		if settings == None:
 			raise DomainException('please provide settings before processing a csv')
 		return CsvProcessor(settings, self.history).processCsv(data.splitlines())
+
+class SaveSettingsRoute(ApiPostRoute):
+
+	def handles(self, path):
+		return path == '/api/settings'
+
+	def handle(self, data):
+		settingsObj = json.loads(data)
+		self.dataProvider.setItem('settings', settingsObj)
+		return 'OK'
 
 class DeleteJsonRoute(ApiPostRoute):
 

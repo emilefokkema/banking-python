@@ -67,7 +67,7 @@
 					</div>
 				</div>
 				<div class="panel-footer">
-					<span class="fas fa-save save-button" v-on:click="save"></span>
+					<span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>
 				</div>
 			</div>
 		</script>
@@ -90,7 +90,7 @@
 			</div>
 		</script>
 		<div id="app">
-			<settings v-on:settingssaved="setSettingsSaved"></settings>
+			<settings v-on:settingssaved="setSettingsSaved" v-on:error="displayError"></settings>
 			<div>
 				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>
