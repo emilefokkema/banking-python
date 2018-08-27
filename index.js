@@ -93,7 +93,7 @@
 				incompletePeriods: [],
 				errorMessage:undefined,
 				fileName:undefined,
-				settingsSaved:false
+				settingsDirty:false
 			},
 			components:{
 				'period-item' : {
@@ -227,6 +227,9 @@
 											this.$emit("deselected", this.index);
 										}
 									}
+								},
+								onChange:function(){
+									this.$emit("change");
 								}
 							},
 							watch:{
@@ -245,6 +248,13 @@
 					watch:{
 						data:function(v){
 							this.createSlots();
+						},
+						dirty:function(v){
+							if(v){
+								this.$emit("settingsdirty");
+							}else{
+								this.$emit("settingsclean");
+							}
 						}
 					},
 					computed:{
@@ -261,7 +271,6 @@
 							doGet("/api/settings",function(data){
 								if(data){
 									self.data = data;
-									self.$emit("settingssaved");
 									self.dirty = false;
 								}else{
 									self.collapsed = false;
@@ -271,6 +280,9 @@
 									}, function(msg){self.$emit("error",msg);})
 								}
 							},function(msg){self.$emit("error",msg);});
+						},
+						onSlotChanged:function(){
+							this.dirty = true;
 						},
 						doSlotSwitch:function(){
 							var self = this;
@@ -369,8 +381,11 @@
 				
 			},
 			methods:{
-				setSettingsSaved:function(){
-					this.settingsSaved = true;
+				setSettingsDirty:function(){
+					this.settingsDirty = true;
+				},
+				setSettingsClean:function(){
+					this.settingsDirty = false;
 				},
 				fileNameChange:function(){
 					this.fileName = this.$refs.file.files[0].name;

@@ -186,3 +186,8 @@ span.toggle-collapse > .amount{
 	float: right;
 	cursor: pointer;
 }
+.reset-button{
+	display: inline-block;
+	float: left;
+	cursor: pointer;
+}

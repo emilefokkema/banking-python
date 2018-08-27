@@ -61,13 +61,13 @@
 				<div class="panel-header"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div>
 				<div class="panel-body">
 					<div class="column-slots">
-						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected"></column-slot>
+						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onSlotChanged"></column-slot>
 						<span class="fas fa-plus add-slot-button" v-on:click="addNewSlot"></span>
 						<span class="fas fa-exchange-alt slot-switch-button" v-on:click="doSlotSwitch" v-if="canSwitch"></span>
 					</div>
 				</div>
 				<div class="panel-footer">
-					<span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>
+					<span class="fas fa-undo-alt reset-button" v-on:click="getSettings" v-if="dirty"></span><span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>
 				</div>
 			</div>
 		</script>
@@ -75,22 +75,22 @@
 			<div class="column-slot" v-on:click="onClick" v-bind:class="{'selected':data.selected}">
 				<div class="slot-index">#{{index + 1}}<div>
 				<template v-if="data.type == 'date'">
-					<span class="fas fa-calendar-alt"></span><input class="input" v-model="data.definition.pattern"/>
+					<span class="fas fa-calendar-alt"></span><input class="input" v-model="data.definition.pattern" v-on:input="onChange"/>
 				</template>
 				<template v-if="data.type == 'direction'">
 					<div>
-						<span class="fas fa-plus"></span><input class="input" v-model="data.definition.incoming"/>
+						<span class="fas fa-plus"></span><input class="input" v-model="data.definition.incoming" v-on:input="onChange"/>
 					</div>
 					<div>
-						<span class="fas fa-minus"></span><input class="input" v-model="data.definition.outgoing"/>
+						<span class="fas fa-minus"></span><input class="input" v-model="data.definition.outgoing" v-on:input="onChange"/>
 					</div>
 				</template>
-				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" placeholder="?" /></span>
+				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" placeholder="?" v-on:input="onChange"/></span>
 				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
 			</div>
 		</script>
 		<div id="app">
-			<settings v-on:settingssaved="setSettingsSaved" v-on:error="displayError"></settings>
+			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:error="displayError"></settings>
 			<div>
 				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>
@@ -98,7 +98,7 @@
 			<div>
 				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
-			<div v-if="settingsSaved">
+			<div v-if="!settingsDirty">
 				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
 				<input type="button" class="input" value="submit" v-on:click="postCsv" />
 			</div>
