@@ -7,12 +7,13 @@ from dataprovider import DataProvider
 from periodhistory import PeriodHistory
 import traceback
 from domainexception import DomainException
+from defaultsettingsprovider import DefaultSettingsProvider
 
 PORT = 8000
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, request, client_address, server):
-		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute(), GetSettingsRoute()]
+		self.routes = [CompletePeriodsRoute(), PostCsvRoute(), DeleteJsonRoute(), GetSettingsRoute(), GetDefaultSettingsRoute()]
 		super(MyHandler, self).__init__(request, client_address, server)
 
 	def do_GET(self):
@@ -114,6 +115,14 @@ class GetSettingsRoute(ApiGetRoute):
 
 	def handle(self, path):
 		return self.dataProvider.getItem('settings')
+
+class GetDefaultSettingsRoute(ApiGetRoute):
+	
+	def handles(self, path):
+		return path == '/api/settings/default'
+
+	def handle(self, path):
+		return DefaultSettingsProvider().getDefaultSettings()
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("serving at port", PORT)

@@ -263,6 +263,9 @@
 									self.$emit("settingssaved");
 								}else{
 									self.collapsed = false;
+									doGet("/api/settings/default", function(data){
+										self.data = data;
+									}, function(msg){self.$emit("error",msg);})
 								}
 							},function(msg){self.$emit("error",msg);});
 						},
