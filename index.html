@@ -90,7 +90,7 @@
 			</div>
 		</script>
 		<div id="app">
-			<settings v-bind:data="settings" ref="settings"></settings>
+			<settings v-on:settingssaved="setSettingsSaved"></settings>
 			<div>
 				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>
@@ -98,7 +98,7 @@
 			<div>
 				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
-			<div>
+			<div v-if="settingsSaved">
 				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
 				<input type="button" class="input" value="submit" v-on:click="postCsv" />
 			</div>

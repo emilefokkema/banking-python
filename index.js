@@ -30,6 +30,18 @@
 			return new Date(year,monthIndex,day,hours,minutes);
 		}
 	};
+	var doGet = function(url, dataCallback, errorCallback){
+		var req = new XMLHttpRequest();
+		onRequestLoaded(req, dataCallback, errorCallback);
+		req.open("GET",url);
+		req.send();
+	};
+	var doPost = function(url, data, dataCallback, errorCallback){
+		var req = new XMLHttpRequest();
+		onRequestLoaded(req, dataCallback, errorCallback);
+		req.open("POST",url);
+		req.send(data);
+	};
 	var onRequestLoaded = function(req, dataCallback, errorCallback){
 		req.addEventListener("load",function(){
 			var data = JSON.parse(this.responseText, dateReviver);
@@ -80,8 +92,8 @@
 				completePeriods: [],
 				incompletePeriods: [],
 				errorMessage:undefined,
-				settings:undefined,
-				fileName:undefined
+				fileName:undefined,
+				settingsSaved:false
 			},
 			components:{
 				'period-item' : {
@@ -105,14 +117,7 @@
 							var self=this;
 							this.isRemoving = true;
 							console.log("removing "+this.fileName);
-							var req = new XMLHttpRequest();
-							onRequestLoaded(req, function(){
-								self.$emit("removal");
-							},function(msg){
-								self.$emit("error", msg)
-							});
-							req.open("POST","api/delete");
-							req.send(this.fileName)
+							doPost("api/delete", this.fileName, function(){self.$emit("removal");},function(msg){self.$emit("error", msg);});
 						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
@@ -192,15 +197,16 @@
 					template:document.getElementById("periodItemTemplate").innerHTML
 				},
 				'settings':{
-					props:{
-						data:Object
-					},
 					data:function(){
 						return {
+							data: undefined,
 							collapsed:true,
 							slots:[],
 							selectedSlots:[]
 						};
+					},
+					mounted:function(){
+						this.getSettings();
 					},
 					components:{
 						'column-slot':{
@@ -249,6 +255,17 @@
 						}
 					},
 					methods:{
+						getSettings:function(){
+							var self = this;
+							doGet("/api/settings",function(data){
+								if(data){
+									self.data = data;
+									self.$emit("settingssaved");
+								}else{
+									self.collapsed = false;
+								}
+							},function(msg){self.$emit("error",msg);});
+						},
 						doSlotSwitch:function(){
 							var self = this;
 							var slot1 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[0];});
@@ -335,32 +352,20 @@
 			},
 			mounted:function(){
 				this.refreshComplete();
-				this.getSettings();
+				
 			},
 			methods:{
+				setSettingsSaved:function(){
+					this.settingsSaved = true;
+				},
 				fileNameChange:function(){
 					this.fileName = this.$refs.file.files[0].name;
 				},
 				refreshComplete:function(){
 					var self = this;
-					this.doGet("/api/complete",function(data){
+					doGet("/api/complete",function(data){
 						self.completePeriods = data;
-					});
-				},
-				getSettings:function(){
-					var self = this;
-					this.doGet("/api/settings",function(data){
-						self.settings = data;
-					});
-				},
-				doGet:function(url, dataCallback){
-					var self = this;
-					var req = new XMLHttpRequest();
-					onRequestLoaded(req, dataCallback,function(msg){
-						self.displayError(msg);
-					});
-					req.open("GET",url);
-					req.send();
+					},function(msg){self.displayError(msg);});
 				},
 				displayError:function(msg){
 					this.errorMessage = msg || "Internal Server Error";
@@ -372,19 +377,13 @@
 					var self = this;
 					var reader = new FileReader();
 					reader.onload = function(){
-						var data = reader.result;
-						var req = new XMLHttpRequest();
-						onRequestLoaded(req, function(data){
+						doPost("/api/csv", reader.result, function(data){
 							self.incompletePeriods = data
 								.filter(function(m){return m.file.hasBeginning;});
 							self.refreshComplete();
 							self.$refs.file.value = "";
 							self.fileName = "";
-						},function(msg){
-							self.displayError(msg);
-						});
-						req.open("POST","/api/csv");
-						req.send(data);
+						},function(msg){self.displayError(msg);});
 					};
 					reader.readAsBinaryString(file);
 				}
