@@ -61,9 +61,13 @@
 				<div class="panel-header"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div>
 				<div class="panel-body">
 					<div class="column-slots">
-						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onSlotChanged"></column-slot>
+						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onChanged"></column-slot>
 						<span class="fas fa-plus add-slot-button" v-on:click="addNewSlot"></span>
 						<span class="fas fa-exchange-alt slot-switch-button" v-on:click="doSlotSwitch" v-if="canSwitch"></span>
+					</div>
+					<div v-if="data && data.categories">
+						<category-settings v-bind:top="true" v-bind:data="data.categories.incoming" v-on:changed="onChanged"></category-settings>
+						<category-settings v-bind:top="true" v-bind:data="data.categories.outgoing" v-on:changed="onChanged"></category-settings>
 					</div>
 				</div>
 				<div class="panel-footer">
@@ -87,6 +91,17 @@
 				</template>
 				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" placeholder="?" v-on:input="onChange"/></span>
 				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
+			</div>
+		</script>
+		<script type="text/template" id="categorySettingsTemplate">
+			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
+				<span class="toggle-collapse" v-on:click="toggleCollapse">
+					<span class="plus"></span><span class="minus"></span>
+				</span>
+				<input class="input" v-model="data.name" v-on:input="changed"/>
+				<div class="category-set">
+					<category-settings v-for="category in categories" v-bind:data="category" v-on:changed="changed"></category-settings>
+				</div>
 			</div>
 		</script>
 		<div id="app">

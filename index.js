@@ -243,6 +243,30 @@
 								}
 							},
 							template:document.getElementById("columnSlotTemplate").innerHTML
+						},
+						'category-settings':{
+							name:'category-settings',
+							props:{
+								top:Boolean,
+								data:Object
+							},
+							methods:{
+								toggleCollapse:function(){
+									this.collapsed = !this.collapsed;
+								},
+								changed:function(){
+									this.$emit("changed");
+								}
+							},
+							computed:{
+								categories:function(){return this.data.categories || [];}
+							},
+							data:function(){
+								return {
+									collapsed:true
+								}
+							},
+							template:document.getElementById("categorySettingsTemplate").innerHTML
 						}
 					},
 					watch:{
@@ -281,7 +305,7 @@
 								}
 							},function(msg){self.$emit("error",msg);});
 						},
-						onSlotChanged:function(){
+						onChanged:function(){
 							this.dirty = true;
 						},
 						doSlotSwitch:function(){
