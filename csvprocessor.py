@@ -6,17 +6,31 @@ from rowcollection import RowCollectionFactory
 import jsonprinter
 from domainexception import DomainException
 
+def getExtendedCategoriesDefinition(categoriesDefinition):
+		incomingOptions = categoriesDefinition['incoming']
+		outgoingOptions = categoriesDefinition['outgoing']
+		return {
+			'categories':[
+				{
+					'name':outgoingOptions['name'],
+					'acceptRow': {'outgoing':True},
+					'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+				},
+				{
+					'name':incomingOptions['name'],
+					'acceptRow':{'incoming':True},
+					'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+				}
+			]
+		}
+
 class CsvProcessor:
 	def __init__(self, configuration, history):
-		rowDefinition = configuration.getRowDefinition()
-		if rowDefinition == None:
-			raise DomainException('Please provide a row definition before processing a csv')
+		rowDefinition = configuration['rowDefinition']
 		self.rowFactory = RowFactory(rowDefinition)
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
-		self.categoriesDefinition = configuration.getCategories()
-		if self.categoriesDefinition == None:
-			raise DomainException('Please provide categories before processing a csv')
+		self.categoriesDefinition = getExtendedCategoriesDefinition(configuration['categories'])
 		self.history = history
 
 	def getPrintedList(self, printableList):

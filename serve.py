@@ -7,7 +7,6 @@ from dataprovider import DataProvider
 from periodhistory import PeriodHistory
 import traceback
 from domainexception import DomainException
-from configuration import Configuration
 
 PORT = 8000
 
@@ -69,7 +68,6 @@ class ApiRoute:
 	def __init__(self):
 		self.dataProvider = DataProvider()
 		self.history = PeriodHistory(self.dataProvider)
-		self.configuration = Configuration(self.dataProvider)
 
 class ApiGetRoute(ApiRoute):
 	def __init__(self):
@@ -87,7 +85,10 @@ class PostCsvRoute(ApiPostRoute):
 		return path == '/api/csv'
 
 	def handle(self, data):
-		return CsvProcessor(self.configuration, self.history).processCsv(data.splitlines())
+		settings = self.dataProvider.getItem('settings')
+		if settings == None:
+			raise DomainException('please provide settings before processing a csv')
+		return CsvProcessor(settings, self.history).processCsv(data.splitlines())
 
 class DeleteJsonRoute(ApiPostRoute):
 
@@ -112,7 +113,7 @@ class GetSettingsRoute(ApiGetRoute):
 		return path == '/api/settings'
 
 	def handle(self, path):
-		return {'rowDefinition':self.configuration.getRowDefinition(),'categories':self.configuration.getCategoryConfiguration()}
+		return self.dataProvider.getItem('settings')
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("serving at port", PORT)
