@@ -216,7 +216,8 @@
 							},
 							computed:{
 								name:function(){return this.data.definition.name;},
-								index:function(){return this.data.definition.columnIndex;}
+								index:function(){return this.data.definition.columnIndex;},
+								protected:function(){return this.data.protected;}
 							},
 							methods:{
 								onClick:function(e){
@@ -271,9 +272,6 @@
 											chosenProperty:undefined
 										};
 									},
-									computed:{
-										chosenPropertyName:function(){return this.chosenProperty && this.chosenProperty.name;}
-									},
 									mounted:function(){
 										var self = this;
 										this.findChosenProperty();
@@ -292,13 +290,11 @@
 										propertyList:function(){
 											this.findChosenProperty();
 										},
-										chosenPropertyName:function(n){
-											this.chosenName = n;
-										},
 										chosenName:function(n){
 											this.chosenProperty = this.propertyList.find(function(p){return p.name == n;});
 											if(this.chosenProperty && this.chosenProperty.name !== this.data.name){
 												this.data.name = this.chosenProperty.name;
+												this.$emit("propertyusechange");
 											}
 										}
 									},
@@ -400,6 +396,26 @@
 							var self = this;
 							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
+							this.determineProtection();
+						},
+						usesProperty:function(cat, propertyName){
+							var self = this;
+							if(cat.acceptRow && cat.acceptRow.propertyContains && cat.acceptRow.propertyContains.name == propertyName){
+								return true;
+							}
+							if(cat.acceptRow && cat.acceptRow.propertyMatches && cat.acceptRow.propertyMatches.name == propertyName){
+								return true;
+							}
+							return cat.categories && cat.categories.some(function(c){return self.usesProperty(c, propertyName);});
+						},
+						determineProtection:function(){
+							for(var i=0;i<this.slots.length;i++){
+								var slot = this.slots[i];
+								if(!slot.definitionExists){
+									continue;
+								}
+								slot.protected = this.usesProperty(this.data.categories.incoming, slot.definition.name) || this.usesProperty(this.data.categories.outgoing, slot.definition.name);
+							}
 						},
 						save:function(){
 							var self = this;
@@ -412,6 +428,7 @@
 						},
 						makeNewSlotData:function(index){
 							return {
+								protected:false,
 								definitionExists:false,
 								selected:false,
 								type:"string",
@@ -437,6 +454,7 @@
 								type = "string";
 							}
 							return {
+								protected:false,
 								definitionExists:true,
 								type:type,
 								definition:definition,
