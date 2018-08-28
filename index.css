@@ -90,10 +90,11 @@ body{
 	display: inline-block;
 	width: 40%;
 	vertical-align: top;
+	margin-left: 1.5em;
 }
 .category{
 	padding:5px 0px 5px 0px;
-	margin: 5px 0px 5px 1.5em;
+	/*margin: 5px 0px 5px 1.5em;*/
 }
 .plus{
 	display: none;
@@ -105,7 +106,7 @@ body{
 	display: initial;
 }
 .category-set{
-	/*border-left: 0.5px solid #ccc;*/
+	padding-left:1.5em;
 }
 .collapsed > .category-set{
 	display: none;
@@ -131,7 +132,6 @@ body{
 }
 .row{
 	padding:8px 0px 8px 0px;
-	margin-left: 1.5em;
 	border-bottom: 0.5px solid #ddd;
 	display: block;
 }

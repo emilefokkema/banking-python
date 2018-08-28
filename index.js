@@ -248,7 +248,8 @@
 							name:'category-settings',
 							props:{
 								top:Boolean,
-								data:Object
+								data:Object,
+								propertyList:Array
 							},
 							methods:{
 								toggleCollapse:function(){
@@ -256,6 +257,52 @@
 								},
 								changed:function(){
 									this.$emit("changed");
+								}
+							},
+							components:{
+								'property-contains':{
+									props:{
+										data:Object,
+										propertyList:Array
+									},
+									data:function(){
+										return {
+											chosenName:undefined,
+											chosenProperty:undefined
+										};
+									},
+									computed:{
+										chosenPropertyName:function(){return this.chosenProperty && this.chosenProperty.name;}
+									},
+									mounted:function(){
+										var self = this;
+										this.findChosenProperty();
+										this.chosenName = this.chosenProperty.name;
+									},
+									methods:{
+										findChosenProperty:function(){
+											var self = this;
+											this.chosenProperty = this.propertyList.find(function(p){return p.name == self.data.name;});
+										}
+									},
+									watch:{
+										data:function(){
+											this.findChosenProperty();
+										},
+										propertyList:function(){
+											this.findChosenProperty();
+										},
+										chosenPropertyName:function(n){
+											this.chosenName = n;
+										},
+										chosenName:function(n){
+											this.chosenProperty = this.propertyList.find(function(p){return p.name == n;});
+											if(this.chosenProperty && this.chosenProperty.name !== this.data.name){
+												this.data.name = this.chosenProperty.name;
+											}
+										}
+									},
+									template:document.getElementById("propertyContainsTemplate").innerHTML
 								}
 							},
 							computed:{
