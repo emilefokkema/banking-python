@@ -203,7 +203,8 @@
 							collapsed:true,
 							slots:[],
 							selectedSlots:[],
-							dirty:false
+							dirty:false,
+							saved:false
 						};
 					},
 					mounted:function(){
@@ -270,38 +271,6 @@
 										data:Object,
 										propertyList:Array
 									},
-									data:function(){
-										return {
-											chosenName:undefined,
-											chosenProperty:undefined
-										};
-									},
-									mounted:function(){
-										var self = this;
-										this.findChosenProperty();
-										this.chosenName = this.chosenProperty.name;
-									},
-									methods:{
-										findChosenProperty:function(){
-											var self = this;
-											this.chosenProperty = this.propertyList.find(function(p){return p.name == self.data.name;});
-										}
-									},
-									watch:{
-										data:function(){
-											this.findChosenProperty();
-										},
-										propertyList:function(){
-											this.findChosenProperty();
-										},
-										chosenName:function(n){
-											this.chosenProperty = this.propertyList.find(function(p){return p.name == n;});
-											if(this.chosenProperty && this.chosenProperty.name !== this.data.name){
-												this.data.name = this.chosenProperty.name;
-												this.$emit("propertyusechange");
-											}
-										}
-									},
 									template:document.getElementById("propertyContainsTemplate").innerHTML
 								}
 							},
@@ -343,11 +312,13 @@
 								if(data){
 									self.data = data;
 									self.dirty = false;
+									self.saved = true;
 								}else{
 									self.collapsed = false;
 									doGet("/api/settings/default", function(data){
 										self.data = data;
 										self.dirty = true;
+										self.saved = false;
 									}, function(msg){self.$emit("error",msg);})
 								}
 							},function(msg){self.$emit("error",msg);});
