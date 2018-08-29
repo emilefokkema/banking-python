@@ -101,7 +101,7 @@
 				<input class="input" v-model="data.name" v-on:input="changed"/>
 				<div class="category-set">
 					<template v-if="data.acceptRow">
-						<property-contains v-on:propertyusechange="$emit('propertyusechange')" v-if="data.acceptRow.propertyContains" v-bind:data="data.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
+						<property-contains v-on:propertyusechange="onPropertyUseChange" v-if="data.acceptRow.propertyContains" v-bind:data="data.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
 					</template>
 					<category-settings v-bind:property-list="propertyList" v-for="category in categories" v-bind:data="category" v-on:changed="changed" v-on:propertyusechange="$emit('propertyusechange')"></category-settings>
 				</div>

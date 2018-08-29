@@ -258,6 +258,10 @@
 								},
 								changed:function(){
 									this.$emit("changed");
+								},
+								onPropertyUseChange:function(){
+									this.$emit("propertyusechange");
+									this.changed();
 								}
 							},
 							components:{
