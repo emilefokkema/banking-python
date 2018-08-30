@@ -67,8 +67,8 @@
 					</div>
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
-					<category-settings v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="incoming" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="outgoing" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
 				</div>
 				<div class="panel-footer">
 					<span class="fas fa-undo-alt reset-button" v-on:click="getSettings" v-if="dirty && saved"></span><span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>

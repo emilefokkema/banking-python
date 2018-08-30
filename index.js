@@ -210,6 +210,12 @@
 					mounted:function(){
 						this.getSettings();
 					},
+					updated:function(){
+						if(this.dirty){
+							this.$refs.incoming.collapsed = false;
+							this.$refs.outgoing.collapsed = false;
+						}
+					},
 					components:{
 						'column-slot':{
 							props:{
