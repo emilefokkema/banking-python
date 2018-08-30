@@ -12,14 +12,16 @@
 
 		<script type="text/template" id="categoryTemplate">
 			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
-				<span v-bind:class="{'toggle-collapse':!isSimple}" v-on:click="toggleCollapse">
-					<span class="neither" v-if="isSimple"></span>
-					<template v-else>
-						<span class="plus"></span>
-						<span class="minus"></span>
-					</template>
-					{{categoryData.name}}<expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
-				</span>
+				<div class="category-header">
+					<span v-bind:class="{'toggle-collapse':!isSimple}" v-on:click="toggleCollapse">
+						<span class="neither category-header-prefix" v-if="isSimple"></span>
+						<template v-else>
+							<span class="plus category-header-prefix"><span class="fas fa-plus-square"></span></span>
+							<span class="minus category-header-prefix"><span class="fas fa-minus-square"></span></span>
+						</template>
+						{{categoryData.name}}<expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
+					</span>
+				</div>
 				<div class="category-set" v-if="categoryData.categories">
 					<category v-for="category in categoryData.categories" v-bind:categoryData="category" v-bind:top="false"></category>
 				</div>
@@ -62,13 +64,13 @@
 				<div class="panel-body">
 					<div class="column-slots">
 						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onChanged"></column-slot>
-						<span class="fas fa-plus add-slot-button" v-on:click="addNewSlot"></span>
+						<span class="fas fa-plus add-button" v-on:click="addNewSlot"></span>
 						<span class="fas fa-exchange-alt slot-switch-button" v-on:click="doSlotSwitch" v-if="canSwitch"></span>
 					</div>
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings ref="incoming" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
-					<category-settings ref="outgoing" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="data.categories.outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="incoming" v-bind:exists="true" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="outgoing" v-bind:exists="true" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
 				</div>
 				<div class="panel-footer">
 					<span class="fas fa-undo-alt reset-button" v-on:click="getSettings" v-if="dirty && saved"></span><span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>
@@ -95,21 +97,31 @@
 		</script>
 		<script type="text/template" id="categorySettingsTemplate">
 			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
-				<span class="toggle-collapse" v-on:click="toggleCollapse">
-					<span class="plus"></span><span class="minus"></span>
-				</span>
-				<input class="input" v-model="data.name" v-on:input="changed"/>
-				<div class="category-set">
-					<template v-if="data.acceptRow">
-						<property-contains v-on:propertyusechange="onPropertyUseChange" v-if="data.acceptRow.propertyContains" v-bind:data="data.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
-					</template>
-					<category-settings v-bind:property-list="propertyList" v-for="category in categories" v-bind:data="category" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange"></category-settings>
+				<div class="category-header category-settings-header">
+					<span class="toggle-collapse" v-on:click="toggleCollapse">
+						<span class="plus category-header-prefix">
+							<span class="fas fa-plus-square"></span>
+						</span>
+						<span class="minus category-header-prefix">
+							<span class="fas fa-minus-square"></span>
+						</span>
+					</span>
+					<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
+
 				</div>
+				<div class="category-set" v-if="data.exists">
+					<div class="category-filter">
+						<span class="fas fa-filter filter-button" v-if="!top"></span>
+						<property-contains v-if="data.category.acceptRow" v-on:propertyusechange="onPropertyUseChange" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
+					</div>
+					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" :key="slot.key"></category-settings>
+				</div>
+
 			</div>
 		</script>
 		<script type="text/template" id="propertyContainsTemplate">
-			<div>
-				<select v-model="data.name" v-on:change="$emit('propertyusechange')">
+			<div class="property-contains">
+				<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
 					<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
 				</select> contains
 			</div>

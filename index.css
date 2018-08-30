@@ -4,6 +4,9 @@ body{
 	font-size: 16px;
 	color: #222;
 }
+#app{
+	max-width: 1100px;
+}
 .input{
 	max-width: 7em;
 	border-radius: 4px;
@@ -93,17 +96,18 @@ body{
 	padding:5px 0px 5px 0px;
 	/*margin: 5px 0px 5px 1.5em;*/
 }
-.plus{
-	display: none;
-}
-.collapsed > span > .minus{
-	display: none;
-}
-.collapsed > span > .plus{
-	display: initial;
-}
+
 .category-set{
 	padding-left:1.5em;
+}
+.category-header.category-settings-header input{
+	display: inline-block;
+}
+.category-header.category-settings-header .property-contains{
+	display: inline-block;
+}
+.new-category-input{
+	margin-left: 1.5em;
 }
 .collapsed > .category-set{
 	display: none;
@@ -111,21 +115,31 @@ body{
 .collapsed > .row{
 	display: none;
 }
-.plus::before{
-	content:"+";
-	font-family: monospace;
-	margin-right: 0.5em;
+.category-header-prefix{
+	width:1.5em;
+	display: inline-block;
+	vertical-align: top;
+	font-size: 14px;
+	padding-top: 2px;
 }
-.minus::before{
-	content:"-";
-	font-family: monospace;
-	margin-right: 0.5em;
+.plus{
+	display: none;
 }
-.neither::before{
-	content:"+";
-	font-family: monospace;
-	color: #fff;
-	margin-right: 0.5em;
+.collapsed > .category-header > span > .minus{
+	display: none;
+}
+.collapsed > .category-header > span > .plus{
+	display: inline-block;
+	vertical-align: top;
+}
+.category-filter{
+	margin-left: 1em;
+}
+.category-filter .filter-button{
+	display: inline-block;
+}
+.category-filter .property-contains{
+	display: inline-block;
 }
 .row{
 	padding:8px 0px 8px 0px;
@@ -153,7 +167,7 @@ body{
 span.toggle-collapse > .amount{
 	display: none;
 }
-.collapsed > span > .amount{
+.collapsed > .category-header > span > .amount{
 	display: initial;
 }
 .row .amount{
@@ -172,7 +186,7 @@ span.toggle-collapse > .amount{
 	background-color: #bbb;
 	color:#fff;
 }
-.add-slot-button{
+.add-button{
 	cursor: pointer;
 }
 .slot-switch-button{

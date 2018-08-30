@@ -211,7 +211,7 @@
 						this.getSettings();
 					},
 					updated:function(){
-						if(this.dirty){
+						if(this.dirty && !this.saved){
 							this.$refs.incoming.collapsed = false;
 							this.$refs.outgoing.collapsed = false;
 						}
@@ -266,10 +266,45 @@
 								changed:function(){
 									this.$emit("changed");
 								},
+								randomKey:function(){
+									return Math.floor(1000 * Math.random());
+								},
+								createNewCategorySlot:function(){
+									return this.createCategorySlot({name:undefined}, false);
+								},
+								createCategorySlot:function(category, exists){
+									var key = this.randomKey();
+									return {category:category, exists:exists, key:key};
+								},
+								createCategorySlots:function(){
+									var self = this;
+									var result = [];
+									if(this.data.category.categories){
+										result = this.data.category.categories.map(function(cat){return self.createCategorySlot(cat, true);});
+									}
+									result.push(this.createNewCategorySlot());
+									this.categorySlots = result;
+								},
 								onPropertyUseChange:function(){
 									this.$emit("propertyusechange");
 									this.changed();
+								},
+								addNewCategory:function(c){
+									c.exists = true;
+									if(!this.data.category.categories){
+										this.$set(this.data.category, 'categories',[]);
+									}
+									this.data.category.categories.push(c.category);
+									this.categorySlots.push(this.createNewCategorySlot());
+								},
+								removeCategory:function(c){
+									var index = this.data.category.categories.indexOf(c.category);
+									this.data.category.categories.splice(index, 1);
+									this.categorySlots.splice(index, 1);
 								}
+							},
+							mounted:function(){
+								this.createCategorySlots();
 							},
 							components:{
 								'property-contains':{
@@ -281,11 +316,26 @@
 								}
 							},
 							computed:{
-								categories:function(){return this.data.categories || [];}
+								name:function(){return this.data.category.name;}
+							},
+							watch:{
+								name:function(v){
+									if(v && !this.data.exists){
+										this.$emit("categorycreated", this.data);
+									}
+									if(!v && this.data.exists){
+										this.$emit("categoryremoved", this.data);
+									}
+								},
+								data:function(){
+									this.createCategorySlots();
+								}
 							},
 							data:function(){
 								return {
-									collapsed:true
+									collapsed:true,
+									categorySlots:[],
+									newCategorySlot:undefined
 								}
 							},
 							template:document.getElementById("categorySettingsTemplate").innerHTML
@@ -309,7 +359,9 @@
 						},
 						canSwitch:function(){
 							return this.selectedSlots.length == 2;
-						}
+						},
+						incoming:function(){return {category:this.data.categories.incoming,exists:true};},
+						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
 					},
 					methods:{
 						getSettings:function(){
