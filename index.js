@@ -374,13 +374,30 @@
 									data:function(){
 										return {
 											verbs:["contains","matches"],
-											chosenVerb:"contains"
+											chosenVerb:"contains",
+											newValue:undefined
 										};
 									},
 									watch:{
 										chosenVerb:function(v){
 											if(v !== "contains"){
 												this.$emit("switch", v);
+											}
+										}
+									},
+									methods:{
+										addNewValue:function(){
+											if(!this.newValue){
+												return;
+											}
+											this.data.values.push(this.newValue);
+											this.newValue = undefined;
+											this.$emit("change");
+										},
+										onKeyDown:function(e){
+											if(e.code === "Backspace" && this.data.values.length > 0){
+												this.data.values.pop();
+												this.$emit("change");
 											}
 										}
 									},

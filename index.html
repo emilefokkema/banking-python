@@ -121,12 +121,15 @@
 		</script>
 		<script type="text/template" id="propertyContainsTemplate">
 			<div class="property-contains">
-				<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
-					<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
-				</select>
-				<select v-model="chosenVerb" class="input">
-					<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
-				</select>
+				<div>
+					<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
+						<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
+					</select>
+					<select v-model="chosenVerb" class="input">
+						<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
+					</select>
+				</div>
+				<div class="input value-list-input"><div class="value-list-value" v-for="value in data.values">{{value}}</div><input v-model="newValue" v-on:blur="addNewValue" v-on:keydown="onKeyDown"/></div>
 			</div>
 		</script>
 		<script type="text/template" id="propertyMatchesTemplate">
