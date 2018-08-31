@@ -96,7 +96,7 @@
 			</div>
 		</script>
 		<script type="text/template" id="categorySettingsTemplate">
-			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
+			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top, 'non-existent':nonExistent}">
 				<div class="category-header category-settings-header">
 					<span class="toggle-collapse" v-on:click="toggleCollapse">
 						<span class="plus category-header-prefix">

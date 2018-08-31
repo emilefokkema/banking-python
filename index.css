@@ -94,9 +94,10 @@ body{
 }
 .category{
 	padding:5px 0px 5px 0px;
-	/*margin: 5px 0px 5px 1.5em;*/
 }
-
+.category.non-existent{
+	color:#ccc;
+}
 .category-set{
 	padding-left:1.5em;
 }
@@ -164,8 +165,12 @@ body{
 	display: inline-block;
 	vertical-align: top;
 }
+
 .toggle-collapse{
 	cursor: pointer;
+}
+.non-existent .toggle-collapse{
+	cursor: initial;
 }
 .more{
 	padding:5px;

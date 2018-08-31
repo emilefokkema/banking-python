@@ -261,6 +261,9 @@
 							},
 							methods:{
 								toggleCollapse:function(){
+									if(!this.data.exists){
+										return;
+									}
 									this.collapsed = !this.collapsed;
 								},
 								toggleFilter:function(){
@@ -341,7 +344,8 @@
 							},
 							computed:{
 								name:function(){return this.data.category.name;},
-								filterActive:function(){return !!this.data.category.acceptRow;}
+								filterActive:function(){return !!this.data.category.acceptRow;},
+								nonExistent:function(){return !this.data.exists;}
 							},
 							watch:{
 								name:function(v){
