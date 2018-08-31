@@ -257,6 +257,7 @@
 							props:{
 								top:Boolean,
 								data:Object,
+								allowNewCategories:Boolean,
 								propertyList:Array
 							},
 							methods:{
@@ -282,7 +283,9 @@
 									if(this.data.category.categories){
 										result = this.data.category.categories.map(function(cat){return self.createCategorySlot(cat, true);});
 									}
-									result.push(this.createNewCategorySlot());
+									if(this.allowNewCategories){
+										result.push(this.createNewCategorySlot());
+									}
 									this.categorySlots = result;
 								},
 								onPropertyUseChange:function(){
@@ -329,6 +332,9 @@
 								},
 								data:function(){
 									this.createCategorySlots();
+								},
+								allowNewCategories:function(v){
+									this.createCategorySlots();
 								}
 							},
 							data:function(){
@@ -361,7 +367,8 @@
 							return this.selectedSlots.length == 2;
 						},
 						incoming:function(){return {category:this.data.categories.incoming,exists:true};},
-						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
+						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};},
+						allowNewCategories:function(){return this.data.rowDefinition.additional.length > 0;}
 					},
 					methods:{
 						getSettings:function(){
