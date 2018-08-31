@@ -142,8 +142,11 @@
 						<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
 					</select>
 				</div>
-				<input v-model="data.pattern" class="input pattern-input" v-bind:class="{invalid:!valid}" v-on:input="onInput"/>
+				<regex-input v-model="data.pattern" v-on:valid="onValid" v-on:input="$emit('change')"></regex-input>
 			</div>
+		</script>
+		<script type="text/template" id="regexInputTemplate">
+			<input v-model="value" class="input pattern-input" v-bind:class="{invalid:!valid}" v-on:input="onInput"/>
 		</script>
 		<div id="app">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:error="displayError"></settings>

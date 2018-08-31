@@ -86,6 +86,37 @@
 			},
 			template: '<span v-bind:title="title" class="date">{{formattedDate}}</span>'
 		};
+		var regexInput = {
+			props:{
+				value:String
+			},
+			model:{
+				prop:"value",
+				event:"input"
+			},
+			data:function(){
+				return {
+					valid:true
+				};
+			},
+			methods:{
+				onInput:function(){
+					this.$emit("input", this.value);
+					try{
+						var rgx = new RegExp(this.value);
+						this.valid = true;
+					}catch(e){
+						this.valid = false;
+					}
+				}
+			},
+			watch:{
+				valid:function(v){
+					this.$emit("valid", v);
+				}
+			},
+			template:document.getElementById("regexInputTemplate").innerHTML
+		};
 		new Vue({
 			el:"#app",
 			data:{
@@ -411,20 +442,15 @@
 									data:function(){
 										return {
 											verbs:["contains","matches"],
-											chosenVerb:"matches",
-											valid:true
+											chosenVerb:"matches"
 										};
 									},
+									components:{
+										'regex-input':regexInput
+									},
 									methods:{
-										onInput:function(){
-											this.$emit("change");
-											var pattern = this.data.pattern;
-											try{
-												var rgx = new RegExp(pattern);
-												this.valid = true;
-											}catch(e){
-												this.valid = false;
-											}
+										onValid:function(v){
+											this.$emit("valid", v);
 										}
 									},
 									watch:{
@@ -432,9 +458,6 @@
 											if(v !== "matches"){
 												this.$emit("switch", v);
 											}
-										},
-										valid:function(v){
-											this.$emit("valid", v);
 										}
 									},
 									template:document.getElementById("propertyMatchesTemplate").innerHTML
