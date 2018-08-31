@@ -135,6 +135,16 @@ body{
 .category-filter{
 	margin-left: 1em;
 }
+.category-filter{
+	margin: 5px;
+}
+.filter-button{
+	color:#ccc;
+	cursor: pointer;
+}
+.active .filter-button{
+	color:#000;
+}
 .category-filter .filter-button{
 	display: inline-block;
 }

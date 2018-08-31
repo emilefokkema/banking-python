@@ -257,12 +257,33 @@
 							props:{
 								top:Boolean,
 								data:Object,
-								allowNewCategories:Boolean,
 								propertyList:Array
 							},
 							methods:{
 								toggleCollapse:function(){
 									this.collapsed = !this.collapsed;
+								},
+								toggleFilter:function(){
+									if(this.filterActive){
+										var acceptRow = this.data.category.acceptRow;
+										if(acceptRow.propertyContains){
+											this.usedFilters.propertyContains = acceptRow.propertyContains;
+										}
+										this.$delete(this.data.category, 'acceptRow');
+									}else{
+										if(this.propertyList.length == 0){
+											return;
+										}
+										var newFilter = {propertyContains:this.createPropertyContains()};
+										if(this.usedFilters.propertyContains){
+											newFilter = {propertyContains:this.usedFilters.propertyContains};
+										}
+										this.$set(this.data.category, 'acceptRow', newFilter);
+									}
+									this.onPropertyUseChange();
+								},
+								createPropertyContains:function(){
+									return {name:this.propertyList[0].name,values:[]};
 								},
 								changed:function(){
 									this.$emit("changed");
@@ -283,7 +304,7 @@
 									if(this.data.category.categories){
 										result = this.data.category.categories.map(function(cat){return self.createCategorySlot(cat, true);});
 									}
-									if(this.allowNewCategories){
+									if(this.propertyList.length > 0){
 										result.push(this.createNewCategorySlot());
 									}
 									this.categorySlots = result;
@@ -319,7 +340,8 @@
 								}
 							},
 							computed:{
-								name:function(){return this.data.category.name;}
+								name:function(){return this.data.category.name;},
+								filterActive:function(){return !!this.data.category.acceptRow;}
 							},
 							watch:{
 								name:function(v){
@@ -333,7 +355,7 @@
 								data:function(){
 									this.createCategorySlots();
 								},
-								allowNewCategories:function(v){
+								propertyList:function(v){
 									this.createCategorySlots();
 								}
 							},
@@ -341,7 +363,8 @@
 								return {
 									collapsed:true,
 									categorySlots:[],
-									newCategorySlot:undefined
+									newCategorySlot:undefined,
+									usedFilters:{}
 								}
 							},
 							template:document.getElementById("categorySettingsTemplate").innerHTML
@@ -367,8 +390,7 @@
 							return this.selectedSlots.length == 2;
 						},
 						incoming:function(){return {category:this.data.categories.incoming,exists:true};},
-						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};},
-						allowNewCategories:function(){return this.data.rowDefinition.additional.length > 0;}
+						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
 					},
 					methods:{
 						getSettings:function(){

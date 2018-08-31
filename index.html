@@ -69,8 +69,8 @@
 					</div>
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings ref="incoming" v-bind:allowNewCategories="allowNewCategories" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
-					<category-settings ref="outgoing" v-bind:allowNewCategories="allowNewCategories" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="incoming" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
+					<category-settings ref="outgoing" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection"></category-settings>
 				</div>
 				<div class="panel-footer">
 					<span class="fas fa-undo-alt reset-button" v-on:click="getSettings" v-if="dirty && saved"></span><span class="fas fa-save save-button" v-on:click="save" v-if="dirty"></span>
@@ -107,14 +107,13 @@
 						</span>
 					</span>
 					<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
-
 				</div>
 				<div class="category-set" v-if="data.exists">
-					<div class="category-filter">
-						<span class="fas fa-filter filter-button" v-if="!top"></span>
+					<div class="category-filter" v-bind:class="{'active':filterActive}">
+						<span class="fas fa-filter filter-button" v-if="!top" v-on:click="toggleFilter"></span>
 						<property-contains v-if="data.category.acceptRow" v-on:propertyusechange="onPropertyUseChange" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
 					</div>
-					<category-settings v-bind:allowNewCategories="allowNewCategories" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" :key="slot.key"></category-settings>
+					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" :key="slot.key"></category-settings>
 				</div>
 
 			</div>
