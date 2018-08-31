@@ -161,6 +161,17 @@ body{
 .property-matches{
 	display: inline-block;
 }
+.pattern-input{
+	max-width: none;
+	width:15em;
+	font-family: monospace;
+	border: 1pt solid #fff;
+}
+.pattern-input.invalid{
+	color:#b00;
+	background-color: #ffefef;
+	border:1pt solid #b00;
+}
 .row{
 	padding:8px 0px 8px 0px;
 	border-bottom: 0.5px solid #ddd;
@@ -174,7 +185,6 @@ body{
 	display: inline-block;
 	vertical-align: top;
 }
-
 .toggle-collapse{
 	cursor: pointer;
 }

@@ -204,7 +204,8 @@
 							slots:[],
 							selectedSlots:[],
 							dirty:false,
-							saved:false
+							saved:false,
+							violationCount:0
 						};
 					},
 					mounted:function(){
@@ -260,6 +261,9 @@
 								propertyList:Array
 							},
 							methods:{
+								onValid:function(v){
+									this.$emit("valid", v);
+								},
 								toggleCollapse:function(){
 									if(!this.data.exists){
 										return;
@@ -267,7 +271,6 @@
 									this.collapsed = !this.collapsed;
 								},
 								onSwitch:function(verb){
-									console.log("onSwitch: ",verb);
 									if(verb === "contains"){
 										this.filterByPropertyContains();
 									}else if(verb === "matches"){
@@ -391,14 +394,30 @@
 									data:function(){
 										return {
 											verbs:["contains","matches"],
-											chosenVerb:"matches"
+											chosenVerb:"matches",
+											valid:true
 										};
+									},
+									methods:{
+										onInput:function(){
+											this.$emit("change");
+											var pattern = this.data.pattern;
+											try{
+												var rgx = new RegExp(pattern);
+												this.valid = true;
+											}catch(e){
+												this.valid = false;
+											}
+										}
 									},
 									watch:{
 										chosenVerb:function(v){
 											if(v !== "matches"){
 												this.$emit("switch", v);
 											}
+										},
+										valid:function(v){
+											this.$emit("valid", v);
 										}
 									},
 									template:document.getElementById("propertyMatchesTemplate").innerHTML
@@ -459,6 +478,13 @@
 						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
 					},
 					methods:{
+						onValid:function(v){
+							if(v){
+								this.violationCount--;
+							}else{
+								this.violationCount++;
+							}
+						},
 						getSettings:function(){
 							var self = this;
 							doGet("/api/settings",function(data){
