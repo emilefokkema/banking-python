@@ -107,6 +107,9 @@ body{
 .category-header.category-settings-header .property-contains{
 	display: inline-block;
 }
+.category-header.category-settings-header .property-matches{
+	display: inline-block;
+}
 .new-category-input{
 	margin-left: 1.5em;
 }
@@ -142,14 +145,20 @@ body{
 .filter-button{
 	color:#ccc;
 	cursor: pointer;
+	display: inline-block;
+	vertical-align: top;
+	margin-top:5px;
 }
 .active .filter-button{
 	color:#000;
 }
-.category-filter .filter-button{
+.category-filter{
+	min-height: 2em;
+}
+.property-contains{
 	display: inline-block;
 }
-.category-filter .property-contains{
+.property-matches{
 	display: inline-block;
 }
 .row{

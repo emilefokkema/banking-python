@@ -266,27 +266,56 @@
 									}
 									this.collapsed = !this.collapsed;
 								},
+								onSwitch:function(verb){
+									console.log("onSwitch: ",verb);
+									if(verb === "contains"){
+										this.filterByPropertyContains();
+									}else if(verb === "matches"){
+										this.filterByPropertyMatches();
+									}
+								},
 								toggleFilter:function(){
 									if(this.filterActive){
-										var acceptRow = this.data.category.acceptRow;
-										if(acceptRow.propertyContains){
-											this.usedFilters.propertyContains = acceptRow.propertyContains;
-										}
-										this.$delete(this.data.category, 'acceptRow');
+										this.removeFilter();
 									}else{
 										if(this.propertyList.length == 0){
 											return;
 										}
-										var newFilter = {propertyContains:this.createPropertyContains()};
-										if(this.usedFilters.propertyContains){
-											newFilter = {propertyContains:this.usedFilters.propertyContains};
-										}
-										this.$set(this.data.category, 'acceptRow', newFilter);
+										var newFilter = this.usedFilters.propertyContains || this.usedFilters.propertyMatches || this.createPropertyContains();
+										this.filterBy(newFilter);
 									}
 									this.onPropertyUseChange();
 								},
+								filterByPropertyMatches:function(){
+									var newFilter = this.usedFilters.propertyMatches || this.createPropertyMatches();
+									this.filterBy(newFilter);
+								},
+								filterByPropertyContains:function(){
+									var newFilter = this.usedFilters.propertyContains || this.createPropertyContains();
+									this.filterBy(newFilter);
+								},
 								createPropertyContains:function(){
-									return {name:this.propertyList[0].name,values:[]};
+									return {propertyContains:{name:this.propertyList[0].name,values:[]}};
+								},
+								createPropertyMatches:function(){
+									return {propertyMatches:{name:this.propertyList[0].name, pattern:undefined}};
+								},
+								removeFilter:function(){
+									if(!this.data.category.acceptRow){
+										return;
+									}
+									var acceptRow = this.data.category.acceptRow;
+									if(acceptRow.propertyContains){
+										this.usedFilters.propertyContains = acceptRow;
+									}
+									if(acceptRow.propertyMatches){
+										this.usedFilters.propertyMatches = acceptRow;
+									}
+									this.$delete(this.data.category, 'acceptRow');
+								},
+								filterBy:function(acceptRow){
+									this.removeFilter();
+									this.$set(this.data.category, 'acceptRow', acceptRow);
 								},
 								changed:function(){
 									this.$emit("changed");
@@ -339,7 +368,40 @@
 										data:Object,
 										propertyList:Array
 									},
+									data:function(){
+										return {
+											verbs:["contains","matches"],
+											chosenVerb:"contains"
+										};
+									},
+									watch:{
+										chosenVerb:function(v){
+											if(v !== "contains"){
+												this.$emit("switch", v);
+											}
+										}
+									},
 									template:document.getElementById("propertyContainsTemplate").innerHTML
+								},
+								'property-matches':{
+									props:{
+										data:Object,
+										propertyList:Array
+									},
+									data:function(){
+										return {
+											verbs:["contains","matches"],
+											chosenVerb:"matches"
+										};
+									},
+									watch:{
+										chosenVerb:function(v){
+											if(v !== "matches"){
+												this.$emit("switch", v);
+											}
+										}
+									},
+									template:document.getElementById("propertyMatchesTemplate").innerHTML
 								}
 							},
 							computed:{

@@ -109,9 +109,10 @@
 					<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
 				</div>
 				<div class="category-set" v-if="data.exists">
-					<div class="category-filter" v-bind:class="{'active':filterActive}">
-						<span class="fas fa-filter filter-button" v-if="!top" v-on:click="toggleFilter"></span>
-						<property-contains v-if="data.category.acceptRow" v-on:propertyusechange="onPropertyUseChange" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
+					<div class="category-filter" v-if="!top" v-bind:class="{'active':filterActive}">
+						<span class="fas fa-filter filter-button" v-on:click="toggleFilter"></span>
+						<property-contains v-on:propertyusechange="onPropertyUseChange" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
+						<property-matches v-on:propertyusechange="onPropertyUseChange" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyMatches" v-bind:data="data.category.acceptRow.propertyMatches" v-bind:property-list="propertyList"></property-matches>
 					</div>
 					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" :key="slot.key"></category-settings>
 				</div>
@@ -122,9 +123,21 @@
 			<div class="property-contains">
 				<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
 					<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
-				</select> contains
+				</select>
+				<select v-model="chosenVerb" class="input">
+					<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
+				</select>
 			</div>
-			
+		</script>
+		<script type="text/template" id="propertyMatchesTemplate">
+			<div class="property-matches">
+				<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
+					<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
+				</select>
+				<select v-model="chosenVerb" class="input">
+					<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
+				</select><input v-model="data.pattern" class="input" />
+			</div>
 		</script>
 		<div id="app">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:error="displayError"></settings>
