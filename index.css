@@ -19,6 +19,25 @@ body{
 	font-family: sans-serif;
 	
 }
+.html-select{
+	max-width: none;
+	position: relative;
+}
+.html-option{
+	cursor: default;
+}
+.html-option-list{
+	position: relative;
+	top:100%;
+	max-width: none;
+	/*width: 6em;*/
+	display: inline-block;
+}
+.html-option-expand{
+	display: inline-block;
+	vertical-align: top;
+	width: 1em;
+}
 .file-input{
 	display: none;
 }
@@ -28,7 +47,6 @@ body{
 	margin-top: 5px;
 	font-family: sans-serif;
 }
-
 .date{
 	border-radius: 4px;
 	background-color: #efefef;
@@ -108,6 +126,50 @@ body{
 	display: inline-block;
 	width:calc(100% - 2em);
 }
+.row-collection{
+	display: inline-block;
+	width:calc(100% - 2em);
+}
+.row-property{
+	margin:3px;
+	display: block;
+}
+.row-property-part{
+	display: inline-block;
+	vertical-align: top;
+}
+.source-type{
+	padding-right: 1em;
+	min-height: 1.5em;
+	min-width: 6em;
+}
+.target-type{
+	padding-left: 1em;
+	max-width: 12em;
+}
+.arrow-container{
+	padding-top: 3px;
+}
+.source-type .input{
+	display: inline;
+	float: right;
+}
+.target-type .input{
+	display: inline;
+	float: left;
+}
+.target-type .string-match{
+	display: inline;
+	float: left;
+}
+.string-match .input{
+	display: inline;
+	float: right;
+	max-width: 10em;
+}
+.string-match span{
+	margin-top: 3px;
+}
 .property-matches{
 	display: inline-block;
 }
@@ -147,18 +209,11 @@ body{
 .active .filter-button{
 	color:#000;
 }
-.category-filter{
+.category-addon{
 	min-height: 2em;
-}
-.property-contains{
-	display: inline-block;
-}
-.property-matches{
-	display: inline-block;
 }
 .pattern-input{
 	max-width: none;
-	width:15em;
 	font-family: monospace;
 	border: 1pt solid #fff;
 }

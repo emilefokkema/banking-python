@@ -99,14 +99,19 @@
 					valid:true
 				};
 			},
-			methods:{
-				onInput:function(){
-					this.$emit("input", this.value);
-					try{
-						var rgx = new RegExp(this.value);
-						this.valid = true;
-					}catch(e){
-						this.valid = false;
+			computed:{
+				inputValue:{
+					get:function(){
+						return this.value;
+					},
+					set:function(v){
+						this.$emit("input", v);
+						try{
+							var rgx = new RegExp(this.value);
+							this.valid = true;
+						}catch(e){
+							this.valid = false;
+						}
 					}
 				}
 			},
@@ -308,6 +313,9 @@
 										this.filterByPropertyMatches();
 									}
 								},
+								toggleCollection:function(){
+
+								},
 								toggleFilter:function(){
 									if(this.filterActive){
 										this.removeFilter();
@@ -461,11 +469,157 @@
 										}
 									},
 									template:document.getElementById("propertyMatchesTemplate").innerHTML
+								},
+								'row-collection':{
+									props:{
+										data:Object,
+										propertyList:Array
+									},
+									components:{
+										'row-property':{
+											props:{
+												data:Object,
+												propertyList:Array
+											},
+											computed:{
+												targetType:{
+													get:function(){
+														if(this.data.conversion){
+															return this.data.conversion.type;
+														}
+														return "string";
+													},
+													set:function(t){
+														if(t === "date"){
+															var newConversion = {type:"date",pattern:"%Y%m%d"};
+															if(this.data.conversion){
+																if(this.data.conversion.type !== "date"){
+																	console.log("setting conversion to a date conversion")
+																	this.data.conversion = newConversion;
+																}
+															}else{
+																console.log("adding a date conversion");
+																this.$set(this.data, 'conversion',newConversion);
+															}
+														}
+														else if(this.data.conversion && this.data.conversion.type === "date"){
+															console.log("removing a date conversion");
+															this.$delete(this.data, 'conversion');
+														}
+													}
+												},
+												stringMatch:{
+													get:function(){
+														if(this.data.conversion && this.data.conversion.type === "string"){
+															return this.data.conversion.match;
+														}
+														return undefined;
+													},
+													set:function(m){
+														if(!m){
+															if(this.data.conversion && this.data.conversion.type == "string"){
+																console.log("removing a string conversion");
+																this.$delete(this.data, 'conversion');
+															}
+															return;
+														}
+														if(!this.data.conversion){
+															console.log("adding a string conversion");
+															this.$set(this.data, 'conversion',{type:"string",match:undefined})
+														}
+														this.data.conversion.match = m;
+													}
+												},
+												source:function(){return this.data.source;},
+												name:function(){return this.data.name;},
+												hasStringSource:function(){
+													var self = this;
+													return this.propertyList.some(function(p){return p.name == self.data.source;})
+												}
+											},
+											watch:{
+												source:function(v){
+													this.$emit("propertyusechange");
+													if(v === "date"){
+														this.data.name = "date";
+													}
+													if(v == "amount"){
+														this.data.name = "amount";
+													}
+												},
+												name:function(n){
+													this.$emit("change");
+												},
+												targetType:function(t){
+													this.$emit("change");
+												}
+											},
+											components:{
+												'source-property-input':{
+													props:{
+														property:String,
+														propertyList:Array
+													},
+													model:{
+														prop:"property",
+														event:"input"
+													},
+													computed:{
+														displayPropertyList:function(){
+															var self = this;
+															return this.propertyList.filter(function(p){return p.name == self.property || self.expanded;});
+														}
+													},
+													data:function(){
+														return {expanded:false};
+													},
+													methods:{
+														select:function(v){
+															if(!this.expanded){
+																this.expanded = true;
+																return;
+															}
+															this.expanded = false;
+															this.$emit("input", v);
+														}
+													},
+													template:document.getElementById("sourcePropertyInputTemplate").innerHTML
+												},
+												'target-type-input':{
+													props:{
+														type:String
+													},
+													model:{
+														prop:"type",
+														event:"input"
+													},
+													data:function(){
+														return {expanded:false};
+													},
+													methods:{
+														select:function(v){
+															if(!this.expanded){
+																this.expanded = true;
+																return;
+															}
+															this.expanded = false;
+															this.$emit("input", v);
+														}
+													},
+													template:document.getElementById("targetTypeInputTemplate").innerHTML
+												},
+												'regex-input':regexInput
+											},
+											template:document.getElementById("rowPropertyTemplate").innerHTML
+										}
+									},
+									template:document.getElementById("rowCollectionSettingsTemplate").innerHTML
 								}
 							},
 							computed:{
 								name:function(){return this.data.category.name;},
 								filterActive:function(){return !!this.data.category.acceptRow;},
+								collectionActive:function(){return !!this.data.category.rowCollection;},
 								nonExistent:function(){return !this.data.exists;}
 							},
 							watch:{
@@ -598,6 +752,9 @@
 								return true;
 							}
 							if(cat.acceptRow && cat.acceptRow.propertyMatches && cat.acceptRow.propertyMatches.name == propertyName){
+								return true;
+							}
+							if(cat.rowCollection && cat.rowCollection.properties.some(function(p){return p.source == propertyName;})){
 								return true;
 							}
 							return cat.categories && cat.categories.some(function(c){return self.usesProperty(c, propertyName);});
