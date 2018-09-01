@@ -129,7 +129,10 @@
 						<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
 					</select>
 				</div>
-				<div class="input value-list-input"><div class="value-list-value" v-for="value in data.values">{{value}}</div><input v-model="newValue" v-on:blur="addNewValue" v-on:keydown="onKeyDown"/></div>
+				<div class="input value-list-input">
+					<div class="value-list-value" v-for="value in data.values">{{value}}</div>
+					<input v-model="newValue" v-on:blur="addNewValue" v-on:keydown="onKeyDown"/>
+				</div>
 			</div>
 		</script>
 		<script type="text/template" id="propertyMatchesTemplate">

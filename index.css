@@ -104,10 +104,11 @@ body{
 .category-header.category-settings-header input{
 	display: inline-block;
 }
-.category-header.category-settings-header .property-contains{
+.property-contains{
 	display: inline-block;
+	width:calc(100% - 2em);
 }
-.category-header.category-settings-header .property-matches{
+.property-matches{
 	display: inline-block;
 }
 .new-category-input{
@@ -135,12 +136,6 @@ body{
 .collapsed > .category-header > span > .plus{
 	display: inline-block;
 	vertical-align: top;
-}
-.category-filter{
-	margin-left: 1em;
-}
-.category-filter{
-	margin: 5px;
 }
 .filter-button{
 	color:#ccc;
@@ -174,27 +169,26 @@ body{
 }
 .value-list-input{
 	max-width: none;
-	width:15em;
-	min-height: 2em;
-	display: inline;
-	padding: 3px;
+	width:100%;
+	display: inline-block;
+	margin:0px;
 }
 .value-list-input input{
-	display: inline-block;
+	float:left;
 	background-color: transparent;
 	border:none;
-	margin:3px;
+	margin:0px 3px 0px 0px;
 	padding: 3px;
 }
 .value-list-input input:focus{
 	outline-width: 0;
 }
 .value-list-value{
-	display: inline-block;
+	float: left;
 	background-color:#999;
 	color:#efefef;
 	border-radius: 3px;
-	margin:3px;
+	margin:0px 3px 0px 0px;
 	padding: 3px 5px 3px 5px;
 }
 .row{
