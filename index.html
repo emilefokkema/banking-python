@@ -96,7 +96,7 @@
 			</div>
 		</script>
 		<script type="text/template" id="categorySettingsTemplate">
-			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top, 'non-existent':nonExistent}">
+			<div class="category category-settings" v-bind:class="{collapsed:collapsed,'category-top':top, 'non-existent':nonExistent}">
 				<div class="category-header category-settings-header">
 					<span class="toggle-collapse" v-on:click="toggleCollapse">
 						<span class="plus category-header-prefix">
@@ -130,6 +130,7 @@
 		</script>
 		<script type="text/template" id="rowPropertyTemplate">
 			<div class="row-property">
+				<div class="row-property-part row-property-bullet"><span class="fas fa-circle"></span></div>
 				<div class="source-type row-property-part">
 					<source-property-input v-model="data.source" v-bind:property-list="propertyList"></source-property-input>
 				</div>

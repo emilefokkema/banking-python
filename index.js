@@ -107,7 +107,7 @@
 					set:function(v){
 						this.$emit("input", v);
 						try{
-							var rgx = new RegExp(this.value);
+							var rgx = new RegExp(v);
 							this.valid = true;
 						}catch(e){
 							this.valid = false;
@@ -362,14 +362,14 @@
 								changed:function(){
 									this.$emit("changed");
 								},
-								randomKey:function(){
-									return Math.floor(1000 * Math.random());
-								},
+								nextKey:(function(initial){return function(){
+									return initial++;
+								}})(0),
 								createNewCategorySlot:function(){
 									return this.createCategorySlot({name:undefined}, false);
 								},
 								createCategorySlot:function(category, exists){
-									var key = this.randomKey();
+									var key = this.nextKey();
 									return {category:category, exists:exists, key:key};
 								},
 								createCategorySlots:function(){
