@@ -314,7 +314,18 @@
 									}
 								},
 								toggleCollection:function(){
-
+									if(!this.data.category.rowCollection){
+										var firstProperty = this.propertyList[0];
+										var newRowCollection = {
+											properties:[{name:firstProperty.name,source:firstProperty.name}]
+										};
+										this.$set(this.data.category, 'rowCollection', newRowCollection);
+									}
+								},
+								removeRowCollection:function(){
+									if(this.data.category.rowCollection){
+										this.$delete(this.data.category, 'rowCollection');
+									}
 								},
 								toggleFilter:function(){
 									if(this.filterActive){
@@ -475,76 +486,91 @@
 										data:Object,
 										propertyList:Array
 									},
+									methods:{
+										onRemove:function(property){
+											var index = this.data.properties.indexOf(property);
+											console.log("removing a property at ", index);
+											this.data.properties.splice(index, 1);
+											this.$emit("change");
+											if(this.data.properties.length == 0){
+												this.$emit("remove");
+											}
+										},
+										addProperty:function(){
+											var firstProperty = this.propertyList[0];
+											this.data.properties.push({name:firstProperty.name,source:firstProperty.name});
+										}
+									},
 									components:{
 										'row-property':{
 											props:{
-												data:Object,
+												property:Object,
 												propertyList:Array
 											},
 											computed:{
 												targetType:{
 													get:function(){
-														if(this.data.conversion){
-															return this.data.conversion.type;
+														if(this.property.conversion){
+															return this.property.conversion.type;
 														}
 														return "string";
 													},
 													set:function(t){
 														if(t === "date"){
 															var newConversion = {type:"date",pattern:"%Y%m%d"};
-															if(this.data.conversion){
-																if(this.data.conversion.type !== "date"){
+															if(this.property.conversion){
+																if(this.property.conversion.type !== "date"){
 																	console.log("setting conversion to a date conversion")
-																	this.data.conversion = newConversion;
+																	this.property.conversion = newConversion;
 																}
 															}else{
 																console.log("adding a date conversion");
-																this.$set(this.data, 'conversion',newConversion);
+																this.$set(this.property, 'conversion',newConversion);
 															}
 														}
-														else if(this.data.conversion && this.data.conversion.type === "date"){
+														else if(this.property.conversion && this.property.conversion.type === "date"){
 															console.log("removing a date conversion");
-															this.$delete(this.data, 'conversion');
+															this.$delete(this.property, 'conversion');
 														}
 													}
 												},
 												stringMatch:{
 													get:function(){
-														if(this.data.conversion && this.data.conversion.type === "string"){
-															return this.data.conversion.match;
+														if(this.property.conversion && this.property.conversion.type === "string"){
+															return this.property.conversion.match;
 														}
 														return undefined;
 													},
 													set:function(m){
 														if(!m){
-															if(this.data.conversion && this.data.conversion.type == "string"){
+															if(this.property.conversion && this.property.conversion.type == "string"){
 																console.log("removing a string conversion");
-																this.$delete(this.data, 'conversion');
+																this.$delete(this.property, 'conversion');
 															}
 															return;
 														}
-														if(!this.data.conversion){
+														if(!this.property.conversion){
 															console.log("adding a string conversion");
-															this.$set(this.data, 'conversion',{type:"string",match:undefined})
+															this.$set(this.property, 'conversion',{type:"string",match:undefined})
 														}
-														this.data.conversion.match = m;
+														this.property.conversion.match = m;
 													}
 												},
-												source:function(){return this.data.source;},
-												name:function(){return this.data.name;},
+												source:function(){return this.property.source;},
+												name:function(){return this.property.name;},
 												hasStringSource:function(){
 													var self = this;
-													return this.propertyList.some(function(p){return p.name == self.data.source;})
+													return this.propertyList.some(function(p){return p.name == self.property.source;})
 												}
 											},
 											watch:{
 												source:function(v){
 													this.$emit("propertyusechange");
 													if(v === "date"){
-														this.data.name = "date";
+														this.property.name = "date";
 													}
 													if(v == "amount"){
-														this.data.name = "amount";
+														this.property.name = "amount";
 													}
 												},
 												name:function(n){

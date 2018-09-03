@@ -115,8 +115,8 @@
 						<property-matches v-on:change="changed" v-on:propertyusechange="onPropertyUseChange" v-on:valid="onValid" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyMatches" v-bind:data="data.category.acceptRow.propertyMatches" v-bind:property-list="propertyList"></property-matches>
 					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':collectionActive}">
-						<span class="fas fa-list-ul filter-button" v-on:click="toggleCollection"></span>
-						<row-collection v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed"></row-collection>
+						<span class="fas fa-list-ul filter-button collection-button" v-on:click="toggleCollection"></span>
+						<row-collection v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed" v-on:remove="removeRowCollection"></row-collection>
 					</div>
 					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" v-on:valid="onValid" :key="slot.key"></category-settings>
 				</div>
@@ -124,28 +124,29 @@
 			</div>
 		</script>
 		<script type="text/template" id="rowCollectionSettingsTemplate">
-			<div class="row-collection">
-				<row-property v-for="property in data.properties" v-bind:data="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:change="$emit('change')"></row-property>
+			<div class="row-collection category-addon-content">
+				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:remove="onRemove" v-on:change="$emit('change')"></row-property>
+				<div class="input add-row-property" v-on:click="addProperty"><span class="fas fa-plus"></span></div>
 			</div>
 		</script>
 		<script type="text/template" id="rowPropertyTemplate">
 			<div class="row-property">
-				<div class="row-property-part row-property-bullet"><span class="fas fa-circle"></span></div>
 				<div class="source-type row-property-part">
-					<source-property-input v-model="data.source" v-bind:property-list="propertyList"></source-property-input>
+					<source-property-input v-model="property.source" v-bind:property-list="propertyList"></source-property-input>
 				</div>
 				<div class="arrow-container row-property-part" v-if="hasStringSource">
 					<span class="fas fa-arrow-right"></span>
 				</div>
 				<div class="row-property-part target-type" v-if="hasStringSource">
 					<target-type-input v-model="targetType"></target-type-input>
-					<input v-if="targetType === 'string'" class="input" v-model="data.name" v-on:input="$emit('change')"/>
+					<input v-if="targetType === 'string'" class="input" v-model="property.name" v-on:input="$emit('change')"/>
 					<div class="string-match" v-if="targetType === 'string'">
 						<span class="fas fa-search"></span>
 						<regex-input v-model="stringMatch" v-on:input="$emit('change')"></regex-input>
 					</div>
-					<input class="input" v-model="data.conversion.pattern" v-if="targetType === 'date'" v-on:input="$emit('change')"/>
+					<input class="input" v-model="property.conversion.pattern" v-if="targetType === 'date'" v-on:input="$emit('change')"/>
 				</div>
+				<div class="row-property-part remove-property" v-on:click="$emit('remove', property)"><span class="fas fa-times"></span></div>
 			</div>
 		</script>
 		<script type="text/template" id="sourcePropertyInputTemplate">
@@ -155,20 +156,20 @@
 					<div class="html-option" v-for="prop of displayPropertyList" v-on:click="select(prop.name)">{{prop.name}}</div>
 					<div class="html-option" v-if="property == 'amount' || expanded" v-on:click="select('amount')"><span class="fas fa-dollar-sign"></span></div>
 				</div>
-				<div class="html-option-expand" v-on:click="expanded = true"><span class="fas fa-caret-down"></span></div>
+				<div class="html-option-expand" v-on:click="expanded = !expanded"><span class="fas fa-caret-down"></span></div>
 			</div>
 		</script>
 		<script type="text/template" id="targetTypeInputTemplate">
 			<div class="input html-select">
 				<div class="html-option-list">
 					<div class="html-option" v-if="type == 'date' || expanded" v-on:click="select('date')"><span class="fas fa-calendar-alt"></span></div>
-					<div class="html-option" v-if="type == 'string' || expanded" v-on:click="select('string')"><span class="fas fa-quote-left"></span><span class="fas fa-quote-right"></span></div>
+					<div class="html-option" v-if="type == 'string' || expanded" v-on:click="select('string')"><span class="fas fa-quote-left"></span></div>
 				</div>
-				<div class="html-option-expand" v-on:click="expanded = true"><span class="fas fa-caret-down"></span></div>
+				<div class="html-option-expand" v-on:click="expanded = !expanded"><span class="fas fa-caret-down"></span></div>
 			</div>
 		</script>
 		<script type="text/template" id="propertyContainsTemplate">
-			<div class="property-contains">
+			<div class="property-contains category-addon-content">
 				<div>
 					<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
 						<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
@@ -184,7 +185,7 @@
 			</div>
 		</script>
 		<script type="text/template" id="propertyMatchesTemplate">
-			<div class="property-matches">
+			<div class="property-matches category-addon-content">
 				<div>
 					<select v-model="data.name" class="input" v-on:change="$emit('propertyusechange')">
 						<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
