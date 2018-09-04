@@ -73,15 +73,17 @@
 					<category-settings ref="outgoing" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
 				</div>
 				<div class="panel-body">
-					<div class="ignore-first" v-bind:class="{'checked':ignoreFirstLine}">
-						<label for="ignoreFirst" class="input"><span class="fas fa-check"></span></label>
-						<input type="checkbox" v-model="ignoreFirstLine" name="ignoreFirst" id="ignoreFirst"/>
-						Ignore first line
-					</div>
+					<custom-checkbox v-model="ignoreFirstLine" v-on:input="onChanged"></custom-checkbox>
+					Ignore first line
 				</div>
 				<div class="panel-footer">
 					<span class="fas fa-undo-alt reset-button" v-on:click="getSettings" v-if="dirty && saved"></span><span class="fas fa-save save-button" v-on:click="save" v-if="dirty && violationCount == 0"></span>
 				</div>
+			</div>
+		</script>
+		<script type="text/template" id="customCheckboxTemplate">
+			<div class="input custom-checkbox" v-bind:class="{'checked':checked}" v-on:click="checked = !checked">
+				<span class="fas fa-check"></span>
 			</div>
 		</script>
 		<script type="text/template" id="columnSlotTemplate">

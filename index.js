@@ -122,6 +122,26 @@
 			},
 			template:document.getElementById("regexInputTemplate").innerHTML
 		};
+		var customCheckbox = {
+			props:{
+				checkedProp:Boolean
+			},
+			model:{
+				prop:"checkedProp",
+				event:"input"
+			},
+			computed:{
+				checked:{
+					get:function(){
+						return this.checkedProp;
+					},
+					set:function(b){
+						this.$emit("input", b);
+					}
+				}
+			},
+			template:document.getElementById("customCheckboxTemplate").innerHTML
+		};
 		new Vue({
 			el:"#app",
 			data:{
@@ -673,7 +693,8 @@
 								}
 							},
 							template:document.getElementById("categorySettingsTemplate").innerHTML
-						}
+						},
+						'custom-checkbox':customCheckbox
 					},
 					watch:{
 						data:function(v){

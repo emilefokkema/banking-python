@@ -336,12 +336,17 @@ span.toggle-collapse > .amount{
 	float: left;
 	cursor: pointer;
 }
-.ignore-first input{
+.custom-checkbox{
+	display: inline;
+	cursor: pointer;
+	width: 1em;
+}
+.custom-checkbox input{
 	display: none;
 }
-.ignore-first .fa-check{
-	color: #efefef;
+.custom-checkbox .fa-check{
+	color: transparent;
 }
-.ignore-first.checked .fa-check{
+.custom-checkbox.checked .fa-check{
 	color:#777;
 }
