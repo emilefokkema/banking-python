@@ -751,6 +751,13 @@
 						},
 						onDefinitionCreated:function(d){
 							console.log("definition crated");
+							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
+								var existingDefitition = this.data.rowDefinition.additional[i];
+								if(existingDefitition.name == d.name){
+									this.data.rowDefinition.additional.splice(i, 1);
+									break;
+								}
+							}
 							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
 							this.dirty = true;
