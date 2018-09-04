@@ -336,3 +336,12 @@ span.toggle-collapse > .amount{
 	float: left;
 	cursor: pointer;
 }
+.ignore-first input{
+	display: none;
+}
+.ignore-first .fa-check{
+	color: #efefef;
+}
+.ignore-first.checked .fa-check{
+	color:#777;
+}

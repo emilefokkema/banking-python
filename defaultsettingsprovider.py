@@ -29,5 +29,6 @@ class DefaultSettingsProvider:
 					'categories':[
 					]
 				}
-			}
+			},
+			'ignoreFirstLine':True
 		}

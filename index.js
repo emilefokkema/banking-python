@@ -694,6 +694,14 @@
 						canSwitch:function(){
 							return this.selectedSlots.length == 2;
 						},
+						ignoreFirstLine:{
+							get:function(){return this.data && this.data.ignoreFirstLine;},
+							set:function(v){
+								if(this.data){
+									this.data.ignoreFirstLine = v;
+								}
+							}
+						},
 						incoming:function(){return {category:this.data.categories.incoming,exists:true};},
 						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
 					},

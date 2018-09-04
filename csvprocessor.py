@@ -31,6 +31,7 @@ class CsvProcessor:
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
 		self.categoriesDefinition = getExtendedCategoriesDefinition(configuration['categories'])
+		self.ignoreFirst = configuration['ignoreFirstLine'] if 'ignoreFirstLine' in configuration else False
 		self.history = history
 
 	def getPrintedList(self, printableList):
@@ -45,11 +46,11 @@ class CsvProcessor:
 		reader = csv.reader(csvfile, delimiter=',')
 		counter = 0
 		for csvRow in reader:
-			if counter == 0:
-				counter += 1
+			counter += 1
+			if counter == 1 and self.ignoreFirst:
 				continue
 			rows.append(self.rowFactory.createRow(csvRow))
-			counter += 1
+			
 
 		rows.sort(key=lambda r:r['date'])
 
