@@ -54,6 +54,39 @@
 			}
 		});
 	};
+	var TreeNode = function(){
+		Object.defineProperty(this, 'children', {value:[]});
+	};
+	TreeNode.prototype.add = function(n, blockReciprocate){
+		this.children.push(n);
+		if(!blockReciprocate){
+			n.add(this, true);
+		}
+	};
+	TreeNode.prototype.some = function(predicate, except){
+		if(predicate(this)){
+			return true;
+		}
+		for(var i=0;i<this.children.length;i++){
+			var child = this.children[i];
+			if(child != except && child.some(predicate, this)){
+				return true;
+			}
+		}
+		return false;
+	};
+	TreeNode.prototype.remove = function(n){
+		var index = this.children.indexOf(n);
+		if(index > -1){
+			this.children.splice(index, 1);
+		}
+	};
+	TreeNode.prototype.destroy = function(){
+		for(var i=0;i<this.children.length;i++){
+			this.children[i].remove(this);
+		}
+		this.children.splice(0, this.children.length);
+	};
 	document.addEventListener("DOMContentLoaded",function(){
 		var amount = {
 			props:{
@@ -129,6 +162,9 @@
 			model:{
 				prop:"checkedProp",
 				event:"input"
+			},
+			updated:function(){
+				console.log("custom checkbox updated")
 			},
 			computed:{
 				checked:{
@@ -261,17 +297,13 @@
 							selectedSlots:[],
 							dirty:false,
 							saved:false,
-							violationCount:0
+							violationCount:0,
+							categorySlots:[],
+							categoriesParent:this.createCategoriesParent()
 						};
 					},
 					mounted:function(){
 						this.getSettings();
-					},
-					updated:function(){
-						if(this.dirty && !this.saved){
-							this.$refs.incoming.collapsed = false;
-							this.$refs.outgoing.collapsed = false;
-						}
 					},
 					components:{
 						'column-slot':{
@@ -401,9 +433,17 @@
 								},
 								createCategorySlot:function(category, exists){
 									var key = this.nextKey();
-									return {category:category, exists:exists, key:key};
+									var newSlot = new TreeNode();
+									this.data.add(newSlot);
+									newSlot.category = category;
+									newSlot.exists = exists;
+									newSlot.key = key;
+									return newSlot;
 								},
 								createCategorySlots:function(){
+									for(var i=0;i<this.categorySlots.length;i++){
+										this.categorySlots[i].destroy();
+									}
 									var self = this;
 									var result = [];
 									if(this.data.category.categories){
@@ -660,13 +700,33 @@
 										}
 									},
 									template:document.getElementById("rowCollectionSettingsTemplate").innerHTML
-								}
+								},
+								'custom-checkbox':customCheckbox
 							},
 							computed:{
 								name:function(){return this.data.category.name;},
 								filterActive:function(){return !!this.data.category.acceptRow;},
 								collectionActive:function(){return !!this.data.category.rowCollection;},
-								nonExistent:function(){return !this.data.exists;}
+								nonExistent:function(){return !this.data.exists;},
+								oncePerPeriod:{
+									get:function(){
+										return this.data && this.data.category.oncePerPeriod;
+									},
+									set:function(b){
+										if(this.data){
+											if(b){
+												this.$set(this.data.category, 'oncePerPeriod', true);
+											}else{
+												if(this.data.category.oncePerPeriod){
+													this.$delete(this.data.category, 'oncePerPeriod');
+												}
+											}
+										}
+									}
+								},
+								onceOverridden:function(){
+									return !this.data.category.oncePerPeriod && this.data.some(function(slot){return slot.category.oncePerPeriod;});
+								}
 							},
 							watch:{
 								name:function(v){
@@ -699,6 +759,7 @@
 					watch:{
 						data:function(v){
 							this.createSlots();
+							this.createCategorySlots();
 						},
 						dirty:function(v){
 							if(v){
@@ -722,11 +783,14 @@
 									this.data.ignoreFirstLine = v;
 								}
 							}
-						},
-						incoming:function(){return {category:this.data.categories.incoming,exists:true};},
-						outgoing:function(){return {category:this.data.categories.outgoing,exists:true};}
+						}
 					},
 					methods:{
+						createCategoriesParent:function(){
+							var parent = new TreeNode();
+							parent.category = {};
+							return parent;
+						},
 						onValid:function(v){
 							if(v){
 								this.violationCount--;
@@ -807,6 +871,17 @@
 							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
 							this.determineProtection();
+						},
+						createCategorySlots:function(){
+							var incoming = new TreeNode();
+							incoming.category = this.data.categories.incoming;
+							incoming.exists = true;
+							var outgoing = new TreeNode();
+							outgoing.category = this.data.categories.outgoing;
+							outgoing.exists = true;
+							this.categoriesParent.add(incoming);
+							this.categoriesParent.add(outgoing);
+							this.categorySlots = [incoming, outgoing];
 						},
 						usesProperty:function(cat, propertyName){
 							var self = this;

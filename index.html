@@ -69,8 +69,7 @@
 					</div>
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings ref="incoming" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="incoming" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
-					<category-settings ref="outgoing" v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-bind:data="outgoing" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
+					<category-settings v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
 				</div>
 				<div class="panel-body">
 					<custom-checkbox v-model="ignoreFirstLine" v-on:input="onChanged"></custom-checkbox>
@@ -118,6 +117,9 @@
 					<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
 				</div>
 				<div class="category-set" v-if="data.exists">
+					<div class="cagegory-addon" v-if="!top && !onceOverridden">
+						<custom-checkbox v-model="oncePerPeriod" v-on:input="changed"></custom-checkbox> once
+					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':filterActive}">
 						<span class="fas fa-filter filter-button" v-on:click="toggleFilter"></span>
 						<property-contains v-on:change="changed" v-on:propertyusechange="onPropertyUseChange" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
