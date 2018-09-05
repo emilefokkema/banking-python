@@ -313,7 +313,8 @@
 							computed:{
 								name:function(){return this.data.definition.name;},
 								index:function(){return this.data.definition.columnIndex;},
-								protected:function(){return this.data.protected;}
+								protected:function(){return this.data.protected;},
+								nameInvalid:function(){return this.data && !this.data.nameValid;}
 							},
 							methods:{
 								onClick:function(e){
@@ -839,6 +840,12 @@
 						},
 						onPropertyNameChange:function(newName, slot){
 							this.onChanged();
+							var nameValid = newName !== "date" && newName !== "amount" && newName !== "direction";
+							var oldNameValid = slot.nameValid;
+							if(oldNameValid != nameValid){
+								this.onValid(nameValid);
+							}
+							slot.nameValid = nameValid;
 							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
 								var definition = this.data.rowDefinition.additional[i];
 								if(definition !== slot.definition && definition.name === newName){
@@ -941,6 +948,7 @@
 							return {
 								protected:false,
 								definitionExists:false,
+								nameValid:true,
 								selected:false,
 								type:"string",
 								definition:{name:undefined,columnIndex:index}
@@ -966,6 +974,7 @@
 							}
 							return {
 								protected:false,
+								nameValid:true,
 								definitionExists:true,
 								type:type,
 								definition:definition,

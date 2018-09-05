@@ -251,7 +251,7 @@ body{
 	font-family: monospace;
 	border: 1pt solid #fff;
 }
-.pattern-input.invalid{
+.invalid{
 	color:#b00;
 	background-color: #ffefef;
 	border:1pt solid #b00;

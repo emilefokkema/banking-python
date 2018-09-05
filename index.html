@@ -99,7 +99,7 @@
 						<span class="fas fa-minus"></span><input class="input" v-model="data.definition.outgoing" v-on:input="onChange"/>
 					</div>
 				</template>
-				<span v-if="data.type == 'string'"><input class="input" v-model="data.definition.name" placeholder="?" v-bind:disabled="protected"/></span>
+				<span v-if="data.type == 'string'"><input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="data.definition.name" placeholder="?" v-bind:disabled="protected"/></span>
 				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
 			</div>
 		</script>
