@@ -129,7 +129,6 @@ body{
 }
 .property-contains{
 	display: inline-block;
-	width:calc(100% - 2em);
 }
 .row-collection{
 	display: inline-block;
@@ -218,10 +217,22 @@ body{
 	margin-top:5px;
 }
 .active .filter-button{
-	color:#000;
+	color:#222;
 }
 .active .collection-button{
 	cursor: default;
+}
+.expectation .fa-times{
+	color:#ccc;
+}
+.expectation.active .fa-times{
+	color:#222;
+}
+.expectation .filter-button{
+	cursor: default;
+}
+.expectation-number{
+	display: inline-block;
 }
 .category-addon{
 	min-height: 2em;

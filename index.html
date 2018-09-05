@@ -117,7 +117,7 @@
 					<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
 				</div>
 				<div class="category-set" v-if="data.exists">
-					<div class="cagegory-addon" v-if="!top && !onceOverridden">
+					<div class="category-addon" v-if="!top && !onceOverridden">
 						<custom-checkbox v-model="oncePerPeriod" v-on:input="changed"></custom-checkbox> once
 					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':filterActive}">
@@ -128,6 +128,12 @@
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':collectionActive}">
 						<span class="fas fa-list-ul filter-button collection-button" v-on:click="toggleCollection"></span>
 						<row-collection v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed" v-on:remove="removeRowCollection"></row-collection>
+					</div>
+					<div class="cagegory-addon expectation" v-bind:class="{'active':!!expectation}" v-if="!oncePerPeriod && !top">
+						<span class="fas fa-times filter-button"></span>
+						<div class="category-addon-content expectation-number">
+							<input type="number" v-model="expectation" min="0" step="1" class="input" v-on:input="changed"/>
+						</div>
 					</div>
 					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" v-on:valid="onValid" :key="slot.key"></category-settings>
 				</div>
