@@ -18,9 +18,8 @@ class AfBij(cat.OptionableCategory):
 		if self.first == None:
 			self.first = row
 		self.last = row
-
-	def begin(self):
-		self.hasBeginning = True
+		if self.acceptsRowInDuplicate(row):
+			self.hasBeginning = True
 
 	def isComplete(self):
 		return self.hasBeginning and self.hasEnd
@@ -65,7 +64,6 @@ class TopCategory:
 	def renewCategory(self):
 		self.currentCategory.end()
 		newCategory = self.getNewPeriod()
-		newCategory.begin()
 		self.currentCategory = newCategory
 		self.categories.append(self.currentCategory)
 
