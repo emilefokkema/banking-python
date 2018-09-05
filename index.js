@@ -331,6 +331,7 @@
 							},
 							watch:{
 								name:function(v){
+									this.$emit("namechange", v, this.data);
 									if(v && !this.data.definitionExists){
 										this.$emit("definitioncreated", this.data.definition);
 									}
@@ -818,6 +819,17 @@
 						onChanged:function(){
 							this.dirty = true;
 						},
+						onPropertyNameChange:function(newName, slot){
+							this.onChanged();
+							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
+								var definition = this.data.rowDefinition.additional[i];
+								if(definition !== slot.definition && definition.name === newName){
+									this.data.rowDefinition.additional.splice(i, 1);
+									this.createSlots();
+									return;
+								}
+							}
+						},
 						doSlotSwitch:function(){
 							var self = this;
 							var slot1 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[0];});
@@ -844,13 +856,6 @@
 						},
 						onDefinitionCreated:function(d){
 							console.log("definition crated");
-							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
-								var existingDefitition = this.data.rowDefinition.additional[i];
-								if(existingDefitition.name == d.name){
-									this.data.rowDefinition.additional.splice(i, 1);
-									break;
-								}
-							}
 							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
 							this.dirty = true;
