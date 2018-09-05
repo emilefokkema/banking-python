@@ -127,7 +127,7 @@
 					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':collectionActive}">
 						<span class="fas fa-list-ul filter-button collection-button" v-on:click="toggleCollection"></span>
-						<row-collection v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed" v-on:remove="removeRowCollection"></row-collection>
+						<row-collection v-on:valid="onValid" v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed" v-on:remove="removeRowCollection"></row-collection>
 					</div>
 					<div class="cagegory-addon expectation" v-bind:class="{'active':!!expectation}" v-if="!oncePerPeriod && !top">
 						<span class="fas fa-times filter-button"></span>
@@ -142,7 +142,7 @@
 		</script>
 		<script type="text/template" id="rowCollectionSettingsTemplate">
 			<div class="row-collection category-addon-content">
-				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:remove="onRemove" v-on:change="$emit('change')"></row-property>
+				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:remove="onRemove" v-on:change="$emit('change')" v-on:valid="onValid"></row-property>
 				<div class="input add-row-property" v-on:click="addProperty"><span class="fas fa-plus"></span></div>
 			</div>
 		</script>
@@ -159,7 +159,7 @@
 					<input v-if="targetType === 'string'" class="input" v-model="property.name" v-on:input="$emit('change')"/>
 					<div class="string-match" v-if="targetType === 'string'">
 						<span class="fas fa-search"></span>
-						<regex-input v-model="stringMatch" v-on:input="$emit('change')"></regex-input>
+						<regex-input v-model="stringMatch" v-on:input="$emit('change')" v-on:valid="onValid"></regex-input>
 					</div>
 					<input class="input" v-model="property.conversion.pattern" v-if="targetType === 'date'" v-on:input="$emit('change')"/>
 				</div>
@@ -218,7 +218,7 @@
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
 		<div id="app">
-			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:error="displayError"></settings>
+			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError"></settings>
 			<div>
 				<div class="empty panel" v-if="completePeriods.length == 0">(no history)</div>
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="refreshComplete" v-on:error="displayError" :key="period.fileName"></period-item>

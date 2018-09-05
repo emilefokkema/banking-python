@@ -150,7 +150,7 @@
 			},
 			watch:{
 				valid:function(v){
-					this.$emit("valid", v);
+					this.$emit("valid", v, !v && "Please use a valid regular expression");
 				}
 			},
 			template:document.getElementById("regexInputTemplate").innerHTML
@@ -351,8 +351,8 @@
 								propertyList:Array
 							},
 							methods:{
-								onValid:function(v){
-									this.$emit("valid", v);
+								onValid:function(v, msg){
+									this.$emit("valid", v, msg);
 								},
 								toggleCollapse:function(){
 									if(!this.data.exists){
@@ -530,8 +530,8 @@
 										'regex-input':regexInput
 									},
 									methods:{
-										onValid:function(v){
-											this.$emit("valid", v);
+										onValid:function(v, msg){
+											this.$emit("valid", v, msg);
 										}
 									},
 									watch:{
@@ -561,6 +561,9 @@
 										addProperty:function(){
 											var firstProperty = this.propertyList[0];
 											this.data.properties.push({name:firstProperty.name,source:firstProperty.name});
+										},
+										onValid:function(v, msg){
+											this.$emit("valid", v, msg);
 										}
 									},
 									components:{
@@ -640,6 +643,11 @@
 												},
 												targetType:function(t){
 													this.$emit("change");
+												}
+											},
+											methods:{
+												onValid:function(v, msg){
+													this.$emit("valid", v, msg);
 												}
 											},
 											components:{
@@ -787,6 +795,11 @@
 							}else{
 								this.$emit("settingsclean");
 							}
+						},
+						violationCount:function(c){
+							if(c == 0){
+								this.$emit("settingsvalid");
+							}
 						}
 					},
 					computed:{
@@ -811,11 +824,14 @@
 							parent.category = {};
 							return parent;
 						},
-						onValid:function(v){
+						onValid:function(v, msg){
 							if(v){
 								this.violationCount--;
 							}else{
 								this.violationCount++;
+								if(msg){
+									this.$emit("error", msg);
+								}
 							}
 						},
 						getSettings:function(){
@@ -843,7 +859,7 @@
 							var nameValid = newName !== "date" && newName !== "amount" && newName !== "direction";
 							var oldNameValid = slot.nameValid;
 							if(oldNameValid != nameValid){
-								this.onValid(nameValid);
+								this.onValid(nameValid, "\""+newName+"\" is a reserved name. Please don't use it for a column.");
 							}
 							slot.nameValid = nameValid;
 							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
@@ -1007,6 +1023,9 @@
 				},
 				displayError:function(msg){
 					this.errorMessage = msg || "Internal Server Error";
+				},
+				clearError:function(){
+					this.errorMessage = undefined;
 				},
 				postCsv:function(){
 					var files = this.$refs.file.files;
