@@ -4,6 +4,12 @@ from datetime import datetime
 from direction import Direction
 import traceback
 
+testClasses = []
+
+def test(testClass):
+	testClasses.append(testClass)
+	return testClass
+
 class TestFailure(BaseException):
 	pass
 
@@ -38,6 +44,7 @@ class RowFactoryTest:
 			]
 		}
 
+@test
 class RowFactoryTest1(RowFactoryTest):
 
 	def test(self):
@@ -48,6 +55,7 @@ class RowFactoryTest1(RowFactoryTest):
 		assertEquals(row['direction'], Direction.INCOMING)
 		assertEquals(row['info'], 'something')
 
+@test
 class RowFactoryTest2(RowFactoryTest):
 
 	def test(self):
@@ -90,6 +98,7 @@ class RowCheckerFactoryTest:
 		})
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
 
+@test
 class PropertyContainsTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -104,6 +113,7 @@ class PropertyContainsTest(RowCheckerFactoryTest):
 		row = self.rowFactory.createRow(['20180509','34.34','in','abraham'])
 		assertEquals(rowChecker.checkRow(row), True)
 
+@test
 class PropertyMatchesTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -118,6 +128,7 @@ class PropertyMatchesTest(RowCheckerFactoryTest):
 		row = self.rowFactory.createRow(['20180509','34.34','in','abraham lincoln'])
 		assertEquals(rowChecker.checkRow(row), True)
 
+@test
 class IncomingTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -132,13 +143,7 @@ class IncomingTest(RowCheckerFactoryTest):
 def runTests():
 	failed = 0
 	passed = 0
-	tests = [
-		RowFactoryTest1(),
-		RowFactoryTest2(),
-		PropertyContainsTest(),
-		PropertyMatchesTest(),
-		IncomingTest()
-		]
+	tests = [tc() for tc in testClasses]
 
 	for test in tests:
 		try:
