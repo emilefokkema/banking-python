@@ -813,6 +813,9 @@
 							get:function(){return this.data && this.data.ignoreFirstLine;},
 							set:function(v){
 								if(this.data){
+									if(!('ignoreFirstLine' in this.data)){
+										this.$set(this.data, 'ignoreFirstLine', v);
+									}
 									this.data.ignoreFirstLine = v;
 								}
 							}
