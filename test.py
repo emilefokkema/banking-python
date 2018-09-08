@@ -232,13 +232,45 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 			]
 		})
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'abraham lincoln\'s car']))
-		collectionObj = getJsonObj(collection)
-		firstItem = collectionObj['items'][0]
-		assertDeepEquals(firstItem,[
-			{'name':'date','type':'date','value':'09-05-2018 00:00'},
-			{'name':'infoPart','type':'string','value':'lincoln'},
-			{'name':'amount','type':'amount','value':3467}
-		])
+		assertDeepEquals(getJsonObj(collection), {
+			'items':[
+				[
+					{'name':'date','type':'date','value':'09-05-2018 00:00'},
+					{'name':'infoPart','type':'string','value':'lincoln'},
+					{'name':'amount','type':'amount','value':3467}
+				]
+			]
+		})
+
+@test
+class RowCollectionTestWithDateConversion(RowCollectionTest):
+
+	def test(self):
+		collection = self.rowCollectionFactory.getDefault({
+			'properties':[
+				{
+					'name':'date',
+					'source':'info',
+					'conversion':{
+						'type':'date',
+						'pattern':r'%d/%m/%Y %H:%M'
+					}
+				},
+				{
+					'name':'amount',
+					'source':'amount'
+				}
+			]
+		})
+		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
+		assertDeepEquals(getJsonObj(collection), {
+			'items':[
+				[
+					{'name':'date','type':'date','value':'08-05-2018 12:34'},
+					{'name':'amount','type':'amount','value':3467}
+				]
+			]
+		})
 
 
 def runTests():
