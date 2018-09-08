@@ -47,6 +47,7 @@ def assertInDict(key, _dict):
 def assertEqualLength(list1, list2):
 	assert len(list1) == len(list2)
 
+@wrapAssertion(lambda obj1, obj2:'expected '+repr(obj1)+' to deep-equal '+repr(obj2))
 def assertDeepEquals(obj1, obj2):
 	if isinstance(obj1, dict):
 		assertInstance(obj2, dict)
@@ -272,6 +273,51 @@ class RowCollectionTestWithDateConversion(RowCollectionTest):
 			]
 		})
 
+@test
+class RowCollectionTestWithDisplayLimit(RowCollectionTest):
+
+	def test(self):
+		collection = self.rowCollectionFactory.getDefault({
+			'properties':[
+				{
+					'name':'date',
+					'source':'info',
+					'conversion':{
+						'type':'date',
+						'pattern':r'%d/%m/%Y %H:%M'
+					}
+				},
+				{
+					'name':'amount',
+					'source':'amount'
+				}
+			],
+			'displayLimit':3
+		})
+		for i in range(4):
+			collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
+		collectionObj = getJsonObj(collection)
+		items = collectionObj['items']
+		assertEquals(len(items), 3)
+		assertInDict('more', collectionObj)
+		assertEquals(collectionObj['more'], 1)
+
+@test
+class RowCollectionTestWithDefault(RowCollectionTest):
+
+	def test(self):
+		collection = self.rowCollectionFactory.getDefault({'default':True})
+		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
+		assertDeepEquals(getJsonObj(collection), {
+			'items':[
+				[
+					{'name':'direction', 'type':'direction', 'value':Direction.INCOMING.value},
+					{'name':'date','type':'date','value':'09-05-2018 00:00'},
+					{'name':'amount','type':'amount','value':3467},
+					{'name':'info','type':'string','value':'something on 08/05/2018 12:34'}
+				]
+			]
+		})
 
 def runTests():
 	failed = 0
