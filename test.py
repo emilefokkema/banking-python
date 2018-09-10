@@ -442,6 +442,90 @@ class TestCategoryOrderNeitherMatches(CategoryTest):
 		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
 		assertEquals(category.canAddRow(row), False)
 
+@test
+class TestCategoryWithExpectationExceeded(CategoryTest):
+
+	def test(self):
+		category = self.makeCategory({'name':'test','expect':1})
+		for i in range(3):
+			category.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
+		assertDeepEquals(getJsonObj(category), {
+			'name':'test',
+			'total':3 * 3467,
+			'expectation':{
+				'expected':1,
+				'actual':3,
+				'dates':['09-05-2018 00:00','09-05-2018 00:00','09-05-2018 00:00']
+			}
+		})
+
+@test
+class TestCategoryWithExpectationNotExceeded(CategoryTest):
+
+	def test(self):
+		category = self.makeCategory({'name':'test','expect':1})
+		category.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
+		assertDeepEquals(getJsonObj(category), {
+			'name':'test',
+			'total':3467
+		})
+
+class OncePerPeriodTest(CategoryTest):
+
+	def makeCategory(self):
+		return super(OncePerPeriodTest, self).makeCategory({
+			'name':'incoming',
+			'categories':[
+				{
+					'name':'paycheck',
+					'acceptRow':{
+						'propertyContains':{
+							'name':'info',
+							'values':['paycheck']
+						}
+					},
+					'oncePerPeriod':True
+				},
+				{
+					'name':'other'
+				}
+			]
+		})
+
+@test
+class TestFirstOther(OncePerPeriodTest):
+
+	def test(self):
+		category = self.makeCategory()
+		otherRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'something else'])
+		paycheckRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck'])
+
+		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
+		assertEquals(category.acceptsRowInDuplicate(paycheckRow), False)
+
+		category.addRow(otherRow)
+
+		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
+		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
+
+@test
+class TestFirstOPP(OncePerPeriodTest):
+
+	def test(self):
+		category = self.makeCategory()
+		otherRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'something else'])
+		paycheckRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck'])
+
+		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
+		assertEquals(category.acceptsRowInDuplicate(paycheckRow), False)
+
+		category.addRow(paycheckRow)
+
+		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
+		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
+
+	
+
 def runTests():
 	failed = []
 	passed = 0
