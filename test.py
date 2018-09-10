@@ -2,6 +2,7 @@ from rowfactory import RowFactory
 from rowcheckerfactory import RowCheckerFactory
 from rowcollection import RowCollectionFactory
 from jsonprinter import JsonPrinter
+from cat import OptionableCategory
 from datetime import datetime
 from direction import Direction
 import traceback
@@ -319,8 +320,130 @@ class RowCollectionTestWithDefault(RowCollectionTest):
 			]
 		})
 
+class CategoryTest:
+	def __init__(self):
+		self.rowFactory = RowFactory({
+			'date':{
+				'columnIndex':0,
+				'pattern':'yyyymmdd'
+			},
+			'amount':{
+				'columnIndex':1
+			},
+			'direction':{
+				'columnIndex':2,
+				'incoming':'in',
+				'outgoing':'out'
+			},
+			'additional':[
+				{
+					'name':'info',
+					'columnIndex':3
+				}
+			]
+		})
+		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
+		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
+
+	def makeCategory(self, options):
+		return OptionableCategory(options, self.rowCheckerFactory, self.rowCollectionFactory)
+
+@test
+class TestCategoryOrder(CategoryTest):
+
+	def test(self):
+		category = self.makeCategory({
+			'name':'test',
+			'categories':[
+				{
+					'name':'one'
+				},
+				{
+					'name':'two'
+				}
+			]
+		})
+		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
+		assertEquals(category.canAddRow(row), True)
+		category.addRow(row)
+		assertDeepEquals(getJsonObj(category), {
+			'name':'test',
+			'total': 3467,
+			'categories':[
+				{
+					'name':'one',
+					'total':3467
+				}
+			]
+		})
+
+@test
+class TestCategoryOrderFirstNoMatch(CategoryTest):
+
+	def test(self):
+		category = self.makeCategory({
+			'name':'test',
+			'categories':[
+				{
+					'name':'one',
+					'acceptRow':{
+						'propertyContains':{
+							'name':'info',
+							'values':['nothing']
+						}
+					}
+				},
+				{
+					'name':'two'
+				}
+			]
+		})
+		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
+		assertEquals(category.canAddRow(row), True)
+		category.addRow(row)
+		assertDeepEquals(getJsonObj(category), {
+			'name':'test',
+			'total': 3467,
+			'categories':[
+				{
+					'name':'two',
+					'total':3467
+				}
+			]
+		})
+
+@test
+class TestCategoryOrderNeitherMatches(CategoryTest):
+
+	def test(self):
+		category = self.makeCategory({
+			'name':'test',
+			'categories':[
+				{
+					'name':'one',
+					'acceptRow':{
+						'propertyContains':{
+							'name':'info',
+							'values':['nothing']
+						}
+					}
+				},
+				{
+					'name':'two',
+					'acceptRow':{
+						'propertyContains':{
+							'name':'info',
+							'values':['everything']
+						}
+					}
+				}
+			]
+		})
+		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
+		assertEquals(category.canAddRow(row), False)
+
 def runTests():
-	failed = 0
+	failed = []
 	passed = 0
 	tests = [tc() for tc in testClasses]
 
@@ -330,9 +453,9 @@ def runTests():
 			passed += 1
 		except BaseException:
 			traceback.print_exc()
-			failed += 1
+			failed.append(type(test).__name__)
 
 	print('tests passed: ',passed)
-	print('tests failed: ', failed)
+	print('tests failed: ', '\n'.join(failed) if len(failed) > 0 else '0')
 
 runTests()
