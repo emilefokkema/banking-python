@@ -3,6 +3,7 @@ from rowcheckerfactory import RowCheckerFactory
 from rowcollection import RowCollectionFactory
 from jsonprinter import JsonPrinter
 from cat import OptionableCategory
+from custom import AfBij
 from datetime import datetime
 from direction import Direction
 import traceback
@@ -524,7 +525,85 @@ class TestFirstOPP(OncePerPeriodTest):
 		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
 		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
 
-	
+class TestAfBij(CategoryTest):
+
+	def makeAfBij(self):
+		return AfBij({
+			'outgoing':{
+				'name':'out',
+				'categories':[]
+			},
+			'incoming':{
+				'name':'in',
+				'categories':[
+					{
+						'name':'paycheck',
+						'acceptRow':{
+							'propertyContains':{
+								'name':'info',
+								'values':['paycheck']
+							}
+						},
+						'oncePerPeriod':True
+					}
+				]
+			}
+		}, self.rowCheckerFactory, self.rowCollectionFactory)
+
+@test
+class TestAfBijWithStart(TestAfBij):
+
+	def test(self):
+		afbij = self.makeAfBij()
+		afbij.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck']))
+		afbijObj = getJsonObj(afbij)
+		assertEquals(afbijObj['from'], '09-05-2018 00:00')
+		assertEquals(afbijObj['hasBeginning'], True)
+
+@test
+class TestAfBijWithLeftover(TestAfBij):
+
+	def test(self):
+		afbij = self.makeAfBij()
+		afbij.addRow(self.rowFactory.createRow(['20180509','34.67', 'out', 'something']))
+		afbijObj = getJsonObj(afbij)
+		assertDeepEquals(afbijObj['Af'], {
+			'name': 'out',
+			'total': 3467,
+			'categories': [
+				{
+					'name': 'leftovers',
+					'total': 3467,
+					'rows': {
+						'items': [
+							[
+								{
+									'name': 'direction',
+									'value': Direction.OUTGOING.value,
+									'type': 'direction'
+								},
+								{
+									'name': 'date',
+									'value': '09-05-2018 00:00',
+									'type': 'date'
+								},
+								{
+									'name': 'amount',
+ 									'value': 3467,
+ 									'type': 'amount'
+ 								},
+ 								{
+ 									'name': 'info',
+ 									'value': 'something',
+ 									'type' : 'string'
+ 								}
+ 							]
+ 						]
+ 					}
+ 				}
+ 			]
+ 		})
+
 
 def runTests():
 	failed = []
