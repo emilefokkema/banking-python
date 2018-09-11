@@ -1,37 +1,17 @@
 import csv
-from rowfactory import RowFactory
+
 import custom
-from rowcheckerfactory import RowCheckerFactory
-from rowcollection import RowCollectionFactory
+
 import jsonprinter
 from domainexception import DomainException
 
-def getExtendedCategoriesDefinition(categoriesDefinition):
-		incomingOptions = categoriesDefinition['incoming']
-		outgoingOptions = categoriesDefinition['outgoing']
-		return {
-			'categories':[
-				{
-					'name':outgoingOptions['name'],
-					'acceptRow': {'outgoing':True},
-					'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
-				},
-				{
-					'name':incomingOptions['name'],
-					'acceptRow':{'incoming':True},
-					'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
-				}
-			]
-		}
-
 class CsvProcessor:
-	def __init__(self, configuration, history):
-		rowDefinition = configuration['rowDefinition']
-		self.rowFactory = RowFactory(rowDefinition)
-		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
-		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
-		self.categoriesDefinition = getExtendedCategoriesDefinition(configuration['categories'])
-		self.ignoreFirst = configuration['ignoreFirstLine'] if 'ignoreFirstLine' in configuration else False
+	def __init__(self, rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst):
+		self.rowFactory = rowFactory
+		self.rowCollectionFactory = rowCollectionFactory
+		self.rowCheckerFactory = rowCheckerFactory
+		self.categoriesConfiguration = categoriesConfiguration
+		self.ignoreFirst = ignoreFirst
 		self.history = history
 
 	def getPrintedList(self, printableList):
@@ -41,7 +21,7 @@ class CsvProcessor:
 
 	def processCsv(self, csvfile):
 		rows = []
-		importer = custom.TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesDefinition)
+		importer = custom.TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesConfiguration)
 
 		reader = csv.reader(csvfile, delimiter=',')
 		counter = 0

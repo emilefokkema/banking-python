@@ -4,14 +4,32 @@ import re
 from direction import Direction
 
 class AfBij(cat.OptionableCategory):
-	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
-		super(AfBij, self).__init__(options, rowCheckerFactory, rowCollectionFactory)
+	def __init__(self, categoriesConfiguration, rowCheckerFactory, rowCollectionFactory):
+		super(AfBij, self).__init__(self.getExtendedCategoriesDefinition(categoriesConfiguration), rowCheckerFactory, rowCollectionFactory)
 		self.af = self.categories[0]
 		self.bij = self.categories[1]
 		self.first = None
 		self.last = None
 		self.hasBeginning = False
 		self.hasEnd = False
+
+	def getExtendedCategoriesDefinition(self, categoriesConfiguration):
+			incomingOptions = categoriesConfiguration['incoming']
+			outgoingOptions = categoriesConfiguration['outgoing']
+			return {
+				'categories':[
+					{
+						'name':outgoingOptions['name'],
+						'acceptRow': {'outgoing':True},
+						'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+					},
+					{
+						'name':incomingOptions['name'],
+						'acceptRow':{'incoming':True},
+						'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+					}
+				]
+			}
 
 	def addRow(self, row):
 		super(AfBij, self).addRow(row)

@@ -2,6 +2,9 @@ import http.server
 import socketserver
 import json
 from csvprocessor import CsvProcessor
+from rowcheckerfactory import RowCheckerFactory
+from rowcollection import RowCollectionFactory
+from rowfactory import RowFactory
 import jsonprinter
 from dataprovider import DataProvider
 from periodhistory import PeriodHistory
@@ -89,7 +92,13 @@ class PostCsvRoute(ApiPostRoute):
 		settings = self.dataProvider.getItem('settings')
 		if settings == None:
 			raise DomainException('please provide settings before processing a csv')
-		return CsvProcessor(settings, self.history).processCsv(data.splitlines())
+		rowDefinition = settings['rowDefinition']
+		rowFactory = RowFactory(rowDefinition)
+		rowCollectionFactory = RowCollectionFactory(rowFactory)
+		rowCheckerFactory = RowCheckerFactory(rowFactory)
+		categoriesConfiguration = settings['categories']
+		ignoreFirst = settings['ignoreFirstLine'] if 'ignoreFirstLine' in settings else False
+		return CsvProcessor(rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, self.history, ignoreFirst).processCsv(data.splitlines())
 
 class SaveSettingsRoute(ApiPostRoute):
 
