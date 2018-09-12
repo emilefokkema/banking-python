@@ -182,7 +182,8 @@
 			el:"#app",
 			data:{
 				completePeriods: [],
-				incompletePeriods: [],
+				incompleteBeginningPeriods: [],
+				incompleteEndingPeriods:[],
 				errorMessage:undefined,
 				fileName:undefined,
 				settingsDirty:false
@@ -209,7 +210,7 @@
 							var self=this;
 							this.isRemoving = true;
 							console.log("removing "+this.fileName);
-							doPost("api/delete", this.fileName, function(){self.$emit("removal");},function(msg){self.$emit("error", msg);});
+							doPost("api/delete", this.fileName, function(){self.$emit("removal", self.fileName);},function(msg){self.$emit("error", msg);});
 						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
@@ -1008,6 +1009,14 @@
 				this.refreshComplete();
 				
 			},
+			computed:{
+				earliestCompleteDate:function(){
+					if(this.completePeriods.length == 0){
+						return undefined;
+					}
+					return Math.min.apply(null, this.completePeriods.map(function(p){return p.file.from;}));
+				}
+			},
 			methods:{
 				setSettingsDirty:function(){
 					this.settingsDirty = true;
@@ -1021,8 +1030,17 @@
 				refreshComplete:function(){
 					var self = this;
 					doGet("/api/complete",function(data){
-						self.completePeriods = data;
+						self.addCompletePeriods(data);
 					},function(msg){self.displayError(msg);});
+				},
+				onRemovePeriod:function(fileName){
+					this.completePeriods = this.completePeriods.filter(function(p){return p.fileName !== fileName;});
+				},
+				periodComplement:function(plusPeriods, minusPeriods){
+					return plusPeriods.filter(function(p){return !minusPeriods.some(function(pp){return p.fileName == pp.fileName;});});
+				},
+				addCompletePeriods:function(completePeriods){
+					this.completePeriods = this.completePeriods.concat(this.periodComplement(completePeriods, this.completePeriods));
 				},
 				displayError:function(msg){
 					this.errorMessage = msg || "Internal Server Error";
@@ -1038,9 +1056,15 @@
 					var reader = new FileReader();
 					reader.onload = function(){
 						doPost("/api/csv", reader.result, function(data){
-							self.incompletePeriods = data
-								.filter(function(m){return m.file.hasBeginning;});
-							self.refreshComplete();
+							var complete = data.filter(function(p){return p.file.hasBeginning && p.file.hasEnd;});
+							self.incompleteBeginningPeriods = data.filter(function(p){return p.file.hasBeginning && !p.file.hasEnd;});
+							var incompleteEndingPeriods = data.filter(function(p){return !p.file.hasBeginning && p.file.hasEnd;});
+							if(self.earliestCompleteDate){
+								self.incompleteEndingPeriods = incompleteEndingPeriods.filter(function(p){return p.file.through < self.earliestCompleteDate;})
+							}else{
+								self.incompleteEndingPeriods = incompleteEndingPeriods;
+							}
+							self.addCompletePeriods(complete);
 							self.$refs.file.value = "";
 							self.fileName = "";
 						},function(msg){self.displayError(msg);});

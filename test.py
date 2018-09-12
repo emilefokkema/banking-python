@@ -674,7 +674,7 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
 		assertDeepEquals(dataprovider.getItem('history'), ['2018-05-092018-05-09'])
-		assertEquals(len(result), 2)
+		assertEquals(len(result), 3)
 
 
 def runTests():

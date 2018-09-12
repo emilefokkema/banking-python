@@ -42,4 +42,4 @@ class CsvProcessor:
 		for c in complete:
 			self.history.addItem(c['fileName'], c['file'])
 
-		return incomplete
+		return incomplete + complete
