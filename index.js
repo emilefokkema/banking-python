@@ -87,7 +87,7 @@
 		}
 		this.children.splice(0, this.children.length);
 	};
-	document.addEventListener("DOMContentLoaded",function(){
+	window.addEventListener("load",function(){
 		var amount = {
 			props:{
 				numberOfCents:Number
