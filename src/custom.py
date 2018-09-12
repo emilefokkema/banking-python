@@ -1,9 +1,9 @@
-import cat
-from printablelist import PrintableList
+from src.cat import OptionableCategory
+from src.printablelist import PrintableList
 import re
-from direction import Direction
+from src.direction import Direction
 
-class AfBij(cat.OptionableCategory):
+class AfBij(OptionableCategory):
 	def __init__(self, categoriesConfiguration, rowCheckerFactory, rowCollectionFactory):
 		super(AfBij, self).__init__(self.getExtendedCategoriesDefinition(categoriesConfiguration), rowCheckerFactory, rowCollectionFactory)
 		self.af = self.categories[0]

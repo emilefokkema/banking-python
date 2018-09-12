@@ -1,11 +1,11 @@
-from rowfactory import RowFactory
-from rowcheckerfactory import RowCheckerFactory
-from rowcollection import RowCollectionFactory
-from jsonprinter import JsonPrinter
-from cat import OptionableCategory
-from custom import AfBij
+from src.rowfactory import RowFactory
+from src.rowcheckerfactory import RowCheckerFactory
+from src.rowcollection import RowCollectionFactory
+from src.jsonprinter import JsonPrinter
+from src.cat import OptionableCategory
+from src.custom import AfBij
 from datetime import datetime
-from direction import Direction
+from src.direction import Direction
 import traceback
 
 testClasses = []

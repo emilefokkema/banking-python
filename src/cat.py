@@ -1,6 +1,6 @@
-import expectation
-import printablelist
-from rowcollection import RowCollection
+from src.expectation import RowNumberExpectation
+from src.printablelist import PrintableList
+from src.rowcollection import RowCollection
 
 class RowCategory(object):
 	def __init__(self, name='name'):
@@ -47,7 +47,7 @@ class RowCategory(object):
 class OptionableCategory(RowCategory):
 	def __init__(self, options, rowCheckerFactory, rowCollectionFactory):
 		super(OptionableCategory, self).__init__(options['name'] if 'name' in options else 'name')
-		self.categories = printablelist.PrintableList([])
+		self.categories = PrintableList([])
 		self.hasCategories = False
 		self.rowCollection = None
 		self.collectsRows = False
@@ -62,7 +62,7 @@ class OptionableCategory(RowCategory):
 				newCategory.setParent(self)
 		self.rowChecker = rowCheckerFactory.getRowChecker(options['acceptRow'] if 'acceptRow' in options else None)
 		if 'expect' in options:
-			self.expectation = expectation.RowNumberExpectation(options['expect'])
+			self.expectation = RowNumberExpectation(options['expect'])
 
 		self.oncePerPeriod = (options['oncePerPeriod'] == True) if 'oncePerPeriod' in options else False
 

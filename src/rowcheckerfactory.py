@@ -1,5 +1,5 @@
 import re
-from direction import Direction
+from src.direction import Direction
 
 class AcceptingRowChecker:
 	def checkRow(self, row):

@@ -1,9 +1,8 @@
 import csv
+from src.custom import TopCategory
 
-import custom
-
-import jsonprinter
-from domainexception import DomainException
+from src.jsonprinter import JsonPrinter
+from src.domainexception import DomainException
 
 class CsvProcessor:
 	def __init__(self, rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst):
@@ -15,13 +14,13 @@ class CsvProcessor:
 		self.history = history
 
 	def getPrintedList(self, printableList):
-		printer = jsonprinter.JsonPrinter()
+		printer = JsonPrinter()
 		printableList.printSelf(printer)
 		return printer.getObj()
 
 	def processCsv(self, csvfile):
 		rows = []
-		importer = custom.TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesConfiguration)
+		importer = TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesConfiguration)
 
 		reader = csv.reader(csvfile, delimiter=',')
 		counter = 0
