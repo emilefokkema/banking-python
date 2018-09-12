@@ -2,10 +2,12 @@ from src.rowfactory import RowFactory
 from src.rowcheckerfactory import RowCheckerFactory
 from src.rowcollection import RowCollectionFactory
 from src.jsonprinter import JsonPrinter
+from src.csvprocessor import CsvProcessor
 from src.cat import OptionableCategory
 from src.custom import AfBij
 from datetime import datetime
 from src.direction import Direction
+from src.periodhistory import PeriodHistory
 import traceback
 
 testClasses = []
@@ -603,6 +605,76 @@ class TestAfBijWithLeftover(TestAfBij):
  				}
  			]
  		})
+
+class MockDataProvider:
+	def __init__(self):
+		self.obj = {}
+
+	def getItem(self, key):
+		if key in self.obj:
+			return self.obj[key]
+		return None
+
+	def setItem(self, key, item):
+		self.obj[key] = item
+
+	def deleteItem(self, key):
+		self.obj.pop(key, None)
+
+class CsvProcessorTest(CategoryTest):
+
+	def makeProcessor(self):
+		dataprovider = MockDataProvider()
+		history = PeriodHistory(dataprovider)
+		processor = CsvProcessor(self.rowFactory, self.rowCheckerFactory, self.rowCollectionFactory, {
+			'outgoing':{
+				'name':'out',
+				'categories':[]
+			},
+			'incoming':{
+				'name':'in',
+				'categories':[
+					{
+						'name':'paycheck',
+						'acceptRow':{
+							'propertyContains':{
+								'name':'info',
+								'values':['paycheck']
+							}
+						},
+						'oncePerPeriod':True
+					}
+				]
+			}
+		}, history, False)
+		return dataprovider, processor
+
+@test
+class TestTwoIncomplete(CsvProcessorTest):
+
+	def test(self):
+		dataprovider, processor = self.makeProcessor()
+		rows = [
+			'"20180509","1.00","out","something"',
+			'"20180509","65.00","in","paycheck"',
+			'"20180509","1.00","out","something"']
+		result = processor.processCsv(rows)
+		assertEquals(dataprovider.getItem('history'), None)
+		assertEquals(len(result), 2)
+
+@test
+class TestOneComplete(CsvProcessorTest):
+
+	def test(self):
+		dataprovider, processor = self.makeProcessor()
+		rows = [
+			'"20180609","65.00","in","paycheck"',
+			'"20180509","1.00","out","something"',
+			'"20180509","65.00","in","paycheck"',
+			'"20180509","1.00","out","something"']
+		result = processor.processCsv(rows)
+		assertDeepEquals(dataprovider.getItem('history'), ['2018-05-092018-05-09'])
+		assertEquals(len(result), 2)
 
 
 def runTests():
