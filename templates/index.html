@@ -3,10 +3,22 @@
 		<title>Process my banking statements</title>
 		<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-		<script src="index.js"></script>
-		
-		<link rel="stylesheet" type="text/css" href="index.css">
+		<script src="{{ url_for('static', filename='index.js') }}"></script>
+  		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+		<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+		<script>
+	    // Initialize Firebase
+	    var config = {
+	      apiKey: "AIzaSyDZ3tU_ccASR1BzaSeN2NyAYUdEuwTsMUM",
+	      authDomain: "expencsv.firebaseapp.com",
+	      databaseURL: "https://expencsv.firebaseio.com",
+	      projectId: "expencsv",
+	      storageBucket: "expencsv.appspot.com",
+	      messagingSenderId: "780194611024"
+	    };
+	    firebase.initializeApp(config);
+	  </script>
 	</head>
 	<body>
 
@@ -217,6 +229,8 @@
 		<script type="text/template" id="regexInputTemplate">
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
+		<div id="firebaseui-auth-container"></div>
+		<button id="sign-out" hidden=true>Sign Out</button>
 		<div id="app">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError"></settings>
 			<div>
