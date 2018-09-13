@@ -19,9 +19,11 @@
 	    };
 	    firebase.initializeApp(config);
 	  </script>
+	  <script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
+	  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
 	</head>
 	<body>
-
+		{% raw %}
 		<script type="text/template" id="categoryTemplate">
 			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
 				<div class="category-header">
@@ -232,7 +234,8 @@
 		<div id="firebaseui-auth-container"></div>
 		<button id="sign-out" hidden=true>Sign Out</button>
 		<div id="app">
-			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError"></settings>
+			<button v-if="loggedIn" v-on:click="signOut">Sign out</button>
+			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true"></settings>
 			<div>
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
@@ -242,11 +245,12 @@
 			<div>
 				<period-item v-for="period in incompleteBeginningPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
-			<div v-if="!settingsDirty">
+			<div v-if="!settingsDirty && settingsSaved">
 				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
 				<input type="button" class="input" value="submit" v-on:click="postCsv" />
 			</div>
 			<div class="error" v-if="errorMessage">{{errorMessage}}</div>
 		</div>
+		{% endraw %}
 	</body>
 </html>
