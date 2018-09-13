@@ -18,23 +18,28 @@ class CsvProcessor:
 		printableList.printSelf(printer)
 		return printer.getObj()
 
-	def processCsv(self, csvfile):
-		rows = []
-		importer = TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesConfiguration)
-
-		reader = csv.reader(csvfile, delimiter=',')
+	def getSkippingReader(self, iterable):
 		counter = 0
-		for csvRow in reader:
+		for x in iterable:
 			counter += 1
 			if counter == 1 and self.ignoreFirst:
 				continue
-			rows.append(self.rowFactory.createRow(csvRow))
+			yield x
+
+
+	def processCsv(self, csvfile):
+		reader = csv.reader(csvfile, delimiter=',')
+		rows = [self.rowFactory.createRow(csvRow) for csvRow in self.getSkippingReader(reader)]
+		days = set(map(lambda row:row['date'], rows))
+		rowsByDay = [(day, [row for row in rows if row['date'] == day]) for day in days]
+		rowsByDay.sort(key=lambda rd:rd[0])
+
+		importer = TopCategory(self.rowCheckerFactory, self.rowCollectionFactory, self.categoriesConfiguration)
 			
+		
 
-		rows.sort(key=lambda r:r['date'])
-
-		for row1 in rows:
-			importer.addRow(row1)
+		for dayRows in rowsByDay:
+			importer.addDayRows(dayRows[1])
 
 		complete = self.getPrintedList(importer.getComplete())
 		incomplete = self.getPrintedList(importer.getIncomplete())

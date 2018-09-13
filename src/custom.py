@@ -91,11 +91,11 @@ class TopCategory:
 	def getIncomplete(self):
 		return PrintableList([PeriodFile(cat) for cat in self.categories if not cat.isComplete()])
 
-	def addRow(self, row):
-		if self.currentCategory.acceptsRowInDuplicate(row):
+	def addDayRows(self, rows):
+		if any((self.currentCategory.acceptsRowInDuplicate(row) for row in rows)):
 			self.renewCategory()
-
-		self.currentCategory.addRow(row)
+		for row in rows:
+			self.currentCategory.addRow(row)
 
 	def printSelf(self, printer):
 		self.categories.printSelf(printer)
