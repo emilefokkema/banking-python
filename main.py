@@ -18,6 +18,9 @@ from flask import Flask, render_template, request
 from google.auth.transport import requests
 from google.cloud import datastore
 import google.oauth2.id_token
+from src.defaultsettingsprovider import DefaultSettingsProvider
+from src.datastoredataprovider import DataStoreDataProvider
+import json
 
 datastore_client = datastore.Client()
 firebase_request_adapter = requests.Request()
@@ -40,38 +43,68 @@ def fetch_times(email, limit):
 
     return times
 
+def wraps(wrapper):
+    def newWrapper(f):
+        wrap = wrapper(f)
+        wrap.__name__ = f.__name__
+        return wrap
+    return newWrapper
+
+@wraps
+def returnsJson(f):
+    def wrap(*args, **kwargs):
+        result = f(*args, **kwargs)
+        return json.dumps(result)
+    return wrap
+
+@wraps
+def loggedIn(f):
+    def wrap():
+        claims = None
+        error_message = None
+        # Verify Firebase auth.
+        id_token = request.cookies.get("token")
+        if not id_token:
+            error_message = 'no token was present in the cookie'
+        else:
+            try:
+                # Verify the token against the Firebase Auth API. This example
+                # verifies the token on each page load. For improved performance,
+                # some applications may wish to cache results in an encrypted
+                # session store (see for instance
+                # http://flask.pocoo.org/docs/1.0/quickstart/#sessions).
+                claims = google.oauth2.id_token.verify_firebase_token(
+                    id_token, firebase_request_adapter)
+                #store_time(claims['email'], datetime.datetime.now())
+                #times = fetch_times(claims['email'], 10)
+            except ValueError as exc:
+                # This will be raised if the token is expired or any other
+                # verification checks fail.
+                error_message = str(exc)
+
+        return f(claims, error_message)
+    return wrap
+
 app = Flask(__name__)
 
 
 @app.route('/')
 def root():
-    # Verify Firebase auth.
-    id_token = request.cookies.get("token")
-    error_message = None
-    claims = None
-    times = None
-
-    if id_token:
-        try:
-            # Verify the token against the Firebase Auth API. This example
-            # verifies the token on each page load. For improved performance,
-            # some applications may wish to cache results in an encrypted
-            # session store (see for instance
-            # http://flask.pocoo.org/docs/1.0/quickstart/#sessions).
-            claims = google.oauth2.id_token.verify_firebase_token(
-                id_token, firebase_request_adapter)
-            store_time(claims['email'], datetime.datetime.now())
-            times = fetch_times(claims['email'], 10)
-        except ValueError as exc:
-            # This will be raised if the token is expired or any other
-            # verification checks fail.
-            error_message = str(exc)
-
-
 
     return render_template(
-        'index.html',
-        user_data=claims, error_message=error_message, times=times)
+        'index.html')
+
+@app.route('/api/settings')
+@returnsJson
+@loggedIn
+def get_settings(claims, error_message):
+    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+    return None
+
+@app.route('/api/settings/default')
+@returnsJson
+def get_default_settings():
+    return DefaultSettingsProvider().getDefaultSettings()
 
 
 if __name__ == '__main__':

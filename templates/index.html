@@ -232,9 +232,8 @@
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
 		<div id="firebaseui-auth-container"></div>
-		<button id="sign-out" hidden=true>Sign Out</button>
 		<div id="app">
-			<button v-if="loggedIn" v-on:click="signOut">Sign out</button>
+			<button v-if="loggedIn" v-on:click="signOut" class="input">Sign out</button>
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true"></settings>
 			<div>
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
