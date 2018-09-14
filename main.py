@@ -54,7 +54,15 @@ def wraps(wrapper):
 def returnsJson(f):
     def wrap(*args, **kwargs):
         result = f(*args, **kwargs)
-        return json.dumps(result)
+        rest = []
+        tupleReturned = isinstance(result, tuple)
+        if tupleReturned:
+            (result, *rest) = result
+        result = json.dumps(result)
+        if tupleReturned:
+            return tuple([result] + rest)
+        else:
+            return result
     return wrap
 
 @wraps
