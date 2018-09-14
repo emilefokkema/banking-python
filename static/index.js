@@ -287,17 +287,17 @@
 									components:{
 										'row':{
 											props:{
-												row:Array
+												row:Object
 											},
 											computed:{
 												dateProperty:function(){
-													return this.row.find(function(p){return p.type == 'date';})
+													return this.row.properties.find(function(p){return p.type == 'date';})
 												},
 												amountProperty:function(){
-													return this.row.find(function(p){return p.type == 'amount';})
+													return this.row.properties.find(function(p){return p.type == 'amount';})
 												},
 												stringProperties:function(){
-													return this.row.filter(function(p){return p.type == 'string';})
+													return this.row.properties.filter(function(p){return p.type == 'string';})
 												}
 											},
 											components:{

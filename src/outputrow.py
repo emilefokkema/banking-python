@@ -22,7 +22,8 @@ class OutputRow:
 		self.propertyValues = propertyValues
 
 	def printSelf(self, printer):
-		with printer.startList() as listPrinter:
-			for propertyValue in self.propertyValues:
-				with listPrinter.indentItem() as itemprinter:
-					propertyValue.printSelf(itemprinter)
+		with printer.indent('properties') as printer1:
+			with printer1.startList() as listPrinter:
+				for propertyValue in self.propertyValues:
+					with listPrinter.indentItem() as itemprinter:
+						propertyValue.printSelf(itemprinter)

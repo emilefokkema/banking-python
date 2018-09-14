@@ -165,8 +165,18 @@ def post_csv(claims):
     categoriesConfiguration = settings['categories']
     ignoreFirst = settings['ignoreFirstLine'] if 'ignoreFirstLine' in settings else False
     processor = CsvProcessor(rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst)
-    entity = datastore.Entity(key=datastore_client.key('something','something'))
     return processor.processCsv(request.data.decode('utf-8').splitlines())
+
+@app.route('/api/delete', methods=['POST'])
+@returnsJson
+@catchesException
+@loggedIn
+def delete_period(claims):
+    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+    history = PeriodHistory(dataprovider)
+    history.removeItem(request.data.decode('utf-8'))
+    return 'OK'
+
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

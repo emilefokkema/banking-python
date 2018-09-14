@@ -239,11 +239,13 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'abraham lincoln\'s car']))
 		assertDeepEquals(getJsonObj(collection), {
 			'items':[
-				[
-					{'name':'date','type':'date','value':'09-05-2018 00:00'},
-					{'name':'infoPart','type':'string','value':'lincoln'},
-					{'name':'amount','type':'amount','value':3467}
-				]
+				{
+					'properties':[
+						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'infoPart','type':'string','value':'lincoln'},
+						{'name':'amount','type':'amount','value':3467}
+					]
+				}
 			]
 		})
 
@@ -270,10 +272,12 @@ class RowCollectionTestWithDateConversion(RowCollectionTest):
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
 		assertDeepEquals(getJsonObj(collection), {
 			'items':[
-				[
-					{'name':'date','type':'date','value':'08-05-2018 12:34'},
-					{'name':'amount','type':'amount','value':3467}
-				]
+				{
+					'properties':[
+						{'name':'date','type':'date','value':'08-05-2018 12:34'},
+						{'name':'amount','type':'amount','value':3467}
+					]
+				}
 			]
 		})
 
@@ -314,12 +318,14 @@ class RowCollectionTestWithDefault(RowCollectionTest):
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
 		assertDeepEquals(getJsonObj(collection), {
 			'items':[
-				[
-					{'name':'direction', 'type':'direction', 'value':Direction.INCOMING.value},
-					{'name':'date','type':'date','value':'09-05-2018 00:00'},
-					{'name':'amount','type':'amount','value':3467},
-					{'name':'info','type':'string','value':'something on 08/05/2018 12:34'}
-				]
+				{
+					'properties':[
+						{'name':'direction', 'type':'direction', 'value':Direction.INCOMING.value},
+						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'amount','type':'amount','value':3467},
+						{'name':'info','type':'string','value':'something on 08/05/2018 12:34'}
+					]
+				}
 			]
 		})
 
@@ -578,28 +584,30 @@ class TestAfBijWithLeftover(TestAfBij):
 					'total': 3467,
 					'rows': {
 						'items': [
-							[
-								{
-									'name': 'direction',
-									'value': Direction.OUTGOING.value,
-									'type': 'direction'
-								},
-								{
-									'name': 'date',
-									'value': '09-05-2018 00:00',
-									'type': 'date'
-								},
-								{
-									'name': 'amount',
- 									'value': 3467,
- 									'type': 'amount'
- 								},
- 								{
- 									'name': 'info',
- 									'value': 'something',
- 									'type' : 'string'
- 								}
- 							]
+							{
+								'properties':[
+									{
+										'name': 'direction',
+										'value': Direction.OUTGOING.value,
+										'type': 'direction'
+									},
+									{
+										'name': 'date',
+										'value': '09-05-2018 00:00',
+										'type': 'date'
+									},
+									{
+										'name': 'amount',
+	 									'value': 3467,
+	 									'type': 'amount'
+	 								},
+	 								{
+	 									'name': 'info',
+	 									'value': 'something',
+	 									'type' : 'string'
+	 								}
+	 							]
+							}
  						]
  					}
  				}
@@ -673,7 +681,7 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertDeepEquals(dataprovider.getItem('history'), ['2018-05-092018-05-09'])
+		assertDeepEquals(dataprovider.getItem('history'), {'entries':['2018-05-092018-05-09']})
 		assertEquals(len(result), 2)
 
 

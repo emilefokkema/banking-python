@@ -12,3 +12,5 @@
 # below:
 .git
 .gitignore
+__pycache__/
+*.pyc

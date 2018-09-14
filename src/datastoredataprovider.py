@@ -29,3 +29,7 @@ class DataStoreDataProvider:
 			print('error while updating with: ',repr(item))
 			raise
 		self.datastore_client.put(entity)
+
+	def deleteItem(self, key):
+		itemKey = self._getItemKey(key)
+		self.datastore_client.delete(itemKey)
