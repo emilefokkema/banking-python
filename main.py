@@ -20,6 +20,7 @@ from google.cloud import datastore
 import google.oauth2.id_token
 from src.defaultsettingsprovider import DefaultSettingsProvider
 from src.datastoredataprovider import DataStoreDataProvider
+import traceback
 import json
 
 datastore_client = datastore.Client()
@@ -66,6 +67,16 @@ def returnsJson(f):
     return wrap
 
 @wraps
+def catchesException(f):
+    def wrap(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as exc:
+            traceback.print_exc()
+            return str(exc), 500
+    return wrap
+
+@wraps
 def loggedIn(f):
     def wrap():
         claims = None
@@ -90,7 +101,10 @@ def loggedIn(f):
                 # verification checks fail.
                 error_message = str(exc)
 
-        return f(claims, error_message)
+        if error_message:
+            return error_message, 500
+
+        return f(claims)
     return wrap
 
 app = Flask(__name__)
@@ -104,10 +118,11 @@ def root():
 
 @app.route('/api/settings')
 @returnsJson
+@catchesException
 @loggedIn
-def get_settings(claims, error_message):
+def get_settings(claims):
     dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
-    return None
+    return dataprovider.getItem('settings')
 
 @app.route('/api/settings/default')
 @returnsJson
