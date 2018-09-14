@@ -83,7 +83,7 @@
 					</div>
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings v-bind:property-list="data.rowDefinition.additional" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
+					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
 				</div>
 				<div class="panel-body">
 					<custom-checkbox v-model="ignoreFirstLine" v-on:input="onChanged"></custom-checkbox>

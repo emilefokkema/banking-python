@@ -860,7 +860,7 @@
 					},
 					computed:{
 						definitions:function(){
-							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional);
+							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional || []);
 						},
 						canSwitch:function(){
 							return this.selectedSlots.length == 2;
@@ -921,6 +921,9 @@
 								this.onValid(nameValid, "\""+newName+"\" is a reserved name. Please don't use it for a column.");
 							}
 							slot.nameValid = nameValid;
+							if(!this.data.rowDefinition.additional){
+								return;
+							}
 							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
 								var definition = this.data.rowDefinition.additional[i];
 								if(definition !== slot.definition && definition.name === newName){
@@ -956,6 +959,9 @@
 						},
 						onDefinitionCreated:function(d){
 							console.log("definition crated");
+							if(!this.data.rowDefinition.additional){
+								this.$set(this.data.rowDefinition, 'additional', []);
+							}
 							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
 							this.dirty = true;

@@ -6,21 +6,21 @@ class PeriodHistory:
 
 	def getHistory(self):
 		history = self.dataProvider.getItem(self.historyKey)
-		return [] if history == None else history
+		return {'entries':[]} if not history else history
 
 	def addItem(self, key, file):
 		history = self.getHistory()
-		if not key in history:
-			history.append(key)
+		if not key in history['entries']:
+			history['entries'].append(key)
 		self.dataProvider.setItem(self.historyKey, history)
 		self.dataProvider.setItem(key, file)
 
 	def removeItem(self, key):
 		history = self.getHistory()
-		if key in history:
-			history.remove(key)
+		if key in history['entries']:
+			history['entries'].remove(key)
 			self.dataProvider.deleteItem(key)
-		if len(history) == 0:
+		if len(history['entries']) == 0:
 			self.dataProvider.deleteItem(self.historyKey)
 		else:
 			self.dataProvider.setItem(self.historyKey, history)
@@ -28,7 +28,7 @@ class PeriodHistory:
 	def getAll(self):
 		result = []
 		history = self.getHistory()
-		for key in history:
+		for key in history['entries']:
 			result.append({
 				'fileName':key,
 				'file':self.dataProvider.getItem(key)

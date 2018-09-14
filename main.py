@@ -20,6 +20,11 @@ from google.cloud import datastore
 import google.oauth2.id_token
 from src.defaultsettingsprovider import DefaultSettingsProvider
 from src.datastoredataprovider import DataStoreDataProvider
+from src.periodhistory import PeriodHistory
+from src.rowcheckerfactory import RowCheckerFactory
+from src.rowcollection import RowCollectionFactory
+from src.rowfactory import RowFactory
+from src.csvprocessor import CsvProcessor
 import traceback
 import json
 
@@ -121,11 +126,12 @@ def root():
 @catchesException
 @loggedIn
 def do_settings(claims):
+    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
     if request.method == 'POST':
-        print(request.data)
+        settings = json.loads(request.data)
+        dataprovider.setItem('settings', settings)
         return 'OK'
     if request.method == 'GET':
-        dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
         return dataprovider.getItem('settings')
 
 @app.route('/api/settings/default')
@@ -133,6 +139,34 @@ def do_settings(claims):
 def get_default_settings():
     return DefaultSettingsProvider().getDefaultSettings()
 
+@app.route('/api/complete')
+@returnsJson
+@catchesException
+@loggedIn
+def get_history(claims):
+    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+    history = PeriodHistory(dataprovider)
+    return history.getAll()
+
+@app.route('/api/csv', methods=['POST'])
+@returnsJson
+@catchesException
+@loggedIn
+def post_csv(claims):
+    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+    history = PeriodHistory(dataprovider)
+    settings = dataprovider.getItem('settings')
+    if not settings:
+        return 'please provide settings before processing a csv', 500
+    rowDefinition = settings['rowDefinition']
+    rowFactory = RowFactory(rowDefinition)
+    rowCollectionFactory = RowCollectionFactory(rowFactory)
+    rowCheckerFactory = RowCheckerFactory(rowFactory)
+    categoriesConfiguration = settings['categories']
+    ignoreFirst = settings['ignoreFirstLine'] if 'ignoreFirstLine' in settings else False
+    processor = CsvProcessor(rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst)
+    entity = datastore.Entity(key=datastore_client.key('something','something'))
+    return processor.processCsv(request.data.decode('utf-8').splitlines())
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
