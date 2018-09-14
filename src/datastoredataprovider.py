@@ -8,7 +8,13 @@ class DataStoreDataProvider:
 			return 'settings'
 		return 'thing'
 
+	def _getItemKey(self, key):
+		return self.datastore_client.key(self._getKind(key), key, ancestor=self.ancestor_key)
+
 	def getItem(self, key):
-		itemKey = self.datastore_client.key(self._getKind(key), key, ancestor=self.ancestor_key)
+		itemKey = self._getItemKey(key)
 		result = self.datastore_client.get(itemKey)
 		return result
+
+	def setItem(self, key):
+		

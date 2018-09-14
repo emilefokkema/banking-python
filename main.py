@@ -116,13 +116,17 @@ def root():
     return render_template(
         'index.html')
 
-@app.route('/api/settings')
+@app.route('/api/settings', methods=['POST','GET'])
 @returnsJson
 @catchesException
 @loggedIn
-def get_settings(claims):
-    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
-    return dataprovider.getItem('settings')
+def do_settings(claims):
+    if request.method == 'POST':
+        print(request.data)
+        return 'OK'
+    if request.method == 'GET':
+        dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+        return dataprovider.getItem('settings')
 
 @app.route('/api/settings/default')
 @returnsJson
