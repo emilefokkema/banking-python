@@ -129,6 +129,42 @@
 		}
 		this.children.splice(0, this.children.length);
 	};
+	var Complete = function(parent){
+		Object.defineProperty(this, 'parent', {value:parent});
+		Object.defineProperty(this, 'incompletes', {value:[]});
+	};
+	Complete.prototype.onComplete = function(completeCallback){
+		this.completeCallback = completeCallback;
+	};
+	Complete.prototype.onIncomplete = function(incompleteCallback){
+		this.incompleteCallback = incompleteCallback;
+	};
+	Complete.prototype.returnIncomplete = function(incomplete){
+		var index = this.incompletes.indexOf(incomplete);
+		if(index == -1){
+			return;
+		}
+		this.incompletes.splice(index, 1);
+		if(this.isComplete()){
+			this.complete();
+		}
+	};
+	Complete.prototype.getIncomplete = function(){
+		var incomplete = new Complete(this);
+		this.incompletes.push(incomplete);
+		this.incompleteCallback && this.incompleteCallback();
+		return incomplete;
+	};
+	Complete.prototype.complete = function(){
+		if(this.incompletes.length > 0){
+			console.error("can't complete before all incompletes are complete");
+		}
+		this.completeCallback && this.completeCallback();
+		this.parent && this.parent.returnIncomplete(this);
+	};
+	Complete.prototype.isComplete = function(){
+		return this.incompletes.length == 0;
+	};
 	window.addEventListener("load",function(){
 		// document.getElementById('sign-out').onclick = function () {
 		//   firebase.auth().signOut();
@@ -236,13 +272,16 @@
 				fileName:undefined,
 				settingsDirty:false,
 				settingsSaved:false,
-				loggedIn:false
+				loggedIn:false,
+				loading:false,
+				loadingStatus: new Complete()
 			},
 			components:{
 				'period-item' : {
 					props:{
 						data:Object,
-						fileName:String
+						fileName:String,
+						loadingstatus: Object
 					},
 					data:function(){
 						return {
@@ -260,7 +299,14 @@
 							var self=this;
 							this.isRemoving = true;
 							console.log("removing "+this.fileName);
-							doPost("api/delete", this.fileName, function(){self.$emit("removal", self.fileName);},function(msg){self.$emit("error", msg);});
+							var loading = this.loadingstatus.getIncomplete();
+							doPost("api/delete", this.fileName, function(){
+								self.$emit("removal", self.fileName);
+								loading.complete();
+							},function(msg){
+								self.$emit("error", msg);
+								loading.complete();
+							});
 						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed
@@ -340,6 +386,9 @@
 					template:document.getElementById("periodItemTemplate").innerHTML
 				},
 				'settings':{
+					props:{
+						loadingstatus: Object
+					},
 					data:function(){
 						return {
 							data: undefined,
@@ -895,20 +944,29 @@
 						},
 						getSettings:function(){
 							var self = this;
+							var loading = this.loadingstatus.getIncomplete();
 							doGet("/api/settings",function(data){
 								if(data){
 									self.data = data;
 									self.dirty = false;
 									self.saved = true;
+									loading.complete();
 								}else{
 									self.collapsed = false;
 									doGet("/api/settings/default", function(data){
 										self.data = data;
 										self.dirty = true;
 										self.saved = false;
-									}, function(msg){self.$emit("error",msg);})
+										loading.complete();
+									}, function(msg){
+										self.$emit("error",msg);
+										loading.complete();
+									})
 								}
-							},function(msg){self.$emit("error",msg);});
+							},function(msg){
+								self.$emit("error",msg);
+								loading.complete();
+							});
 						},
 						onChanged:function(){
 							this.dirty = true;
@@ -1018,9 +1076,14 @@
 						},
 						save:function(){
 							var self = this;
+							var loading = this.loadingstatus.getIncomplete();
 							doPost("/api/settings", JSON.stringify(this.data), function(){
 								self.getSettings();
-							}, function(msg){self.$emit("error",msg);});
+								loading.complete();
+							}, function(msg){
+								self.$emit("error",msg);
+								loading.complete();
+							});
 						},
 						toggleCollapse:function(){
 							this.collapsed = !this.collapsed;
@@ -1084,6 +1147,11 @@
 				
 				
 			},
+			created:function(){
+				var self = this;
+				this.loadingStatus.onComplete(function(){self.loading = false;});
+				this.loadingStatus.onIncomplete(function(){self.loading = true;})
+			},
 			computed:{
 				earliestCompleteDate:function(){
 					if(this.completePeriods.length == 0){
@@ -1107,9 +1175,14 @@
 				},
 				refreshComplete:function(){
 					var self = this;
+					var loading = this.loadingStatus.getIncomplete();
 					doGet("/api/complete",function(data){
 						self.addCompletePeriods(data);
-					},function(msg){self.displayError(msg);});
+						loading.complete();
+					},function(msg){
+						self.displayError(msg);
+						loading.complete();
+					});
 				},
 				onRemovePeriod:function(fileName){
 					this.completePeriods = this.completePeriods.filter(function(p){return p.fileName !== fileName;});
@@ -1132,6 +1205,7 @@
 					var file = files[0];
 					var self = this;
 					var reader = new FileReader();
+					var loading = this.loadingStatus.getIncomplete();
 					reader.onload = function(){
 						doPost("/api/csv", reader.result, function(data){
 							var complete = data.filter(function(p){return p.file.hasBeginning && p.file.hasEnd;});
@@ -1145,7 +1219,11 @@
 							self.addCompletePeriods(complete);
 							self.$refs.file.value = "";
 							self.fileName = "";
-						},function(msg){self.displayError(msg);});
+							loading.complete();
+						},function(msg){
+							self.displayError(msg);
+							loading.complete();
+						});
 					};
 					reader.readAsBinaryString(file);
 				}

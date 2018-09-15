@@ -234,12 +234,12 @@
 		<div id="firebaseui-auth-container"></div>
 		<div id="app">
 			<button v-if="loggedIn" v-on:click="signOut" class="input">Sign out</button>
-			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true"></settings>
+			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus"></settings>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div v-if="loggedIn">
-				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName"></period-item>
+				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
 			</div>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteBeginningPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
@@ -248,6 +248,7 @@
 				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
 				<input type="button" class="input" value="submit" v-on:click="postCsv" />
 			</div>
+			<span class="fas fa-spinner fa-spin" v-if="loading"></span>
 			<div class="error" v-if="errorMessage">{{errorMessage}}</div>
 		</div>
 		{% endraw %}
