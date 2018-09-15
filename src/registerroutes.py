@@ -7,7 +7,7 @@ from src.rowcollection import RowCollectionFactory
 from src.rowfactory import RowFactory
 from src.csvprocessor import CsvProcessor
 
-def registerRoutes(app, loggedIn):
+def registerRoutes(app, accessesData):
 
 	@app.route('/')
 	def root():
@@ -18,7 +18,7 @@ def registerRoutes(app, loggedIn):
 	@app.route('/api/settings', methods=['POST','GET'])
 	@returnsJson
 	@catchesException
-	@loggedIn
+	@accessesData
 	def do_settings(dataprovider):
 	    if request.method == 'POST':
 	        settings = json.loads(request.data)
@@ -35,7 +35,7 @@ def registerRoutes(app, loggedIn):
 	@app.route('/api/complete')
 	@returnsJson
 	@catchesException
-	@loggedIn
+	@accessesData
 	def get_history(dataprovider):
 	    history = PeriodHistory(dataprovider)
 	    return history.getAll()
@@ -43,7 +43,7 @@ def registerRoutes(app, loggedIn):
 	@app.route('/api/csv', methods=['POST'])
 	@returnsJson
 	@catchesException
-	@loggedIn
+	@accessesData
 	def post_csv(dataprovider):
 	    history = PeriodHistory(dataprovider)
 	    settings = dataprovider.getItem('settings')
@@ -61,7 +61,7 @@ def registerRoutes(app, loggedIn):
 	@app.route('/api/delete', methods=['POST'])
 	@returnsJson
 	@catchesException
-	@loggedIn
+	@accessesData
 	def delete_period(dataprovider):
 	    history = PeriodHistory(dataprovider)
 	    history.removeItem(request.data.decode('utf-8'))

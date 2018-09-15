@@ -25,7 +25,7 @@ datastore_client = datastore.Client()
 firebase_request_adapter = requests.Request()
 
 @wraps
-def loggedIn(f):
+def accessesData(f):
     def wrap():
         claims = None
         error_message = None
@@ -55,7 +55,7 @@ def loggedIn(f):
 
 app = Flask(__name__)
 
-registerRoutes(app, loggedIn)
+registerRoutes(app, accessesData)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
