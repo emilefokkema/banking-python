@@ -25,61 +25,11 @@ from src.rowcheckerfactory import RowCheckerFactory
 from src.rowcollection import RowCollectionFactory
 from src.rowfactory import RowFactory
 from src.csvprocessor import CsvProcessor
-import traceback
 import json
+from src.decorators import returnsJson, catchesException, wraps
 
 datastore_client = datastore.Client()
 firebase_request_adapter = requests.Request()
-
-def store_time(email, dt):
-    entity = datastore.Entity(key=datastore_client.key('User', email, 'visit'))
-    entity.update({
-        'timestamp': dt
-    })
-
-    datastore_client.put(entity)
-
-
-def fetch_times(email, limit):
-    ancestor = datastore_client.key('User', email)
-    query = datastore_client.query(kind='visit', ancestor=ancestor)
-    query.order = ['-timestamp']
-
-    times = query.fetch(limit=limit)
-
-    return times
-
-def wraps(wrapper):
-    def newWrapper(f):
-        wrap = wrapper(f)
-        wrap.__name__ = f.__name__
-        return wrap
-    return newWrapper
-
-@wraps
-def returnsJson(f):
-    def wrap(*args, **kwargs):
-        result = f(*args, **kwargs)
-        rest = []
-        tupleReturned = isinstance(result, tuple)
-        if tupleReturned:
-            (result, *rest) = result
-        result = json.dumps(result)
-        if tupleReturned:
-            return tuple([result] + rest)
-        else:
-            return result
-    return wrap
-
-@wraps
-def catchesException(f):
-    def wrap(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except Exception as exc:
-            traceback.print_exc()
-            return str(exc), 500
-    return wrap
 
 @wraps
 def loggedIn(f):
@@ -99,8 +49,6 @@ def loggedIn(f):
                 # http://flask.pocoo.org/docs/1.0/quickstart/#sessions).
                 claims = google.oauth2.id_token.verify_firebase_token(
                     id_token, firebase_request_adapter)
-                #store_time(claims['email'], datetime.datetime.now())
-                #times = fetch_times(claims['email'], 10)
             except ValueError as exc:
                 # This will be raised if the token is expired or any other
                 # verification checks fail.
@@ -108,8 +56,8 @@ def loggedIn(f):
 
         if error_message:
             return error_message, 500
-
-        return f(claims)
+        dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+        return f(dataprovider)
     return wrap
 
 app = Flask(__name__)
@@ -125,8 +73,7 @@ def root():
 @returnsJson
 @catchesException
 @loggedIn
-def do_settings(claims):
-    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+def do_settings(dataprovider):
     if request.method == 'POST':
         settings = json.loads(request.data)
         dataprovider.setItem('settings', settings)
@@ -143,8 +90,7 @@ def get_default_settings():
 @returnsJson
 @catchesException
 @loggedIn
-def get_history(claims):
-    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+def get_history(dataprovider):
     history = PeriodHistory(dataprovider)
     return history.getAll()
 
@@ -152,8 +98,7 @@ def get_history(claims):
 @returnsJson
 @catchesException
 @loggedIn
-def post_csv(claims):
-    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+def post_csv(dataprovider):
     history = PeriodHistory(dataprovider)
     settings = dataprovider.getItem('settings')
     if not settings:
@@ -171,8 +116,7 @@ def post_csv(claims):
 @returnsJson
 @catchesException
 @loggedIn
-def delete_period(claims):
-    dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
+def delete_period(dataprovider):
     history = PeriodHistory(dataprovider)
     history.removeItem(request.data.decode('utf-8'))
     return 'OK'
