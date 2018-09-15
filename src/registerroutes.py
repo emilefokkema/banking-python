@@ -1,4 +1,5 @@
 from flask import render_template, request
+import json
 from src.decorators import returnsJson, catchesException
 from src.defaultsettingsprovider import DefaultSettingsProvider
 from src.periodhistory import PeriodHistory
