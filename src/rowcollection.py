@@ -8,6 +8,10 @@ def finddate(_format, string):
 	pattern = re.sub(r'%\w','\\\\d+',_format)
 	return re.search(pattern, string).group()
 
+def findMatchOrEmpty(pattern, string):
+	match = re.search(pattern, string)
+	return match.group() if match else ''
+
 class Conversion:
 	def __init__(self, sourceType, options):
 		self.targetType = options['type']
@@ -18,7 +22,7 @@ class Conversion:
 				self.convert = lambda x:datetime.strptime(finddate(pattern, x), pattern)
 			if self.targetType == RowPropertyType.STRING.value:
 				pattern = options['match']
-				self.convert = lambda x:re.search(pattern, x).group()
+				self.convert = lambda x:findMatchOrEmpty(pattern, x)
 	
 
 

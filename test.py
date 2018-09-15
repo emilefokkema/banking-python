@@ -250,6 +250,43 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 		})
 
 @test
+class RowCollectionTestWithStringConversionNoMatch(RowCollectionTest):
+
+	def test(self):
+		collection = self.rowCollectionFactory.getDefault({
+			'properties':[
+				{
+					'name':'date',
+					'source':'date'
+				},
+				{
+					'name':'infoPart',
+					'source':'info',
+					'conversion':{
+						'type':'string',
+						'match':r'(?<=abraham\s)(?:(?!\W).)*'
+					}
+				},
+				{
+					'name':'amount',
+					'source':'amount'
+				}
+			]
+		})
+		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'lincoln\'s car']))
+		assertDeepEquals(getJsonObj(collection), {
+			'items':[
+				{
+					'properties':[
+						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'infoPart','type':'string','value':''},
+						{'name':'amount','type':'amount','value':3467}
+					]
+				}
+			]
+		})
+
+@test
 class RowCollectionTestWithDateConversion(RowCollectionTest):
 
 	def test(self):
