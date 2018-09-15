@@ -15,7 +15,7 @@ class RegexRowChecker:
 
 class RowPropertyContainsChecker(RegexRowChecker):
 	def __init__(self, getStringProperty, substrs):
-		pattern = '(?:'+'|'.join(substrs)+')'
+		pattern = '(?:'+'|'.join([re.escape(substr) for substr in substrs])+')'
 		super(RowPropertyContainsChecker, self).__init__(pattern, getStringProperty)
 
 class DirectionChecker:

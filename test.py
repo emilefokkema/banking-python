@@ -162,6 +162,21 @@ class PropertyContainsTest(RowCheckerFactoryTest):
 		assertEquals(rowChecker.checkRow(row), True)
 
 @test
+class PropertyContainsTestWithTrickyCharacters(RowCheckerFactoryTest):
+
+	def test(self):
+		rowChecker = self.rowCheckerFactory.getRowChecker({
+			'propertyContains':{
+				'name':'info',
+				'values':['amazon.com']
+			}
+		})
+		row = self.rowFactory.createRow(['20180509','34.34','in','to amazon.com'])
+		assertEquals(rowChecker.checkRow(row), True)
+		row = self.rowFactory.createRow(['20180509','34.34','in','to amazonacom'])
+		assertEquals(rowChecker.checkRow(row), False)
+
+@test
 class PropertyMatchesTest(RowCheckerFactoryTest):
 
 	def test(self):
