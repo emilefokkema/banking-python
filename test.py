@@ -585,6 +585,19 @@ class TestFirstOPP(OncePerPeriodTest):
 		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
 		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
 
+@test
+class TestAfBijConstructor(CategoryTest):
+
+	def test(self):
+		afbij = AfBij({
+			'outgoing':{
+				'name':'out'
+			},
+			'incoming':{
+				'name':'in'
+			}
+		}, self.rowCheckerFactory, self.rowCollectionFactory)
+
 class TestAfBij(CategoryTest):
 
 	def makeAfBij(self):
