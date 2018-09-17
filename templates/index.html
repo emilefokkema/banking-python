@@ -242,6 +242,9 @@
 				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
 			</div>
 			<div v-if="loggedIn">
+				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
+			</div>
+			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteBeginningPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div v-if="!settingsDirty && settingsSaved && loggedIn">

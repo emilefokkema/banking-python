@@ -16,17 +16,19 @@ class AfBij(OptionableCategory):
 	def getExtendedCategoriesDefinition(self, categoriesConfiguration):
 			incomingOptions = categoriesConfiguration['incoming']
 			outgoingOptions = categoriesConfiguration['outgoing']
+			incomingCategories = incomingOptions['categories'] if 'categories' in incomingOptions else []
+			outgoingCategories = outgoingOptions['categories'] if 'categories' in outgoingOptions else []
 			return {
 				'categories':[
 					{
 						'name':outgoingOptions['name'],
 						'acceptRow': {'outgoing':True},
-						'categories':outgoingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+						'categories':outgoingCategories + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
 					},
 					{
 						'name':incomingOptions['name'],
 						'acceptRow':{'incoming':True},
-						'categories':incomingOptions['categories'] + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
+						'categories':incomingCategories + [{'name':'leftovers','rowCollection':{'displayLimit':5,'default':True}}]
 					}
 				]
 			}

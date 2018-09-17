@@ -268,6 +268,7 @@
 				completePeriods: [],
 				incompleteBeginningPeriods: [],
 				incompleteEndingPeriods:[],
+				incompletePeriods:[],
 				errorMessage:undefined,
 				fileName:undefined,
 				settingsDirty:false,
@@ -1210,6 +1211,7 @@
 						doPost("/api/csv", reader.result, function(data){
 							var complete = data.filter(function(p){return p.file.hasBeginning && p.file.hasEnd;});
 							self.incompleteBeginningPeriods = data.filter(function(p){return p.file.hasBeginning && !p.file.hasEnd;});
+							self.incompletePeriods = data.filter(function(p){return !p.file.hasBeginning && !p.file.hasEnd;});
 							var incompleteEndingPeriods = data.filter(function(p){return !p.file.hasBeginning && p.file.hasEnd;});
 							if(self.earliestCompleteDate){
 								self.incompleteEndingPeriods = incompleteEndingPeriods.filter(function(p){return p.file.through < self.earliestCompleteDate;})
