@@ -440,6 +440,9 @@
 							},
 							watch:{
 								name:function(v){
+									if(this.data.type !== "string"){
+										return;
+									}
 									this.$emit("namechange", v, this.data);
 									if(v && !this.data.definitionExists){
 										this.$emit("definitioncreated", this.data.definition);
