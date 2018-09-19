@@ -21,7 +21,7 @@ def registerRoutes(app, accessesData, mocklogin=False):
 	@accessesData
 	def do_settings(dataprovider):
 	    if request.method == 'POST':
-	        settings = json.loads(request.data)
+	        settings = json.loads(request.data.decode('utf-8'))
 	        dataprovider.setItem('settings', settings)
 	        return 'OK'
 	    if request.method == 'GET':
