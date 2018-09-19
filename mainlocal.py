@@ -1,5 +1,6 @@
 from flask import Flask
 from src.decorators import wraps
+import argparse
 from src.dataprovider import DataProvider
 from src.registerroutes import registerRoutes
 
@@ -11,7 +12,13 @@ def accessesData(f):
 
 app = Flask(__name__)
 
-registerRoutes(app, accessesData)
+parser = argparse.ArgumentParser()
+parser.add_argument("--mocklogin", action="store_true")
+parser.add_argument("--port", type=int, default=8080)
+parser.add_argument("--host", type=str, default='127.0.0.1')
+args = parser.parse_args()
+
+registerRoutes(app, accessesData, mocklogin=args.mocklogin)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
@@ -21,4 +28,4 @@ if __name__ == '__main__':
     # the "static" directory. See:
     # http://flask.pocoo.org/docs/1.0/quickstart/#static-files. Once deployed,
     # App Engine itself will serve those files as configured in app.yaml.
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host=args.host, port=args.port, debug=True)

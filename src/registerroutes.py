@@ -8,13 +8,12 @@ from src.rowcollection import RowCollectionFactory
 from src.rowfactory import RowFactory
 from src.csvprocessor import CsvProcessor
 
-def registerRoutes(app, accessesData):
+def registerRoutes(app, accessesData, mocklogin=False):
 
 	@app.route('/')
 	def root():
 
-	    return render_template(
-	        'index.html')
+	    return render_template('index.html', mocklogin=mocklogin)
 
 	@app.route('/api/settings', methods=['POST','GET'])
 	@returnsJson

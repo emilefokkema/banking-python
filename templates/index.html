@@ -6,21 +6,39 @@
 		<script src="{{ url_for('static', filename='index.js') }}"></script>
   		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-		<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
-		<script>
-	    // Initialize Firebase
-	    var config = {
-	      apiKey: "AIzaSyDZ3tU_ccASR1BzaSeN2NyAYUdEuwTsMUM",
-	      authDomain: "expencsv.firebaseapp.com",
-	      databaseURL: "https://expencsv.firebaseio.com",
-	      projectId: "expencsv",
-	      storageBucket: "expencsv.appspot.com",
-	      messagingSenderId: "780194611024"
-	    };
-	    firebase.initializeApp(config);
-	  </script>
-	  <script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
-	  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
+		{% if mocklogin %}
+			<script>
+				(function(){
+					var initializeApp = function(){};
+					var auth = function(){
+						return {
+							onAuthStateChanged:function(userCallback){
+								userCallback({
+									displayName:"Mocked User",
+									email:"mockeduseremail@email.com",
+									getIdToken:function(){
+										return new Promise(function(res, rej){
+											res("");
+										});
+									}
+								});
+							},
+							signOut:function(){}
+						};
+					};
+					auth.GoogleAuthProvider = {PROVIDER_ID:0};
+					auth.EmailAuthProvider = {PROVIDER_ID:0};
+					window.firebase = {
+						initializeApp:initializeApp,
+						auth:auth
+					};
+				})();
+			</script>
+		{% else %}
+			<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+		  	<script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
+		  	<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
+		{% endif %}
 	</head>
 	<body>
 		{% raw %}

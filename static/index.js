@@ -1,4 +1,5 @@
 (function(){
+
 	// FirebaseUI config.
 	var getFirebaseUiConfig = function(firebase){
 		return {
@@ -166,10 +167,16 @@
 		return this.incompletes.length == 0;
 	};
 	window.addEventListener("load",function(){
-		// document.getElementById('sign-out').onclick = function () {
-		//   firebase.auth().signOut();
-		// };
-		
+		// Initialize Firebase
+		var config = {
+		  apiKey: "AIzaSyDZ3tU_ccASR1BzaSeN2NyAYUdEuwTsMUM",
+		  authDomain: "expencsv.firebaseapp.com",
+		  databaseURL: "https://expencsv.firebaseio.com",
+		  projectId: "expencsv",
+		  storageBucket: "expencsv.appspot.com",
+		  messagingSenderId: "780194611024"
+		};
+		firebase.initializeApp(config);
 
 		
 		var amount = {
