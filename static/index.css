@@ -14,7 +14,10 @@ body{
 	color:#777;
 	margin-bottom: 2px;
 	font-family: sans-serif;
-	
+}
+.user-name{
+	font-family: sans-serif;
+	margin-left: 5px;
 }
 .html-select{
 	max-width: none;

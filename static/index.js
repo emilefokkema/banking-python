@@ -282,6 +282,7 @@
 				settingsSaved:false,
 				loggedIn:false,
 				loading:false,
+				loggedInName:undefined,
 				loadingStatus: new Complete()
 			},
 			components:{
@@ -1145,6 +1146,7 @@
 				firebase.auth().onAuthStateChanged(function (user) {
 				  if (user) {
 				   onLoggedIn(user);
+				   self.loggedInName = user.displayName;
 				   self.refreshComplete();
 				   self.loggedIn = true;
 				  } else {

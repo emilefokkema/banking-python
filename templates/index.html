@@ -254,7 +254,9 @@
 		</script>
 		<div id="firebaseui-auth-container"></div>
 		<div id="app">
-			<button v-if="loggedIn" v-on:click="signOut" class="input">Sign out</button>
+			<div v-if="loggedIn" >
+				<button v-on:click="signOut" class="input">Sign out</button><span class="user-name">{{loggedInName}}</span>
+			</div>
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus"></settings>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
