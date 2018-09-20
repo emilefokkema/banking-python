@@ -1,6 +1,9 @@
 <html>
 	<head>
 		<title>Process my banking statements</title>
+    <meta name="viewport" content="width=475,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="mobile-web-app-capable" content="yes" />
 		<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<script src="{{ url_for('static', filename='index.js') }}"></script>
@@ -44,7 +47,7 @@
 		{% raw %}
 		<script type="text/template" id="categoryTemplate">
 			<div class="category" v-bind:class="{collapsed:collapsed,'category-top':top}">
-				<div class="category-header">
+				<div class="category-header" unselectable="on" onselectstart="return false;" onmousedown="return false;">
 					<span v-bind:class="{'toggle-collapse':!isSimple}" v-on:click="toggleCollapse">
 						<span class="neither category-header-prefix" v-if="isSimple"></span>
 						<template v-else>
@@ -71,7 +74,7 @@
 		</script>
 		<script type="text/template" id="periodItemTemplate">
 			<div class="panel period-list-item" v-bind:class="{'removing':isRemoving,'with-end':data.hasEnd, 'with-beginning':data.hasBeginning, 'collapsed':collapsed}">
-				<div class="panel-header"><span class="panel-title" v-on:click="toggleCollapse">{{periodDescription}}</span> <remove-button v-if="data.hasEnd && data.hasBeginning" v-on:click="remove"></remove-button></div>
+				<div class="panel-header"><span class="panel-title" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span> <remove-button v-if="data.hasEnd && data.hasBeginning" v-on:click="remove"></remove-button></div>
 				<div class="panel-body">
 					<category v-bind:top="true" v-bind:categoryData="data.Bij" v-if="data.Bij"></category>
 					<category v-bind:top="true" v-bind:categoryData="data.Af" v-if="data.Af"></category>
