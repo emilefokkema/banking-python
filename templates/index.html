@@ -1,11 +1,15 @@
 <html>
 	<head>
 		<title>Process my banking statements</title>
-    <meta name="viewport" content="width=475,user-scalable=no" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="mobile-web-app-capable" content="yes" />
-		<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
-		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	    <meta name="viewport" content="width=475,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		{% if debug %}
+			<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		{% else %}
+			<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		{% endif %}
+		
 		<script src="{{ url_for('static', filename='index.js') }}"></script>
   		<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
@@ -38,8 +42,14 @@
 				})();
 			</script>
 		{% else %}
-			<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
-		  	<script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
+			<script src="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.js"></script>
+			
+			{% if debug %}
+		  		<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase.js"></script>
+		  	{% else %}
+		  		<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-app.js"></script>
+		  		<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-auth.js"></script>
+		  	{% endif %}
 		  	<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.2/firebaseui.css">
 		{% endif %}
 	</head>

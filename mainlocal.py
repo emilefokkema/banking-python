@@ -18,7 +18,7 @@ parser.add_argument("--port", type=int, default=8080)
 parser.add_argument("--host", type=str, default='127.0.0.1')
 args = parser.parse_args()
 
-registerRoutes(app, accessesData, mocklogin=args.mocklogin)
+registerRoutes(app, accessesData, mocklogin=args.mocklogin, debug=True)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
