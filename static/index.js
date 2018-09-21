@@ -248,7 +248,9 @@
 		};
 		var customCheckbox = {
 			props:{
-				checkedProp:Boolean
+				checkedProp:Boolean,
+				tooltip:String,
+				tooltippos:String
 			},
 			model:{
 				prop:"checkedProp",
@@ -265,6 +267,9 @@
 					set:function(b){
 						this.$emit("input", b);
 					}
+				},
+				pos:function(){
+					return this.tooltippos || "up";
 				}
 			},
 			template:document.getElementById("customCheckboxTemplate").innerHTML

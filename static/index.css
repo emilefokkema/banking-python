@@ -4,6 +4,9 @@ body{
 	font-size: 16px;
 	color: #222;
 }
+.with-balloon{
+	display: inline-block;
+}
 .input{
 	max-width: 7em;
 	border-radius: 4px;
@@ -183,11 +186,7 @@ body{
 	display: inline;
 	float: right;
 }
-.target-type .input{
-	display: inline;
-	float: left;
-}
-.target-type .string-match{
+.target-type .input-part{
 	display: inline;
 	float: left;
 }
@@ -285,7 +284,6 @@ body{
 	margin:0px;
 }
 .value-list-input input{
-	float:left;
 	background-color: transparent;
 	border:none;
 	margin:0px 3px 0px 0px;
