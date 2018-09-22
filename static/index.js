@@ -401,7 +401,8 @@
 				},
 				'settings':{
 					props:{
-						loadingstatus: Object
+						loadingstatus: Object,
+            loggedinname:String
 					},
 					data:function(){
 						return {
@@ -1180,6 +1181,7 @@
 			},
 			methods:{
 				signOut:function(){
+          console.log("signing out");
 					firebase.auth().signOut();
 				},
 				setSettingsDirty:function(){

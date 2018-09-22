@@ -61,10 +61,21 @@ body{
 }
 .remove-button{
 	cursor: pointer;
-	float: right;
+  float:right;
 }
 #app{
 	margin: 20px;
+}
+.login-status{
+  height:1.5em;
+}
+.login-status-inner{
+  display:inline-block;
+  float:right;
+}
+.sign-out-button{
+  cursor:pointer;
+  padding:5px;
 }
 .panel{
 	border: 0.5px solid #bbb;
@@ -334,6 +345,9 @@ span.toggle-collapse > .amount{
 }
 .row .amount{
 	display: initial;
+}
+.column-slots{
+  margin-bottom:15px;
 }
 .column-slot{
 	display: inline-block;

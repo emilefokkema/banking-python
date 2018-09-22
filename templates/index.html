@@ -119,23 +119,33 @@
 							<span class="fas fa-exchange-alt slot-switch-button" v-on:click="doSlotSwitch"></span>
 						</div>
 					</div>
+          <custom-checkbox v-model="ignoreFirstLine" v-bind:tooltip="'Use this if the first line of your csv contains column headers instead of data'" v-bind:tooltippos="'down-left'" v-on:input="onChanged"></custom-checkbox>
+					Ignore first line
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
 					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
 				</div>
-				<div class="panel-body">
-					<custom-checkbox v-model="ignoreFirstLine" v-bind:tooltip="'Use this if the first line of your csv contains column headers instead of data'" v-bind:tooltippos="'down-left'" v-on:input="onChanged"></custom-checkbox>
-					Ignore first line
-				</div>
-				<div class="panel-footer">
+				<div class="panel-body" v-if="dirty">
 					<div data-balloon="undo all changes" data-balloon-pos="down-left" class="reset-button" v-if="dirty && saved">
 						<span class="fas fa-undo-alt" v-on:click="getSettings"></span>
 					</div>
 					<div data-balloon="save changes" data-balloon-pos="down-right" class="save-button" v-if="dirty && violationCount == 0">
 						<span class="fas fa-save" v-on:click="save"></span>
 					</div>
-					
 				</div>
+        <div class="panel-body">
+          <div class="login-status">
+            <div class="login-status-inner">
+              {{loggedinname}}
+              <div class="with-balloon sign-out-button">
+                <span class="fas fa-sign-out-alt" v-on:click="$emit('signout')"></span>
+              </div>
+            </div>
+          
+          
+          </div>
+          
+        </div>
 			</div>
 		</script>
 		<script type="text/template" id="customCheckboxTemplate">
@@ -303,10 +313,7 @@
 		</script>
 		<div id="firebaseui-auth-container"></div>
 		<div id="app">
-			<div v-if="loggedIn" >
-				<button v-on:click="signOut" class="input">Sign out</button><span class="user-name">{{loggedInName}}</span>
-			</div>
-			<settings v-on:settingsdirty="setSettingsDirty" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus"></settings>
+			<settings v-on:settingsdirty="setSettingsDirty" v-on:signout="signOut" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus" v-bind:loggedinname="loggedInName"></settings>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
