@@ -73,6 +73,9 @@ body{
   display:inline-block;
   float:right;
 }
+.saved-status{
+	height:1.5em;
+}
 .sign-out-button{
   cursor:pointer;
   padding:5px;
@@ -372,11 +375,13 @@ span.toggle-collapse > .amount{
 	display: inline-block;
 	float: right;
 	cursor: pointer;
+	padding: 5px;
 }
 .reset-button{
 	display: inline-block;
 	float: left;
 	cursor: pointer;
+	padding: 5px;
 }
 .custom-checkbox{
 	display: inline;

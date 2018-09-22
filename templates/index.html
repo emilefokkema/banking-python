@@ -126,21 +126,24 @@
 					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:propertyusechange="determineProtection" v-on:valid="onValid"></category-settings>
 				</div>
 				<div class="panel-body" v-if="dirty">
-					<div data-balloon="undo all changes" data-balloon-pos="down-left" class="reset-button" v-if="dirty && saved">
-						<span class="fas fa-undo-alt" v-on:click="getSettings"></span>
+					<div class="saved-status">
+						<div data-balloon="undo all changes" data-balloon-pos="down-left" class="reset-button" v-if="dirty && saved">
+							<span class="fas fa-undo-alt" v-on:click="getSettings"></span>
+						</div>
+						<div data-balloon="save changes" data-balloon-pos="down-right" class="save-button" v-if="dirty && violationCount == 0">
+							<span class="fas fa-save" v-on:click="save"></span>
+						</div>
 					</div>
-					<div data-balloon="save changes" data-balloon-pos="down-right" class="save-button" v-if="dirty && violationCount == 0">
-						<span class="fas fa-save" v-on:click="save"></span>
-					</div>
+					
 				</div>
-        <div class="panel-body">
-          <div class="login-status">
-            <div class="login-status-inner">
-              {{loggedinname}}
-              <div class="with-balloon sign-out-button">
-                <span class="fas fa-sign-out-alt" v-on:click="$emit('signout')"></span>
-              </div>
-            </div>
+				<div class="panel-body">
+					<div class="login-status">
+						<div class="login-status-inner">
+						{{loggedinname}}
+						<div class="with-balloon sign-out-button">
+							<span class="fas fa-sign-out-alt" v-on:click="$emit('signout')"></span>
+						</div>
+				</div>
           
           
           </div>
