@@ -402,7 +402,7 @@
 				'settings':{
 					props:{
 						loadingstatus: Object,
-            loggedinname:String
+						loggedinname:String
 					},
 					data:function(){
 						return {
@@ -625,7 +625,7 @@
 											this.$emit("change");
 										},
 										onKeyDown:function(e){
-											if(e.code === "Backspace" && this.data.values.length > 0){
+											if(e.code === "Backspace" && this.data.values.length > 0 && !this.newValue){
 												this.data.values.pop();
 												this.$emit("change");
 											}
