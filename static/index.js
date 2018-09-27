@@ -466,9 +466,65 @@
 							props:{
 								top:Boolean,
 								data:Object,
-								propertyList:Array
+								propertyList:Array,
+								parentdraggedslot:Object,
+								draggedfrom:Boolean
 							},
 							methods:{
+								onDragOver:function(e){
+									if(!this.parentdraggedslot){
+										return;
+									}
+									e.preventDefault();
+									this.draggedOver = true;
+								},
+								onDrop:function(e){
+									if(!this.parentdraggedslot){
+										return;
+									}
+									e.preventDefault();
+									e.cancelBubble = true;
+									this.$emit("categorydropbefore", this.data);
+									this.draggedOver = false;
+								},
+								onDragStart:function(e){
+									this.$emit("categorydragstart", this.data);
+									e.cancelBubble = true;
+								},
+								onCategoryDragStart:function(slot){
+									this.draggedSlot = slot;
+								},
+								onChildCategoryDropBefore:function(slot){
+									var newCategories = [];
+									var draggedCategory = this.draggedSlot.category;
+									this.draggedSlot = undefined;
+									var indexOfDraggedCategory = this.data.category.categories.indexOf(draggedCategory);
+									var indexOfTargetCategory;
+									if(slot.exists){
+										indexOfTargetCategory = this.data.category.categories.indexOf(slot.category);
+									}else{
+										indexOfTargetCategory = this.data.category.categories.length;
+									}
+									if(indexOfTargetCategory == indexOfDraggedCategory + 1 || indexOfTargetCategory == indexOfDraggedCategory){
+										return;
+									}
+									if(indexOfTargetCategory == 0){
+										newCategories.push(draggedCategory);
+									}
+									for(var i=0;i<this.data.category.categories.length;i++){
+										if(i == indexOfDraggedCategory){
+											continue;
+										}
+										newCategories.push(this.data.category.categories[i])
+										if(i == indexOfTargetCategory - 1){
+											newCategories.push(draggedCategory);
+										}
+									}
+									console.log("within "+this.data.category.name+": dropped "+draggedCategory.name+" before slot ", slot.category.name);
+									this.data.category.categories = newCategories;
+									this.createCategorySlots();
+									this.changed();
+								},
 								onValid:function(v, msg){
 									this.$emit("valid", v, msg);
 								},
@@ -549,14 +605,17 @@
 									return initial++;
 								}})(0),
 								createNewCategorySlot:function(){
-									return this.createCategorySlot({name:undefined}, false);
+									return this.createCategorySlot({
+										category:{name:undefined},
+										exists:false
+									});
 								},
-								createCategorySlot:function(category, exists){
+								createCategorySlot:function(specs){
 									var key = this.nextKey();
 									var newSlot = new TreeNode();
 									this.data.add(newSlot);
-									newSlot.category = category;
-									newSlot.exists = exists;
+									newSlot.category = specs.category;
+									newSlot.exists = specs.exists;
 									newSlot.key = key;
 									return newSlot;
 								},
@@ -567,7 +626,11 @@
 									var self = this;
 									var result = [];
 									if(this.data.category.categories){
-										result = this.data.category.categories.map(function(cat){return self.createCategorySlot(cat, true);});
+										result = this.data.category.categories.map(function(cat, index){
+											return self.createCategorySlot({
+												category:cat,
+												exists:true
+											});});
 									}
 									if(this.propertyList.length > 0){
 										result.push(this.createNewCategorySlot());
@@ -872,7 +935,8 @@
 								},
 								onceOverridden:function(){
 									return !this.data.category.oncePerPeriod && this.data.some(function(slot){return slot.category.oncePerPeriod;});
-								}
+								},
+								draggable:function(){return !this.top && this.data.exists;}
 							},
 							watch:{
 								name:function(v){
@@ -895,7 +959,9 @@
 									collapsed:true,
 									categorySlots:[],
 									newCategorySlot:undefined,
-									usedFilters:{}
+									usedFilters:{},
+									draggedSlot:undefined,
+									draggedOver:false
 								}
 							},
 							template:document.getElementById("categorySettingsTemplate").innerHTML

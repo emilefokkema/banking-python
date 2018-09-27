@@ -186,7 +186,10 @@
 			</div>
 		</script>
 		<script type="text/template" id="categorySettingsTemplate">
-			<div class="category category-settings" v-bind:class="{collapsed:collapsed,'category-top':top, 'non-existent':nonExistent}">
+			<div class="category category-settings" v-bind:class="{collapsed:collapsed,'category-top':top, 'non-existent':nonExistent,'draggable':draggable, 'dragged-over':draggedOver, 'dragged-from':draggedfrom}" v-bind:draggable="draggable" v-on:dragstart="onDragStart" v-on:dragover="onDragOver" v-on:dragleave="draggedOver = false" v-on:drop="onDrop">
+				<div class="drag-slot">
+					<div class="drag-slot-inner"></div>
+				</div>
 				<div class="category-header category-settings-header">
 					<span class="toggle-collapse" v-on:click="toggleCollapse">
 						<span class="plus category-header-prefix">
@@ -223,9 +226,9 @@
 							<input type="number" v-model="expectation" min="0" step="1" class="input" v-on:input="changed"/>
 						</div>
 					</div>
-					<category-settings v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" v-on:valid="onValid" :key="slot.key"></category-settings>
+					<category-settings v-on:categorydropbefore="onChildCategoryDropBefore" v-bind:parentdraggedslot="draggedSlot" v-on:categorydragstart="onCategoryDragStart" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-on:propertyusechange="onPropertyUseChange" v-bind:draggedfrom="slot == draggedSlot" v-on:valid="onValid" :key="slot.key"></category-settings>
 				</div>
-
+				<div class="category-layover"></div>
 			</div>
 		</script>
 		<script type="text/template" id="rowCollectionSettingsTemplate">
