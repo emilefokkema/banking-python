@@ -471,6 +471,14 @@
 								draggedfrom:Boolean
 							},
 							methods:{
+								onDragEnd:function(e){
+									e.preventDefault();
+									e.cancelBubble = true;
+									this.$emit("categorydragend")
+								},
+								onChildDragEnd:function(){
+									this.draggedSlot = undefined;
+								},
 								onDragOver:function(e){
 									if(!this.parentdraggedslot){
 										return;
