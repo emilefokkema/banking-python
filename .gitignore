@@ -3,3 +3,4 @@ userdata/
 *.pyc
 *.ps1
 static/dist/*
+node_modules/
