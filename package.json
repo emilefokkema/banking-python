@@ -4,8 +4,10 @@
   "description": "a tool for uploading banking mutations and categorizing them",
   "main": "src/index.js",
   "scripts": {
+    "dev":"concurrently --kill-others \"npm run watch\" \"npm run start\"",
     "start": "python mainlocal.py",
-    "build": "browserify js/main.js -o static/dist/main.js"
+    "build": "browserify js/main.js -o static/dist/main.js",
+    "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose"
   },
   "repository": {
     "type": "git",
