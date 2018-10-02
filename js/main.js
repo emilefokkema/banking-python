@@ -8,61 +8,7 @@
 		}
 		return result;
 	};
-	var dateReviver = function(key, value){
-		if(typeof value !== "string"){
-			return value;
-		}
-		var match1 = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-		var match2 = value.match(/^(\d{2})-(\d{2})-(\d{4})\s+(\d{2}):(\d{2})$/)
-		if(!match1 && !match2){
-			return value;
-		}
-		if(match1){
-			var year = parseInt(match1[1]),
-				monthIndex = parseInt(match1[2])-1,
-				day = parseInt(match1[3]);
-			return new Date(year,monthIndex,day);
-		}
-		if(match2){
-			var year = parseInt(match2[3]),
-				monthIndex = parseInt(match2[2]) - 1,
-				day = parseInt(match2[1]),
-				hours = parseInt(match2[4]),
-				minutes = parseInt(match2[5]);
-			return new Date(year,monthIndex,day,hours,minutes);
-		}
-	};
-	var doGet = function(url, dataCallback, errorCallback){
-		var req = new XMLHttpRequest();
-		onRequestLoaded(req, dataCallback, errorCallback);
-		req.open("GET",url);
-		req.send();
-	};
-	var doPost = function(url, data, dataCallback, errorCallback){
-		var req = new XMLHttpRequest();
-		onRequestLoaded(req, dataCallback, errorCallback);
-		req.open("POST",url);
-		req.send(data);
-	};
-	var onRequestLoaded = function(req, dataCallback, errorCallback){
-		req.addEventListener("load",function(){
-			var data;
-			try{
-				data = JSON.parse(this.responseText, dateReviver);
-			}
-			catch(e){
-				errorCallback(this.responseText);
-				return;
-			}
-			if(this.status != 200){
-				if(errorCallback){
-					errorCallback(data);
-				}
-			}else{
-				dataCallback(data);
-			}
-		});
-	};
+	var postget = require("./postget.js")
 	var TreeNode = function(){
 		Object.defineProperty(this, 'children', {value:[]});
 	};
@@ -280,7 +226,7 @@
 							this.isRemoving = true;
 							console.log("removing "+this.fileName);
 							var loading = this.loadingstatus.getIncomplete();
-							doPost("api/delete", this.fileName, function(){
+							postget.doPost("api/delete", this.fileName, function(){
 								self.$emit("removal", self.fileName);
 								loading.complete();
 							},function(msg){
@@ -1003,7 +949,7 @@
 						getSettings:function(){
 							var self = this;
 							var loading = this.loadingstatus.getIncomplete();
-							doGet("/api/settings",function(data){
+							postget.doGet("/api/settings",function(data){
 								if(data){
 									self.data = data;
 									self.dirty = false;
@@ -1011,7 +957,7 @@
 									loading.complete();
 								}else{
 									self.collapsed = false;
-									doGet("/api/settings/default", function(data){
+									postget.doGet("/api/settings/default", function(data){
 										self.data = data;
 										self.dirty = true;
 										self.saved = false;
@@ -1135,7 +1081,7 @@
 						save:function(){
 							var self = this;
 							var loading = this.loadingstatus.getIncomplete();
-							doPost("/api/settings", JSON.stringify(this.data), function(){
+							postget.doPost("/api/settings", JSON.stringify(this.data), function(){
 								self.getSettings();
 								loading.complete();
 							}, function(msg){
@@ -1229,7 +1175,7 @@
 				refreshComplete:function(){
 					var self = this;
 					var loading = this.loadingStatus.getIncomplete();
-					doGet("/api/complete",function(data){
+					postget.doGet("/api/complete",function(data){
 						self.addCompletePeriods(data);
 						loading.complete();
 					},function(msg){
@@ -1260,7 +1206,7 @@
 					var reader = new FileReader();
 					var loading = this.loadingStatus.getIncomplete();
 					reader.onload = function(){
-						doPost("/api/csv", reader.result, function(data){
+						postget.doPost("/api/csv", reader.result, function(data){
 							var complete = data.filter(function(p){return p.file.hasBeginning && p.file.hasEnd;});
 							self.incompleteBeginningPeriods = data.filter(function(p){return p.file.hasBeginning && !p.file.hasEnd;});
 							self.incompletePeriods = data.filter(function(p){return !p.file.hasBeginning && !p.file.hasEnd;});
