@@ -16,3 +16,4 @@ __pycache__/
 *.pyc
 *.ps1
 userdata/
+node_modules/
