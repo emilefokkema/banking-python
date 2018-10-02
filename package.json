@@ -4,7 +4,8 @@
   "description": "a tool for uploading banking mutations and categorizing them",
   "main": "src/index.js",
   "scripts": {
-    "start": "python mainlocal.py"
+    "start": "python mainlocal.py",
+    "build":"browserify js/main.js -o static/dist/main.js"
   },
   "repository": {
     "type": "git",
