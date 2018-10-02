@@ -1,5 +1,5 @@
 (function(){
-	var login = require("./login.js")
+	var login = require("./login.js");
 
 	var zeroPadded = function(n, l){
 		var result = n.toString();
@@ -8,76 +8,9 @@
 		}
 		return result;
 	};
-	var postget = require("./postget.js")
-	var TreeNode = function(){
-		Object.defineProperty(this, 'children', {value:[]});
-	};
-	TreeNode.prototype.add = function(n, blockReciprocate){
-		this.children.push(n);
-		if(!blockReciprocate){
-			n.add(this, true);
-		}
-	};
-	TreeNode.prototype.some = function(predicate, except){
-		if(predicate(this)){
-			return true;
-		}
-		for(var i=0;i<this.children.length;i++){
-			var child = this.children[i];
-			if(child != except && child.some(predicate, this)){
-				return true;
-			}
-		}
-		return false;
-	};
-	TreeNode.prototype.remove = function(n){
-		var index = this.children.indexOf(n);
-		if(index > -1){
-			this.children.splice(index, 1);
-		}
-	};
-	TreeNode.prototype.destroy = function(){
-		for(var i=0;i<this.children.length;i++){
-			this.children[i].remove(this);
-		}
-		this.children.splice(0, this.children.length);
-	};
-	var Complete = function(parent){
-		Object.defineProperty(this, 'parent', {value:parent});
-		Object.defineProperty(this, 'incompletes', {value:[]});
-	};
-	Complete.prototype.onComplete = function(completeCallback){
-		this.completeCallback = completeCallback;
-	};
-	Complete.prototype.onIncomplete = function(incompleteCallback){
-		this.incompleteCallback = incompleteCallback;
-	};
-	Complete.prototype.returnIncomplete = function(incomplete){
-		var index = this.incompletes.indexOf(incomplete);
-		if(index == -1){
-			return;
-		}
-		this.incompletes.splice(index, 1);
-		if(this.isComplete()){
-			this.complete();
-		}
-	};
-	Complete.prototype.getIncomplete = function(){
-		var incomplete = new Complete(this);
-		this.incompletes.push(incomplete);
-		this.incompleteCallback && this.incompleteCallback();
-		return incomplete;
-	};
-	Complete.prototype.complete = function(){
-		if(this.incompletes.length > 0){
-			console.error("can't complete before all incompletes are complete");
-		}
-		this.completeCallback && this.completeCallback();
-		this.parent && this.parent.returnIncomplete(this);
-	};
-	Complete.prototype.isComplete = function(){
-		return this.incompletes.length == 0;
-	};
+	var postget = require("./postget.js");
+	var TreeNode = require("./treenode.js");
+	var Complete = require("./complete.js");
 	window.addEventListener("load",function(){
 		// Initialize Firebase
 		var config = {
