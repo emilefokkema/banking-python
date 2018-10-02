@@ -1,0 +1,25 @@
+{
+  "name": "expencsv",
+  "version": "1.0.0",
+  "description": "a tool for uploading banking mutations and categorizing them",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "python mainlocal.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilefokkema/banking-python.git"
+  },
+  "keywords": [
+    "banking",
+    "vue",
+    "python",
+    "csv"
+  ],
+  "author": "Emile Fokkema",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emilefokkema/banking-python/issues"
+  },
+  "homepage": "https://github.com/emilefokkema/banking-python#readme"
+}
