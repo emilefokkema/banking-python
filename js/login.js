@@ -2,7 +2,7 @@ module.exports = (function(){
 	var onLoggedIn = function(user){
 	    // User is signed in, so display the "sign out" button and login info.
 		//document.getElementById('sign-out').hidden = false;
-	    console.log(`Signed in as ${user.displayName} (${user.email})`);
+	    console.log("Signed in as "+user.displayName+" ("+user.email+")");
 	    user.getIdToken().then(function (token) {
 	      // Add the token to the browser's cookies. The server will then be
 	      // able to verify the token against the API.

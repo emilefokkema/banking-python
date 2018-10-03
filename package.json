@@ -4,9 +4,9 @@
   "description": "a tool for uploading banking mutations and categorizing them",
   "main": "src/index.js",
   "scripts": {
-    "dev":"concurrently --kill-others \"npm run watch\" \"npm run start\"",
+    "dev": "concurrently --kill-others \"npm run watch\" \"npm run start\"",
     "start": "python mainlocal.py",
-    "build": "browserify js/main.js -o static/dist/main.js",
+    "build": "browserify js/main.js | uglifyjs > static/dist/main.js",
     "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose"
   },
   "repository": {
@@ -29,5 +29,8 @@
     "browserify": "^16.2.3",
     "concurrently": "^4.0.1",
     "watchify": "^3.11.0"
+  },
+  "dependencies": {
+    "uglify-js": "^3.4.9"
   }
 }
