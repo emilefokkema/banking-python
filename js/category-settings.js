@@ -1,6 +1,8 @@
 var regexInputBuilder = require("./regex-input.js");
 var customCheckboxBuilder = require("./custom-checkbox.js");
 var TreeNode = require("./treenode.js");
+var propertyContains = require("./property-contains.js");
+var propertyMatches = require("./property-matches.js");
 
 module.exports = (function(){
 	var build = function(document){
@@ -211,71 +213,8 @@ module.exports = (function(){
 						this.createCategorySlots();
 					},
 					components:{
-						'property-contains':{
-							props:{
-								data:Object,
-								propertyList:Array
-							},
-							data:function(){
-								return {
-									verbs:["contains","matches"],
-									chosenVerb:"contains",
-									newValue:undefined
-								};
-							},
-							watch:{
-								chosenVerb:function(v){
-									if(v !== "contains"){
-										this.$emit("switch", v);
-									}
-								}
-							},
-							methods:{
-								addNewValue:function(){
-									if(!this.newValue){
-										return;
-									}
-									this.data.values.push(this.newValue);
-									this.newValue = undefined;
-									this.$emit("change");
-								},
-								onKeyDown:function(e){
-									if(e.code === "Backspace" && this.data.values.length > 0 && !this.newValue){
-										this.data.values.pop();
-										this.$emit("change");
-									}
-								}
-							},
-							template:document.getElementById("propertyContainsTemplate").innerHTML
-						},
-						'property-matches':{
-							props:{
-								data:Object,
-								propertyList:Array
-							},
-							data:function(){
-								return {
-									verbs:["contains","matches"],
-									chosenVerb:"matches"
-								};
-							},
-							components:{
-								'regex-input':regexInput
-							},
-							methods:{
-								onValid:function(v, msg){
-									this.$emit("valid", v, msg);
-								}
-							},
-							watch:{
-								chosenVerb:function(v){
-									if(v !== "matches"){
-										this.$emit("switch", v);
-									}
-								}
-							},
-							template:document.getElementById("propertyMatchesTemplate").innerHTML
-						},
+						'property-contains':propertyContains.build(document),
+						'property-matches':propertyMatches.build(document),
 						'row-collection':{
 							props:{
 								data:Object,
