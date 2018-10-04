@@ -3,6 +3,7 @@ var postget = require("./postget.js");
 var TreeNode = require("./treenode.js");
 var columnSlot = require("./column-slot.js");
 var categorySettings = require("./category-settings.js");
+var Settings = require("./settings-logic.js")
 
 module.exports = (function(){
 	var build = function(document){
@@ -57,7 +58,7 @@ module.exports = (function(){
 					},
 					computed:{
 						definitions:function(){
-							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional || []);
+							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional);
 						},
 						canSwitch:function(){
 							return this.selectedSlots.length == 2;
@@ -66,9 +67,6 @@ module.exports = (function(){
 							get:function(){return this.data && this.data.ignoreFirstLine;},
 							set:function(v){
 								if(this.data){
-									if(!('ignoreFirstLine' in this.data)){
-										this.$set(this.data, 'ignoreFirstLine', v);
-									}
 									this.data.ignoreFirstLine = v;
 								}
 							}
@@ -95,14 +93,14 @@ module.exports = (function(){
 							var loading = this.loadingstatus.getIncomplete();
 							postget.doGet("/api/settings",function(data){
 								if(data){
-									self.data = data;
+									self.data = new Settings(data);
 									self.dirty = false;
 									self.saved = true;
 									loading.complete();
 								}else{
 									self.collapsed = false;
 									postget.doGet("/api/settings/default", function(data){
-										self.data = data;
+										self.data = new Settings(data);
 										self.dirty = true;
 										self.saved = false;
 										loading.complete();
@@ -127,9 +125,6 @@ module.exports = (function(){
 								this.onValid(nameValid, "\""+newName+"\" is a reserved name. Please don't use it for a column.");
 							}
 							slot.nameValid = nameValid;
-							if(!this.data.rowDefinition.additional){
-								return;
-							}
 							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
 								var definition = this.data.rowDefinition.additional[i];
 								if(definition !== slot.definition && definition.name === newName){
@@ -165,9 +160,6 @@ module.exports = (function(){
 						},
 						onDefinitionCreated:function(d){
 							console.log("definition crated");
-							if(!this.data.rowDefinition.additional){
-								this.$set(this.data.rowDefinition, 'additional', []);
-							}
 							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
 							this.dirty = true;
@@ -247,31 +239,27 @@ module.exports = (function(){
 							};
 						},
 						makeSlotData:function(index){
+							var result = this.makeNewSlotData(index);
 							var definition = this.definitions.find(function(d){return d.columnIndex == index;});
 							if(!definition){
-								return this.makeNewSlotData(index);
+								return result;
 							}
 							var type;
 							if(definition == this.data.rowDefinition.amount){
-								type = "amount";
+								result.type = "amount";
 							}
 							else if(definition == this.data.rowDefinition.date){
-								type = "date";
+								result.type = "date";
 							}
 							else if(definition == this.data.rowDefinition.direction){
-								type = "direction";
+								result.type = "direction";
 							}
 							else{
-								type = "string";
+								result.type = "string";
 							}
-							return {
-								protected:false,
-								nameValid:true,
-								definitionExists:true,
-								type:type,
-								definition:definition,
-								selected:false
-							};
+							result.definitionExists = true;
+							result.definition = definition;
+							return result;
 						}
 					},
 					template: document.getElementById("settingsTemplate").innerHTML
