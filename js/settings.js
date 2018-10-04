@@ -94,6 +94,7 @@ module.exports = (function(){
 							postget.doGet("/api/settings",function(data){
 								if(data){
 									self.data = new Settings(data);
+									console.log(self.data);
 									self.dirty = false;
 									self.saved = true;
 									loading.complete();
@@ -235,7 +236,7 @@ module.exports = (function(){
 								nameValid:true,
 								selected:false,
 								type:"string",
-								definition:{name:undefined,columnIndex:index}
+								definition:{name:undefined,columnIndex:index,type:"string"}
 							};
 						},
 						makeSlotData:function(index){
@@ -244,19 +245,7 @@ module.exports = (function(){
 							if(!definition){
 								return result;
 							}
-							var type;
-							if(definition == this.data.rowDefinition.amount){
-								result.type = "amount";
-							}
-							else if(definition == this.data.rowDefinition.date){
-								result.type = "date";
-							}
-							else if(definition == this.data.rowDefinition.direction){
-								result.type = "direction";
-							}
-							else{
-								result.type = "string";
-							}
+							result.type = definition.type;
 							result.definitionExists = true;
 							result.definition = definition;
 							return result;
