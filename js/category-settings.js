@@ -1,4 +1,3 @@
-var regexInputBuilder = require("./regex-input.js");
 var customCheckboxBuilder = require("./custom-checkbox.js");
 var TreeNode = require("./treenode.js");
 var propertyContains = require("./property-contains.js");
@@ -7,7 +6,6 @@ var rowCollection = require("./row-collection-settings.js");
 
 module.exports = (function(){
 	var build = function(document){
-		var regexInput = regexInputBuilder.build(document);
 		return {
 					name:'category-settings',
 					props:{
