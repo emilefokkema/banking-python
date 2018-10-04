@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently --kill-others \"npm run watch\" \"npm run start\"",
     "start": "python mainlocal.py",
-    "build": "browserify js/main.js | uglifyjs > static/dist/main.js",
+    "build": "browserify js/main.js | minify --js > static/dist/main.js",
     "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose"
   },
   "repository": {
@@ -28,9 +28,7 @@
   "devDependencies": {
     "browserify": "^16.2.3",
     "concurrently": "^4.0.1",
+    "minify": "^3.0.5",
     "watchify": "^3.11.0"
-  },
-  "dependencies": {
-    "uglify-js": "^3.4.9"
   }
 }
