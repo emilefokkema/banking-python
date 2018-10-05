@@ -5,18 +5,19 @@ module.exports = (function(){
 						data:Object
 					},
 					computed:{
+						index:function(){return this.data.index + 1;},
 						name:function(){return this.data.definition.name;},
-						index:function(){return this.data.definition.columnIndex;},
 						protected:function(){return this.data.protected;},
-						nameInvalid:function(){return this.data && !this.data.nameValid;}
+						nameInvalid:function(){return this.data && !this.data.nameValid;},
+						type:function(){return this.data.definition.type;}
 					},
 					methods:{
 						onClick:function(e){
 							if(e.target.nodeName.toLowerCase() !== "input"){
 								if(!this.data.selected){
-									this.$emit("selected", this.index);
+									this.$emit("selected", this.data.index);
 								}else{
-									this.$emit("deselected", this.index);
+									this.$emit("deselected", this.data.index);
 								}
 							}
 						},
@@ -26,7 +27,7 @@ module.exports = (function(){
 					},
 					watch:{
 						name:function(v){
-							if(this.data.type !== "string"){
+							if(this.type !== "string"){
 								return;
 							}
 							this.$emit("namechange", v, this.data);

@@ -158,31 +158,31 @@
 		</script>
 		<script type="text/template" id="columnSlotTemplate">
 			<div class="column-slot" v-on:click="onClick" v-bind:class="{'selected':data.selected}">
-				<div class="slot-index">#{{index + 1}}</div>
-				<template v-if="data.type == 'date'">
+				<div class="slot-index">#{{index}}</div>
+				<template v-if="type == 'date'">
 					<span class="fas fa-calendar-alt"></span>
-					<div class="with-balloon" data-balloon-pos="up-left" v-bind:data-balloon="'the form in which each row\'s date is present in column ' + (index + 1)">
+					<div class="with-balloon" data-balloon-pos="up-left" v-bind:data-balloon="'the form in which each row\'s date is present in column ' + index">
 						<input class="input" v-model="data.definition.pattern" v-on:input="onChange"/>
 					</div>
 				</template>
-				<template v-if="data.type == 'direction'">
+				<template v-if="type == 'direction'">
 					<div>
 						<span class="fas fa-plus"></span>
-						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+(index+1)+' that signifies that the transaction is incoming'" data-balloon-length="medium">
+						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+index+' that signifies that the transaction is incoming'" data-balloon-length="medium">
 							<input class="input" v-model="data.definition.incoming" v-on:input="onChange"/>
 						</div>
 					</div>
 					<div>
 						<span class="fas fa-minus"></span>
-						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+(index+1)+' that signifies that the transaction is outgoing'" data-balloon-length="medium">
+						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+index+' that signifies that the transaction is outgoing'" data-balloon-length="medium">
 							<input class="input" v-model="data.definition.outgoing" v-on:input="onChange"/>
 						</div>
 					</div>
 				</template>
-				<div data-balloon="name of the column (to use when filtering)" data-balloon-pos="up" data-balloon-length="fit" v-if="data.type == 'string'">
+				<div data-balloon="name of the column (to use when filtering)" data-balloon-pos="up" data-balloon-length="fit" v-if="type == 'string'">
 					<input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="data.definition.name" placeholder="?" v-bind:disabled="protected"/>
 				</div>
-				<span class="fas fa-dollar-sign" v-if="data.type == 'amount'"></span>
+				<span class="fas fa-dollar-sign" v-if="type == 'amount'"></span>
 			</div>
 		</script>
 		<script type="text/template" id="categorySettingsTemplate">

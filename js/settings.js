@@ -58,7 +58,7 @@ module.exports = (function(){
 					},
 					computed:{
 						definitions:function(){
-							return [this.data.rowDefinition.amount, this.data.rowDefinition.date, this.data.rowDefinition.direction].concat(this.data.rowDefinition.additional);
+							return this.data.rowDefinition.definitions;
 						},
 						canSwitch:function(){
 							return this.selectedSlots.length == 2;
@@ -137,11 +137,11 @@ module.exports = (function(){
 						},
 						doSlotSwitch:function(){
 							var self = this;
-							var slot1 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[0];});
-							var slot2 = this.slots.find(function(d){return d.definition.columnIndex == self.selectedSlots[1];});
+							var slot1 = this.slots[self.selectedSlots[0]];
+							var slot2 = this.slots[self.selectedSlots[1]];
 							slot1.definition.columnIndex = this.selectedSlots[1];
 							slot2.definition.columnIndex = this.selectedSlots[0];
-							if(this.definitions.indexOf(slot1.definition) != -1 || this.definitions.indexOf(slot2.definition) != -1){
+							if(slot1.definitionExists || slot2.definitionExists){
 								this.dirty = true;
 							}
 							this.createSlots();
@@ -178,7 +178,7 @@ module.exports = (function(){
 						createSlots:function(){
 							this.selectedSlots = [];
 							var self = this;
-							var numberOfSlots = Math.max.apply(null, this.definitions.map(function(x){return x.columnIndex;})) + 1;
+							var numberOfSlots = this.data.rowDefinition.maxColumnIndex + 1;
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
 							this.determineProtection();
 						},
@@ -231,21 +231,20 @@ module.exports = (function(){
 						},
 						makeNewSlotData:function(index){
 							return {
+								index:index,
 								protected:false,
 								definitionExists:false,
 								nameValid:true,
 								selected:false,
-								type:"string",
-								definition:{name:undefined,columnIndex:index,type:"string"}
+								definition:this.data.rowDefinition.getNewDefinition(index)
 							};
 						},
 						makeSlotData:function(index){
 							var result = this.makeNewSlotData(index);
-							var definition = this.definitions.find(function(d){return d.columnIndex == index;});
+							var definition = this.data.rowDefinition.getDefinitionAtIndex(index);
 							if(!definition){
 								return result;
 							}
-							result.type = definition.type;
 							result.definitionExists = true;
 							result.definition = definition;
 							return result;

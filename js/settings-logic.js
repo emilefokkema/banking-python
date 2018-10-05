@@ -1,6 +1,7 @@
 module.exports = (function(){
 	var inherit = function(a,b){a.prototype = Object.create(b.prototype);};
-	var defGet = function(obj, key, value){Object.defineProperty(obj, key, {get:function(){return value;}});};
+	var defGetFn = function(obj, key, getter){Object.defineProperty(obj, key, {get:getter});}
+	var defGet = function(obj, key, value){defGetFn(obj, key, function(){return value;})};
 
 	var RowProperty = function(data){
 		this.columnIndex = data.columnIndex;
@@ -40,6 +41,15 @@ module.exports = (function(){
 		this.direction = new DirectionProperty(data.direction);
 		this.additional = (data.additional || []).map(function(d){return new AdditionalProperty(d);});
 	};
+	defGetFn(RowDefinition.prototype, 'definitions', function(){return [this.amount, this.date, this.direction].concat(this.additional);});
+	defGetFn(RowDefinition.prototype, 'maxColumnIndex', function(){return Math.max.apply(null, this.definitions.map(function(d){return d.columnIndex;}));});
+	RowDefinition.prototype.getNewDefinition = function(index){
+		return new AdditionalProperty({name:undefined, columnIndex:index});
+	};
+	RowDefinition.prototype.getDefinitionAtIndex = function(index){
+		return this.definitions.find(function(d){return d.columnIndex == index;});
+	};
+
 	var Settings = function(data){
 		this.rowDefinition = new RowDefinition(data.rowDefinition);
 		this.categories = data.categories;
