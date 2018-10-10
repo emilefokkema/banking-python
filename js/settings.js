@@ -193,26 +193,13 @@ module.exports = (function(){
 							this.categoriesParent.add(outgoing);
 							this.categorySlots = [incoming, outgoing];
 						},
-						usesProperty:function(cat, propertyName){
-							var self = this;
-							if(cat.acceptRow && cat.acceptRow.propertyContains && cat.acceptRow.propertyContains.name == propertyName){
-								return true;
-							}
-							if(cat.acceptRow && cat.acceptRow.propertyMatches && cat.acceptRow.propertyMatches.name == propertyName){
-								return true;
-							}
-							if(cat.rowCollection && cat.rowCollection.properties.some(function(p){return p.source == propertyName;})){
-								return true;
-							}
-							return cat.categories && cat.categories.some(function(c){return self.usesProperty(c, propertyName);});
-						},
 						determineProtection:function(){
 							for(var i=0;i<this.slots.length;i++){
 								var slot = this.slots[i];
 								if(!slot.definitionExists){
 									continue;
 								}
-								slot.protected = this.usesProperty(this.data.categories.incoming, slot.definition.name) || this.usesProperty(this.data.categories.outgoing, slot.definition.name);
+								slot.protected = this.data.usesProperty(slot.definition);
 							}
 						},
 						save:function(){

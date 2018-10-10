@@ -58,6 +58,22 @@ module.exports = (function(){
 		this.expect = data.expect;
 		this.oncePerPeriod = data.oncePerPeriod || false;
 	};
+	CategorySettings.prototype = Object.create(CategorySettings.prototype, {
+		usesProperty:{
+			value:function(prop){
+				if(this.acceptRow && this.acceptRow.propertyContains && this.acceptRow.propertyContains.name == prop.name){
+					return true;
+				}
+				if(this.acceptRow && this.acceptRow.propertyMatches && this.acceptRow.propertyMatches.name == prop.name){
+					return true;
+				}
+				if(this.rowCollection && this.rowCollection.properties.some(function(p){return p.source == prop.name;})){
+					return true;
+				}
+				return this.categories.some(function(c){return c.usesProperty(prop);});
+			}
+		}
+	});
 
 	var Settings = function(data){
 		this.rowDefinition = new RowDefinition(data.rowDefinition);
@@ -67,5 +83,12 @@ module.exports = (function(){
 		};
 		this.ignoreFirstLine = data.ignoreFirstLine || false;
 	};
+	Settings.prototype = Object.create(Settings.prototype, {
+		usesProperty:{
+			value:function(prop){
+				return this.categories.incoming.usesProperty(prop) || this.categories.outgoing.usesProperty(prop);
+			}
+		}
+	});
 	return Settings;
 })()
