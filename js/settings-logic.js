@@ -50,9 +50,21 @@ module.exports = (function(){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
 	};
 
+	var CategorySettings = function(data){
+		this.name = data.name;
+		this.categories = (data.categories || []).map(function(cd){return new CategorySettings(cd);});
+		this.rowCollection = data.rowCollection;
+		this.acceptRow = data.acceptRow;
+		this.expect = data.expect;
+		this.oncePerPeriod = data.oncePerPeriod || false;
+	};
+
 	var Settings = function(data){
 		this.rowDefinition = new RowDefinition(data.rowDefinition);
-		this.categories = data.categories;
+		this.categories = {
+			incoming: new CategorySettings(data.categories.incoming),
+			outgoing: new CategorySettings(data.categories.outgoing)
+		};
 		this.ignoreFirstLine = data.ignoreFirstLine || false;
 	};
 	return Settings;
