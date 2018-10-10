@@ -1,3 +1,5 @@
+var TreeNode = require("./treenode.js");
+
 module.exports = (function(){
 	var inherit = function(a,b){a.prototype = Object.create(b.prototype);};
 	var defGetFn = function(obj, key, getter){Object.defineProperty(obj, key, {get:getter});}
@@ -51,8 +53,17 @@ module.exports = (function(){
 	};
 
 	var CategorySettings = function(data){
+		var self = this;
+		var node = new TreeNode();
+		node.category = this;
+		Object.defineProperty(this, 'node', {value:node});
 		this.name = data.name;
-		this.categories = (data.categories || []).map(function(cd){return new CategorySettings(cd);});
+		this.categories = [];
+		(data.categories || []).map(function(cd){
+			var cat = new CategorySettings(cd);
+			self.addCategory(cat);
+			return cat;
+		});
 		this.rowCollection = data.rowCollection;
 		this.acceptRow = data.acceptRow;
 		this.expect = data.expect;
@@ -72,14 +83,51 @@ module.exports = (function(){
 				}
 				return this.categories.some(function(c){return c.usesProperty(prop);});
 			}
+		},
+		addCategory:{
+			value:function(cat){
+				this.categories.push(cat);
+				this.node.add(cat.node);
+			}
+		},
+		removeCategory:{
+			value:function(cat){
+				cat.destroy();
+				var index = this.categories.indexOf(cat);
+				this.categories.splice(index, 1);
+			}
+		},
+		destroy:{
+			value:function(){
+				this.oncePerPeriod = false;
+				this.node.destroy();
+			}
+		},
+		getNewCategory:{
+			value:function(){
+				return new CategorySettings({});
+			}
+		},
+		onceOverridden:{
+			get:function(){
+				if(this.oncePerPeriod){
+					return false;
+				}
+				return this.node.some(function(n){return n.category && n.category.oncePerPeriod;});
+			}
 		}
 	});
 
 	var Settings = function(data){
 		this.rowDefinition = new RowDefinition(data.rowDefinition);
+		var incoming = new CategorySettings(data.categories.incoming);
+		var outgoing = new CategorySettings(data.categories.outgoing);
+		var categoriesRoot = new TreeNode();
+		categoriesRoot.add(incoming.node);
+		categoriesRoot.add(outgoing.node);
 		this.categories = {
-			incoming: new CategorySettings(data.categories.incoming),
-			outgoing: new CategorySettings(data.categories.outgoing)
+			incoming: incoming,
+			outgoing: outgoing
 		};
 		this.ignoreFirstLine = data.ignoreFirstLine || false;
 	};

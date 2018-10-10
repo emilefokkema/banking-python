@@ -1,5 +1,4 @@
 var customCheckboxBuilder = require("./custom-checkbox.js");
-var TreeNode = require("./treenode.js");
 var propertyContains = require("./property-contains.js");
 var propertyMatches = require("./property-matches.js");
 var rowCollection = require("./row-collection-settings.js");
@@ -159,23 +158,19 @@ module.exports = (function(){
 						}})(0),
 						createNewCategorySlot:function(){
 							return this.createCategorySlot({
-								category:{name:undefined},
+								category:this.data.category.getNewCategory(),
 								exists:false
 							});
 						},
 						createCategorySlot:function(specs){
 							var key = this.nextKey();
-							var newSlot = new TreeNode();
-							this.data.add(newSlot);
+							var newSlot = {};
 							newSlot.category = specs.category;
 							newSlot.exists = specs.exists;
 							newSlot.key = key;
 							return newSlot;
 						},
 						createCategorySlots:function(){
-							for(var i=0;i<this.categorySlots.length;i++){
-								this.categorySlots[i].destroy();
-							}
 							var self = this;
 							var result = [];
 							if(this.data.category.categories){
@@ -196,16 +191,13 @@ module.exports = (function(){
 						},
 						addNewCategory:function(c){
 							c.exists = true;
-							if(!this.data.category.categories){
-								this.$set(this.data.category, 'categories',[]);
-							}
-							this.data.category.categories.push(c.category);
+							this.data.category.addCategory(c.category);
 							this.categorySlots.push(this.createNewCategorySlot());
 						},
 						removeCategory:function(c){
-							var index = this.data.category.categories.indexOf(c.category);
-							this.data.category.categories.splice(index, 1);
+							var index = this.categorySlots.indexOf(c);
 							this.categorySlots.splice(index, 1);
+							this.data.category.removeCategory(c.category);
 						}
 					},
 					mounted:function(){
@@ -246,18 +238,12 @@ module.exports = (function(){
 							},
 							set:function(b){
 								if(this.data){
-									if(b){
-										this.$set(this.data.category, 'oncePerPeriod', true);
-									}else{
-										if(this.data.category.oncePerPeriod){
-											this.$delete(this.data.category, 'oncePerPeriod');
-										}
-									}
+									this.data.category.oncePerPeriod = b;
 								}
 							}
 						},
 						onceOverridden:function(){
-							return !this.data.category.oncePerPeriod && this.data.some(function(slot){return slot.category.oncePerPeriod;});
+							return this.data.category.onceOverridden;
 						},
 						draggable:function(){return !this.top && this.data.exists;}
 					},

@@ -1,6 +1,5 @@
 var customCheckboxBuilder = require("./custom-checkbox.js");
 var postget = require("./postget.js");
-var TreeNode = require("./treenode.js");
 var columnSlot = require("./column-slot.js");
 var categorySettings = require("./category-settings.js");
 var Settings = require("./settings-logic.js")
@@ -21,8 +20,7 @@ module.exports = (function(){
 							dirty:false,
 							saved:false,
 							violationCount:0,
-							categorySlots:[],
-							categoriesParent:this.createCategoriesParent()
+							categorySlots:[]
 						};
 					},
 					mounted:function(){
@@ -73,11 +71,6 @@ module.exports = (function(){
 						}
 					},
 					methods:{
-						createCategoriesParent:function(){
-							var parent = new TreeNode();
-							parent.category = {};
-							return parent;
-						},
 						onValid:function(v, msg){
 							if(v){
 								this.violationCount--;
@@ -183,14 +176,12 @@ module.exports = (function(){
 							this.determineProtection();
 						},
 						createCategorySlots:function(){
-							var incoming = new TreeNode();
+							var incoming = {};
 							incoming.category = this.data.categories.incoming;
 							incoming.exists = true;
-							var outgoing = new TreeNode();
+							var outgoing = {};
 							outgoing.category = this.data.categories.outgoing;
 							outgoing.exists = true;
-							this.categoriesParent.add(incoming);
-							this.categoriesParent.add(outgoing);
 							this.categorySlots = [incoming, outgoing];
 						},
 						determineProtection:function(){
