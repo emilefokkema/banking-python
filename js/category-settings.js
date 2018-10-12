@@ -163,23 +163,20 @@ module.exports = (function(){
 							});
 						},
 						createCategorySlot:function(specs){
-							var key = this.nextKey();
-							var newSlot = {};
-							newSlot.category = specs.category;
-							newSlot.exists = specs.exists;
-							newSlot.key = key;
-							return newSlot;
+							return {
+								category:specs.category,
+								exists:specs.exists,
+								key:this.nextKey()
+							};
 						},
 						createCategorySlots:function(){
 							var self = this;
 							var result = [];
-							if(this.data.category.categories){
-								result = this.data.category.categories.map(function(cat, index){
-									return self.createCategorySlot({
-										category:cat,
-										exists:true
-									});});
-							}
+							result = this.data.category.categories.map(function(cat){
+								return self.createCategorySlot({
+									category:cat,
+									exists:true
+								});});
 							if(this.propertyList.length > 0){
 								result.push(this.createNewCategorySlot());
 							}
