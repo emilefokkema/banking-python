@@ -18,8 +18,7 @@ module.exports = (function(){
 							}
 						},
 						addProperty:function(){
-							var firstProperty = this.propertyList[0];
-							this.data.properties.push({name:firstProperty.name,source:firstProperty.name});
+							this.data.addProperty();
 						},
 						onValid:function(v, msg){
 							this.$emit("valid", v, msg);

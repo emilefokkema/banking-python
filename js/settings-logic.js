@@ -167,9 +167,18 @@ module.exports = (function(){
 		}
 	});
 
-	var RowCollection = function(data){
+	var RowCollection = function(data, rowDefinition){
+		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
 		this.properties = (data.properties || []).map(function(p){return new RowCollectionProperty(p);})
 	};
+	RowCollection.prototype = Object.create(RowCollection.prototype, {
+		addProperty:{
+			value:function(){
+				var name = this.rowDefinition.additional[0].name;
+				this.properties.push(new RowCollectionProperty({name:name,source:name}));
+			}
+		}
+	});
 
 	var CategorySettings = function(data, rowDefinition){
 		var self = this;
@@ -185,7 +194,7 @@ module.exports = (function(){
 			self.addCategory(cat);
 			return cat;
 		});
-		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection);
+		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection, rowDefinition);
 		this.acceptRow = data.acceptRow && new AcceptRow(data.acceptRow);
 		this.expect = data.expect;
 		this.oncePerPeriod = data.oncePerPeriod || false;
