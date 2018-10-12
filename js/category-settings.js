@@ -88,9 +88,9 @@ module.exports = (function(){
 						},
 						onSwitch:function(verb){
 							if(verb === "contains"){
-								this.filterByPropertyContains();
+								this.data.category.filterByPropertyContains();
 							}else if(verb === "matches"){
-								this.filterByPropertyMatches();
+								this.data.category.filterByPropertyMatches();
 							}
 						},
 						toggleCollection:function(){
@@ -108,47 +108,8 @@ module.exports = (function(){
 							}
 						},
 						toggleFilter:function(){
-							if(this.filterActive){
-								this.removeFilter();
-							}else{
-								if(this.propertyList.length == 0){
-									return;
-								}
-								var newFilter = this.usedFilters.propertyContains || this.usedFilters.propertyMatches || this.createPropertyContains();
-								this.filterBy(newFilter);
-							}
+							this.data.category.toggleFilter();
 							this.onPropertyUseChange();
-						},
-						filterByPropertyMatches:function(){
-							var newFilter = this.usedFilters.propertyMatches || this.createPropertyMatches();
-							this.filterBy(newFilter);
-						},
-						filterByPropertyContains:function(){
-							var newFilter = this.usedFilters.propertyContains || this.createPropertyContains();
-							this.filterBy(newFilter);
-						},
-						createPropertyContains:function(){
-							return {propertyContains:{name:this.propertyList[0].name,values:[]}};
-						},
-						createPropertyMatches:function(){
-							return {propertyMatches:{name:this.propertyList[0].name, pattern:undefined}};
-						},
-						removeFilter:function(){
-							if(!this.data.category.acceptRow){
-								return;
-							}
-							var acceptRow = this.data.category.acceptRow;
-							if(acceptRow.propertyContains){
-								this.usedFilters.propertyContains = acceptRow;
-							}
-							if(acceptRow.propertyMatches){
-								this.usedFilters.propertyMatches = acceptRow;
-							}
-							this.$delete(this.data.category, 'acceptRow');
-						},
-						filterBy:function(acceptRow){
-							this.removeFilter();
-							this.$set(this.data.category, 'acceptRow', acceptRow);
 						},
 						changed:function(){
 							this.$emit("changed");

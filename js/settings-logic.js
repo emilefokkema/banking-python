@@ -52,13 +52,61 @@ module.exports = (function(){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
 	};
 
+	var FilterCache = function(rowDefinition){
+		this.propertyContains = undefined;
+		this.propertyMatches = undefined;
+		this.latest = undefined;
+		this.rowDefinition = rowDefinition;
+	};
+	FilterCache.prototype = Object.create(FilterCache.prototype, {
+		getPropertyContains:{
+			value:function(){
+				return this.propertyContains || (this.propertyContains = this.createPropertyContains());
+			}
+		},
+		createPropertyContains:{
+			value:function(){
+				var name = (this.latest && this.latest.name) || this.rowDefinition.additional[0].name;
+				return new PropertyContains({name:name});
+			}
+		},
+		getPropertyMatches:{
+			value:function(){
+				return this.propertyMatches || (this.propertyMatches = this.createPropertyMatches());
+			}
+		},
+		createPropertyMatches:{
+			value:function(){
+				var name = (this.latest && this.latest.name) || this.rowDefinition.additional[0].name;
+				return new PropertyMatches({name:name});
+			}
+		},
+		save:{
+			value:function(acceptRow){
+				this.propertyContains = acceptRow.propertyContains || this.propertyContains;
+				this.propertyMatches = acceptRow.propertyMatches || this.propertyMatches;
+				this.latest = acceptRow.propertyMatches || acceptRow.propertyContains;
+			}
+		},
+		getFilter:{
+			value:function(){
+				return this.latest || this.createPropertyContains();
+			}
+		}
+	});
+
 	var PropertyContains = function(data){
 		this.name = data.name;
-		this.values = data.values;
+		this.values = data.values || [];
 	};
 	PropertyContains.prototype = Object.create(PropertyContains.prototype, {
 		usesProperty:{
 			value:function(prop){return prop.name == this.name;}
+		},
+		toAcceptRow:{
+			value:function(){
+				return new AcceptRow({propertyContains:this});
+			}
 		}
 	});
 
@@ -69,6 +117,11 @@ module.exports = (function(){
 	PropertyMatches.prototype = Object.create(PropertyMatches.prototype, {
 		usesProperty:{
 			value:function(prop){return prop.name == this.name;}
+		},
+		toAcceptRow:{
+			value:function(){
+				return new AcceptRow({propertyMatches:this});
+			}
 		}
 	});
 
@@ -88,15 +141,17 @@ module.exports = (function(){
 		}
 	});
 
-	var CategorySettings = function(data){
+	var CategorySettings = function(data, rowDefinition){
 		var self = this;
 		var node = new TreeNode();
 		node.category = this;
 		Object.defineProperty(this, 'node', {value:node});
+		Object.defineProperty(this, 'filterCache', {value:new FilterCache(rowDefinition)});
+		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
 		this.name = data.name;
 		this.categories = [];
 		(data.categories || []).map(function(cd){
-			var cat = new CategorySettings(cd);
+			var cat = new CategorySettings(cd, rowDefinition);
 			self.addCategory(cat);
 			return cat;
 		});
@@ -138,7 +193,7 @@ module.exports = (function(){
 		},
 		getNewCategory:{
 			value:function(){
-				return new CategorySettings({});
+				return new CategorySettings({}, this.rowDefinition);
 			}
 		},
 		onceOverridden:{
@@ -148,13 +203,43 @@ module.exports = (function(){
 				}
 				return this.node.some(function(n){return n.category && n.category.oncePerPeriod;});
 			}
+		},
+		removeFilter:{
+			value:function(){
+				if(!this.acceptRow){
+					return;
+				}
+				this.filterCache.save(this.acceptRow);
+				this.acceptRow = undefined;
+			}
+		},
+		toggleFilter:{
+			value:function(){
+				if(this.acceptRow){
+					this.removeFilter();
+				}else{
+					this.acceptRow = this.filterCache.getFilter().toAcceptRow();
+				}
+			}
+		},
+		filterByPropertyMatches:{
+			value:function(){
+				this.filterCache.save(this.acceptRow);
+				this.acceptRow = this.filterCache.getPropertyMatches().toAcceptRow();
+			}
+		},
+		filterByPropertyContains:{
+			value:function(){
+				this.filterCache.save(this.acceptRow);
+				this.acceptRow = this.filterCache.getPropertyContains().toAcceptRow();
+			}
 		}
 	});
 
 	var Settings = function(data){
 		this.rowDefinition = new RowDefinition(data.rowDefinition);
-		var incoming = new CategorySettings(data.categories.incoming);
-		var outgoing = new CategorySettings(data.categories.outgoing);
+		var incoming = new CategorySettings(data.categories.incoming, this.rowDefinition);
+		var outgoing = new CategorySettings(data.categories.outgoing, this.rowDefinition);
 		var categoriesRoot = new TreeNode();
 		categoriesRoot.add(incoming.node);
 		categoriesRoot.add(outgoing.node);
