@@ -141,6 +141,36 @@ module.exports = (function(){
 		}
 	});
 
+	var DateConversion = function(data){
+		this.type = "date";
+		this.pattern = data.pattern;
+	};
+
+	var StringConversion = function(data){
+		this.type = "string";
+		this.match = data.match;
+	};
+
+	var RowCollectionProperty = function(data){
+		this.name = data.name;
+		this.source = data.source;
+		this.conversion = data.conversion && this.createConversion(data.conversion);
+	};
+	RowCollectionProperty.prototype = Object.create(RowCollectionProperty.prototype,{
+		createConversion:{
+			value:function(data){
+				if(data.type === "date"){
+					return new DateConversion(data);
+				}
+				return new StringConversion(data);
+			}
+		}
+	});
+
+	var RowCollection = function(data){
+		this.properties = (data.properties || []).map(function(p){return new RowCollectionProperty(p);})
+	};
+
 	var CategorySettings = function(data, rowDefinition){
 		var self = this;
 		var node = new TreeNode();
@@ -155,7 +185,7 @@ module.exports = (function(){
 			self.addCategory(cat);
 			return cat;
 		});
-		this.rowCollection = data.rowCollection;
+		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection);
 		this.acceptRow = data.acceptRow && new AcceptRow(data.acceptRow);
 		this.expect = data.expect;
 		this.oncePerPeriod = data.oncePerPeriod || false;
