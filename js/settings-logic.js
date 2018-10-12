@@ -52,6 +52,42 @@ module.exports = (function(){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
 	};
 
+	var PropertyContains = function(data){
+		this.name = data.name;
+		this.values = data.values;
+	};
+	PropertyContains.prototype = Object.create(PropertyContains.prototype, {
+		usesProperty:{
+			value:function(prop){return prop.name == this.name;}
+		}
+	});
+
+	var PropertyMatches = function(data){
+		this.name = data.name;
+		this.pattern = data.pattern;
+	};
+	PropertyMatches.prototype = Object.create(PropertyMatches.prototype, {
+		usesProperty:{
+			value:function(prop){return prop.name == this.name;}
+		}
+	});
+
+	var AcceptRow = function(data){
+		if(data.propertyContains){
+			this.propertyContains = new PropertyContains(data.propertyContains);
+		}
+		if(data.propertyMatches){
+			this.propertyMatches = new PropertyMatches(data.propertyMatches);
+		}
+	};
+	AcceptRow.prototype = Object.create(AcceptRow.prototype, {
+		usesProperty:{
+			value:function(prop){
+				return (this.propertyContains && this.propertyContains.usesProperty(prop)) || (this.propertyMatches && this.propertyMatches.usesProperty(prop));
+			}
+		}
+	});
+
 	var CategorySettings = function(data){
 		var self = this;
 		var node = new TreeNode();
@@ -65,17 +101,14 @@ module.exports = (function(){
 			return cat;
 		});
 		this.rowCollection = data.rowCollection;
-		this.acceptRow = data.acceptRow;
+		this.acceptRow = data.acceptRow && new AcceptRow(data.acceptRow);
 		this.expect = data.expect;
 		this.oncePerPeriod = data.oncePerPeriod || false;
 	};
 	CategorySettings.prototype = Object.create(CategorySettings.prototype, {
 		usesProperty:{
 			value:function(prop){
-				if(this.acceptRow && this.acceptRow.propertyContains && this.acceptRow.propertyContains.name == prop.name){
-					return true;
-				}
-				if(this.acceptRow && this.acceptRow.propertyMatches && this.acceptRow.propertyMatches.name == prop.name){
+				if(this.acceptRow && this.acceptRow.usesProperty(prop)){
 					return true;
 				}
 				if(this.rowCollection && this.rowCollection.properties.some(function(p){return p.source == prop.name;})){
