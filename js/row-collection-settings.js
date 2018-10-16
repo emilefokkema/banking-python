@@ -22,28 +22,6 @@ module.exports = (function(){
 								propertyList:Array
 							},
 							computed:{
-								stringMatch:{
-									get:function(){
-										if(this.property.conversion && this.property.conversion.type === "string"){
-											return this.property.conversion.match;
-										}
-										return undefined;
-									},
-									set:function(m){
-										if(!m){
-											if(this.property.conversion && this.property.conversion.type == "string"){
-												console.log("removing a string conversion");
-												this.$delete(this.property, 'conversion');
-											}
-											return;
-										}
-										if(!this.property.conversion){
-											console.log("adding a string conversion");
-											this.$set(this.property, 'conversion',{type:"string",match:undefined})
-										}
-										this.property.conversion.match = m;
-									}
-								},
 								source:function(){return this.property.source;},
 								name:function(){return this.property.name;},
 								hasStringSource:function(){

@@ -252,7 +252,7 @@
 					</div>
 					<div class="input-part" v-if="property.targetType === 'string'" data-balloon="display the part of the source that is matched by this regular expression. Leave empty to display the whole source" data-balloon-pos="up-right" data-balloon-length="large">
 						<span class="fas fa-search"></span>
-						<regex-input v-model="stringMatch" v-on:input="$emit('change')" v-on:valid="onValid"></regex-input>
+						<regex-input v-model="property.stringMatch" v-on:input="$emit('change')" v-on:valid="onValid"></regex-input>
 					</div>
 					<div class="with-balloon input-part" data-balloon="the date pattern to look for in the source" data-balloon-pos="up" v-if="property.targetType === 'date'">
 						<input class="input" v-model="property.conversion.pattern" v-on:input="$emit('change')"/>

@@ -196,6 +196,28 @@ module.exports = (function(){
 					this.conversion = undefined;
 				}
 			}
+		},
+		stringMatch:{
+			get:function(){
+				if(this.conversion && this.conversion.type === "string"){
+					return this.conversion.match;
+				}
+				return undefined;
+			},
+			set:function(m){
+				if(!m){
+					if(this.conversion && this.conversion.type == "string"){
+						console.log("removing a string conversion");
+						this.conversion = undefined;
+					}
+					return;
+				}
+				if(!this.conversion){
+					console.log("adding a string conversion");
+					this.conversion = new StringConversion({});
+				}
+				this.conversion.match = m;
+			}
 		}
 	});
 
