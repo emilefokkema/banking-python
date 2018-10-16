@@ -8,15 +8,6 @@ module.exports = (function(){
 						propertyList:Array
 					},
 					methods:{
-						onRemove:function(property){
-							var index = this.data.properties.indexOf(property);
-							console.log("removing a property at ", index);
-							this.data.properties.splice(index, 1);
-							this.$emit("change");
-							if(this.data.properties.length == 0){
-								this.$emit("remove");
-							}
-						},
 						addProperty:function(){
 							this.data.addProperty();
 						},
@@ -106,6 +97,10 @@ module.exports = (function(){
 							methods:{
 								onValid:function(v, msg){
 									this.$emit("valid", v, msg);
+								},
+								onRemove:function(){
+									this.property.remove();
+									this.$emit("change");
 								}
 							},
 							components:{

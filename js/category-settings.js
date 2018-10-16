@@ -94,18 +94,8 @@ module.exports = (function(){
 							}
 						},
 						toggleCollection:function(){
-							if(!this.data.category.rowCollection){
-								var firstProperty = this.propertyList[0];
-								var newRowCollection = {
-									properties:[{name:firstProperty.name,source:firstProperty.name}]
-								};
-								this.$set(this.data.category, 'rowCollection', newRowCollection);
-							}
-						},
-						removeRowCollection:function(){
-							if(this.data.category.rowCollection){
-								this.$delete(this.data.category, 'rowCollection');
-							}
+							this.data.category.addRowCollection();
+							this.onPropertyUseChange();
 						},
 						toggleFilter:function(){
 							this.data.category.toggleFilter();

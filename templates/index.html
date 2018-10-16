@@ -218,7 +218,7 @@
 						<div class="with-balloon filter-button collection-button" data-balloon="display (properties of) rows that enter this category" data-balloon-pos="up-left">
 							<span class="fas fa-list-ul" v-on:click="toggleCollection"></span>
 						</div>
-						<row-collection v-on:valid="onValid" v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed" v-on:remove="removeRowCollection"></row-collection>
+						<row-collection v-on:valid="onValid" v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:propertyusechange="onPropertyUseChange" v-on:change="changed"></row-collection>
 					</div>
 					<div class="cagegory-addon expectation" v-bind:class="{'active':!!expectation}" v-if="!oncePerPeriod && !top">
 						<span class="fas fa-times filter-button"></span>
@@ -233,7 +233,7 @@
 		</script>
 		<script type="text/template" id="rowCollectionSettingsTemplate">
 			<div class="row-collection category-addon-content">
-				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:remove="onRemove" v-on:change="$emit('change')" v-on:valid="onValid"></row-property>
+				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:propertyusechange="$emit('propertyusechange')" v-on:change="$emit('change')" v-on:valid="onValid"></row-property>
 				<div class="input add-row-property" v-on:click="addProperty" data-balloon="add a property to display for each row" data-balloon-pos="right"><span class="fas fa-plus"></span></div>
 			</div>
 		</script>
@@ -259,7 +259,7 @@
 					</div>
 					
 				</div>
-				<div class="row-property-part remove-property" data-balloon="remove this property" data-balloon-pos="up-right" v-on:click="$emit('remove', property)">
+				<div class="row-property-part remove-property" data-balloon="remove this property" data-balloon-pos="up-right" v-on:click="onRemove">
 					<span class="fas fa-times"></span>
 				</div>
 			</div>

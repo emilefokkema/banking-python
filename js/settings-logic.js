@@ -151,7 +151,8 @@ module.exports = (function(){
 		this.match = data.match;
 	};
 
-	var RowCollectionProperty = function(data){
+	var RowCollectionProperty = function(data, collection){
+		Object.defineProperty(this, 'collection', {value:collection});
 		this.name = data.name;
 		this.source = data.source;
 		this.conversion = data.conversion && this.createConversion(data.conversion);
@@ -164,18 +165,34 @@ module.exports = (function(){
 				}
 				return new StringConversion(data);
 			}
+		},
+		remove:{
+			value:function(){
+				this.collection.removeProperty(this);
+			}
 		}
 	});
 
-	var RowCollection = function(data, rowDefinition){
+	var RowCollection = function(data, onDestroy, rowDefinition){
+		var self = this;
 		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
-		this.properties = (data.properties || []).map(function(p){return new RowCollectionProperty(p);})
+		Object.defineProperty(this, 'onDestroy', {value:onDestroy});
+		this.properties = (data.properties || []).map(function(p){return new RowCollectionProperty(p, self);})
 	};
 	RowCollection.prototype = Object.create(RowCollection.prototype, {
 		addProperty:{
 			value:function(){
 				var name = this.rowDefinition.additional[0].name;
-				this.properties.push(new RowCollectionProperty({name:name,source:name}));
+				this.properties.push(new RowCollectionProperty({name:name,source:name}, this));
+			}
+		},
+		removeProperty:{
+			value:function(p){
+				var index = this.properties.indexOf(p);
+				this.properties.splice(index, 1);
+				if(!this.properties.length){
+					this.onDestroy();
+				}
 			}
 		}
 	});
@@ -194,7 +211,7 @@ module.exports = (function(){
 			self.addCategory(cat);
 			return cat;
 		});
-		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection, rowDefinition);
+		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection, function(){self.removeRowCollection();}, rowDefinition);
 		this.acceptRow = data.acceptRow && new AcceptRow(data.acceptRow);
 		this.expect = data.expect;
 		this.oncePerPeriod = data.oncePerPeriod || false;
@@ -209,6 +226,18 @@ module.exports = (function(){
 					return true;
 				}
 				return this.categories.some(function(c){return c.usesProperty(prop);});
+			}
+		},
+		removeRowCollection:{
+			value:function(){
+				this.rowCollection = undefined;
+			}
+		},
+		addRowCollection:{
+			value:function(){
+				var self = this;
+				this.rowCollection = new RowCollection({properties:[]}, function(){self.removeRowCollection();}, this.rowDefinition);
+				this.rowCollection.addProperty();
 			}
 		},
 		addCategory:{
