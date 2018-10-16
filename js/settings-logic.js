@@ -143,7 +143,7 @@ module.exports = (function(){
 
 	var DateConversion = function(data){
 		this.type = "date";
-		this.pattern = data.pattern;
+		this.pattern = data.pattern || "%Y%m%d";
 	};
 
 	var StringConversion = function(data){
@@ -169,6 +169,32 @@ module.exports = (function(){
 		remove:{
 			value:function(){
 				this.collection.removeProperty(this);
+			}
+		},
+		targetType:{
+			get:function(){
+				if(this.conversion){
+					return this.conversion.type;
+				}
+				return "string";
+			},
+			set:function(t){
+				if(t === "date"){
+					var newConversion = new DateConversion({});
+					if(this.conversion){
+						if(this.conversion.type !== "date"){
+							console.log("setting conversion to a date conversion")
+							this.conversion = newConversion;
+						}
+					}else{
+						console.log("adding a date conversion");
+						this.conversion = newConversion;
+					}
+				}
+				else if(this.conversion && this.conversion.type === "date"){
+					console.log("removing a date conversion");
+					this.conversion = undefined;
+				}
 			}
 		}
 	});

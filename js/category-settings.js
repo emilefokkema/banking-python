@@ -208,7 +208,7 @@ module.exports = (function(){
 							this.createCategorySlots();
 						},
 						propertyList:function(v){
-							this.createCategorySlots();
+							//this.createCategorySlots();
 						}
 					},
 					data:function(){

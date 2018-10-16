@@ -22,32 +22,6 @@ module.exports = (function(){
 								propertyList:Array
 							},
 							computed:{
-								targetType:{
-									get:function(){
-										if(this.property.conversion){
-											return this.property.conversion.type;
-										}
-										return "string";
-									},
-									set:function(t){
-										if(t === "date"){
-											var newConversion = {type:"date",pattern:"%Y%m%d"};
-											if(this.property.conversion){
-												if(this.property.conversion.type !== "date"){
-													console.log("setting conversion to a date conversion")
-													this.property.conversion = newConversion;
-												}
-											}else{
-												console.log("adding a date conversion");
-												this.$set(this.property, 'conversion',newConversion);
-											}
-										}
-										else if(this.property.conversion && this.property.conversion.type === "date"){
-											console.log("removing a date conversion");
-											this.$delete(this.property, 'conversion');
-										}
-									}
-								},
 								stringMatch:{
 									get:function(){
 										if(this.property.conversion && this.property.conversion.type === "string"){
@@ -88,9 +62,6 @@ module.exports = (function(){
 									}
 								},
 								name:function(n){
-									this.$emit("change");
-								},
-								targetType:function(t){
 									this.$emit("change");
 								}
 							},
