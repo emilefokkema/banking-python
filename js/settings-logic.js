@@ -30,23 +30,26 @@ module.exports = (function(){
 	inherit(DirectionProperty, RowProperty);
 	defGet(DirectionProperty.prototype, "type", "direction");
 
-	var AdditionalProperty = function(data){
+	var AdditionalProperty = function(data, settings){
 		RowProperty.apply(this,[data]);
+		Object.defineProperty(this, 'settings', {value:settings});
 		this.name = data.name;
 	};
 	inherit(AdditionalProperty, RowProperty);
 	defGet(AdditionalProperty.prototype, "type", "string");
+	defGetFn(AdditionalProperty.prototype, "inUse", function(){return this.settings.usesProperty(this);});
 
-	var RowDefinition = function(data){
+	var RowDefinition = function(data, settings){
+		Object.defineProperty(this, 'settings', {value:settings});
 		this.amount = new AmountProperty(data.amount);
 		this.date = new DateProperty(data.date);
 		this.direction = new DirectionProperty(data.direction);
-		this.additional = (data.additional || []).map(function(d){return new AdditionalProperty(d);});
+		this.additional = (data.additional || []).map(function(d){return new AdditionalProperty(d, settings);});
 	};
 	defGetFn(RowDefinition.prototype, 'definitions', function(){return [this.amount, this.date, this.direction].concat(this.additional);});
 	defGetFn(RowDefinition.prototype, 'maxColumnIndex', function(){return Math.max.apply(null, this.definitions.map(function(d){return d.columnIndex;}));});
 	RowDefinition.prototype.getNewDefinition = function(index){
-		return new AdditionalProperty({name:undefined, columnIndex:index});
+		return new AdditionalProperty({name:undefined, columnIndex:index}, this.settings);
 	};
 	RowDefinition.prototype.getDefinitionAtIndex = function(index){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
@@ -353,7 +356,7 @@ module.exports = (function(){
 	});
 
 	var Settings = function(data){
-		this.rowDefinition = new RowDefinition(data.rowDefinition);
+		this.rowDefinition = new RowDefinition(data.rowDefinition, this);
 		var incoming = new CategorySettings(data.categories.incoming, this.rowDefinition);
 		var outgoing = new CategorySettings(data.categories.outgoing, this.rowDefinition);
 		var categoriesRoot = new TreeNode();

@@ -180,7 +180,7 @@
 					</div>
 				</template>
 				<div data-balloon="name of the column (to use when filtering)" data-balloon-pos="up" data-balloon-length="fit" v-if="type == 'string'">
-					<input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="data.definition.name" placeholder="?" v-bind:disabled="protected"/>
+					<input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="data.definition.name" placeholder="?" v-bind:disabled="data.definition.inUse"/>
 				</div>
 				<span class="fas fa-dollar-sign" v-if="type == 'amount'"></span>
 			</div>
