@@ -193,7 +193,8 @@ module.exports = (function(){
 						onceOverridden:function(){
 							return this.data.category.onceOverridden;
 						},
-						draggable:function(){return !this.top && this.data.exists;}
+						draggable:function(){return !this.top && this.data.exists;},
+						hasAdditional:function(){return this.propertyList.length > 0;}
 					},
 					watch:{
 						name:function(v){
@@ -207,8 +208,8 @@ module.exports = (function(){
 						data:function(){
 							this.createCategorySlots();
 						},
-						propertyList:function(v){
-							//this.createCategorySlots();
+						hasAdditional:function(v){
+							this.createCategorySlots();
 						}
 					},
 					data:function(){
