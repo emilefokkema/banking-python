@@ -31,7 +31,6 @@ module.exports = (function(){
 							},
 							watch:{
 								source:function(v){
-									this.$emit("propertyusechange");
 									if(v === "date"){
 										this.property.name = "date";
 									}

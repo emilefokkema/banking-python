@@ -7,7 +7,6 @@ module.exports = (function(){
 					computed:{
 						index:function(){return this.data.index + 1;},
 						name:function(){return this.data.definition.name;},
-						protected:function(){return this.data.protected;},
 						nameInvalid:function(){return this.data && !this.data.nameValid;},
 						type:function(){return this.data.definition.type;}
 					},

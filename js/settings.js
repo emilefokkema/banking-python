@@ -173,7 +173,6 @@ module.exports = (function(){
 							var self = this;
 							var numberOfSlots = this.data.rowDefinition.maxColumnIndex + 1;
 							this.slots = Array.apply(null, new Array(numberOfSlots)).map(function(x, i){return self.makeSlotData(i);});
-							this.determineProtection();
 						},
 						createCategorySlots:function(){
 							var incoming = {};
@@ -183,15 +182,6 @@ module.exports = (function(){
 							outgoing.category = this.data.categories.outgoing;
 							outgoing.exists = true;
 							this.categorySlots = [incoming, outgoing];
-						},
-						determineProtection:function(){
-							for(var i=0;i<this.slots.length;i++){
-								var slot = this.slots[i];
-								if(!slot.definitionExists){
-									continue;
-								}
-								slot.protected = this.data.usesProperty(slot.definition);
-							}
 						},
 						save:function(){
 							var self = this;
@@ -210,7 +200,6 @@ module.exports = (function(){
 						makeNewSlotData:function(index){
 							return {
 								index:index,
-								protected:false,
 								definitionExists:false,
 								nameValid:true,
 								selected:false,

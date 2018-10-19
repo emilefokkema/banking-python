@@ -95,11 +95,9 @@ module.exports = (function(){
 						},
 						toggleCollection:function(){
 							this.data.category.addRowCollection();
-							this.onPropertyUseChange();
 						},
 						toggleFilter:function(){
 							this.data.category.toggleFilter();
-							this.onPropertyUseChange();
 						},
 						changed:function(){
 							this.$emit("changed");
@@ -132,10 +130,6 @@ module.exports = (function(){
 								result.push(this.createNewCategorySlot());
 							}
 							this.categorySlots = result;
-						},
-						onPropertyUseChange:function(){
-							this.$emit("propertyusechange");
-							this.changed();
 						},
 						addNewCategory:function(c){
 							c.exists = true;
