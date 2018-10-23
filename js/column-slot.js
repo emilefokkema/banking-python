@@ -31,10 +31,12 @@ module.exports = (function(){
 							}
 							this.$emit("namechange", v, this.data);
 							if(v && !this.data.definitionExists){
-								this.$emit("definitioncreated", this.data.definition);
+								this.data.definition.add();
+								this.$emit("definitioncreated");
 							}
 							if(!v && this.data.definitionExists){
-								this.$emit("definitionremoved",this.data.definition);
+								this.data.definition.remove();
+								this.$emit("definitionremoved");
 							}
 						}
 					},

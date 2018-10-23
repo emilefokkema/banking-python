@@ -30,29 +30,46 @@ module.exports = (function(){
 	inherit(DirectionProperty, RowProperty);
 	defGet(DirectionProperty.prototype, "type", "direction");
 
-	var AdditionalProperty = function(data, settings){
+	var AdditionalProperty = function(data, settings, rowDefinition){
 		RowProperty.apply(this,[data]);
 		Object.defineProperty(this, 'settings', {value:settings});
+		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
 		this.name = data.name;
 	};
 	inherit(AdditionalProperty, RowProperty);
 	defGet(AdditionalProperty.prototype, "type", "string");
 	defGetFn(AdditionalProperty.prototype, "inUse", function(){return this.settings.usesProperty(this);});
+	AdditionalProperty.prototype.add = function(){
+		this.rowDefinition.addDefinition(this);
+	};
+	AdditionalProperty.prototype.remove = function(){
+		this.rowDefinition.removeDefinition(this);
+	};
 
 	var RowDefinition = function(data, settings){
+		var self = this;
 		Object.defineProperty(this, 'settings', {value:settings});
 		this.amount = new AmountProperty(data.amount);
 		this.date = new DateProperty(data.date);
 		this.direction = new DirectionProperty(data.direction);
-		this.additional = (data.additional || []).map(function(d){return new AdditionalProperty(d, settings);});
+		this.additional = (data.additional || []).map(function(d){return new AdditionalProperty(d, settings, self);});
 	};
 	defGetFn(RowDefinition.prototype, 'definitions', function(){return [this.amount, this.date, this.direction].concat(this.additional);});
 	defGetFn(RowDefinition.prototype, 'maxColumnIndex', function(){return Math.max.apply(null, this.definitions.map(function(d){return d.columnIndex;}));});
 	RowDefinition.prototype.getNewDefinition = function(index){
-		return new AdditionalProperty({name:undefined, columnIndex:index}, this.settings);
+		return new AdditionalProperty({name:undefined, columnIndex:index}, this.settings, this);
 	};
 	RowDefinition.prototype.getDefinitionAtIndex = function(index){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
+	};
+	RowDefinition.prototype.addDefinition = function(d){
+		this.additional.push(d);
+	};
+	RowDefinition.prototype.removeDefinition = function(d){
+		var index = this.additional.indexOf(d);
+		if(index > -1){
+			this.additional.splice(index, 1);
+		}
 	};
 
 	var FilterCache = function(rowDefinition){

@@ -153,15 +153,10 @@ module.exports = (function(){
 							this.slots[i].selected = false;
 						},
 						onDefinitionCreated:function(d){
-							console.log("definition crated");
-							this.data.rowDefinition.additional.push(d);
 							this.createSlots();
 							this.dirty = true;
 						},
 						onDefinitionRemoved:function(d){
-							console.log("definition removed");
-							var index = this.data.rowDefinition.additional.indexOf(d);
-							this.data.rowDefinition.additional.splice(index, 1);
 							this.createSlots();
 							this.dirty = true;
 						},
