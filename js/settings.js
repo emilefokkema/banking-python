@@ -73,7 +73,7 @@ module.exports = (function(){
 					methods:{
 						onValid:function(v, msg){
 							if(v){
-								this.violationCount--;
+								this.violationCount && this.violationCount--;
 							}else{
 								this.violationCount++;
 								if(msg){
@@ -110,23 +110,6 @@ module.exports = (function(){
 						},
 						onChanged:function(){
 							this.dirty = true;
-						},
-						onPropertyNameChange:function(newName, slot){
-							this.onChanged();
-							var nameValid = newName !== "date" && newName !== "amount" && newName !== "direction";
-							var oldNameValid = slot.nameValid;
-							if(oldNameValid != nameValid){
-								this.onValid(nameValid, "\""+newName+"\" is a reserved name. Please don't use it for a column.");
-							}
-							slot.nameValid = nameValid;
-							for(var i=0;i<this.data.rowDefinition.additional.length;i++){
-								var definition = this.data.rowDefinition.additional[i];
-								if(definition !== slot.definition && definition.name === newName){
-									this.data.rowDefinition.additional.splice(i, 1);
-									this.createSlots();
-									return;
-								}
-							}
 						},
 						doSlotSwitch:function(){
 							var self = this;

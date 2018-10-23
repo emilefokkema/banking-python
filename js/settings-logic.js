@@ -34,7 +34,23 @@ module.exports = (function(){
 		RowProperty.apply(this,[data]);
 		Object.defineProperty(this, 'settings', {value:settings});
 		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
-		this.name = data.name;
+		Object.defineProperty(this, '_name', {value:data.name, writable:true});
+		Object.defineProperty(this, 'name', {
+			get:function(){return this._name;},
+			set:function(v){
+				if(v === "date" || v === "amount" || v === "direction"){
+					throw new Error("\""+v+"\" is a reserved name. Please don't use it for a column.")
+				}
+				this._name = v;
+				if(v){
+					this.add();
+				}else{
+					this.remove();
+				}
+			},
+			configurable:true,
+			enumerable:true
+		});
 	};
 	inherit(AdditionalProperty, RowProperty);
 	defGet(AdditionalProperty.prototype, "type", "string");
@@ -63,6 +79,15 @@ module.exports = (function(){
 		return this.definitions.find(function(d){return d.columnIndex == index;});
 	};
 	RowDefinition.prototype.addDefinition = function(d){
+		if(this.additional.indexOf(d) > -1){
+			return;
+		}
+		for(var i=0;i<this.additional.length;i++){
+			if(this.additional[i].name == d.name){
+				this.additional.splice(i, 1);
+				break;
+			}
+		}
 		this.additional.push(d);
 	};
 	RowDefinition.prototype.removeDefinition = function(d){

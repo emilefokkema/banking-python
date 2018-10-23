@@ -111,7 +111,7 @@
 				<div class="panel-header"><div class ="with-balloon" data-balloon="settings" data-balloon-pos="up"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div></div>
 				<div class="panel-body">
 					<div class="column-slots">
-						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onChanged" v-on:namechange="onPropertyNameChange"></column-slot>
+						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onChanged" v-on:valid="onValid"></column-slot>
 						<div class="with-balloon" data-balloon="add a column definition" data-balloon-pos="up">
 							<span class="fas fa-plus add-button" v-on:click="addNewSlot"></span>
 						</div>
@@ -180,7 +180,7 @@
 					</div>
 				</template>
 				<div data-balloon="name of the column (to use when filtering)" data-balloon-pos="up" data-balloon-length="fit" v-if="type == 'string'">
-					<input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="data.definition.name" placeholder="?" v-bind:disabled="data.definition.inUse"/>
+					<input class="input" v-bind:class="{'invalid':nameInvalid}" v-model="name" placeholder="?" v-bind:disabled="data.definition.inUse"/>
 				</div>
 				<span class="fas fa-dollar-sign" v-if="type == 'amount'"></span>
 			</div>

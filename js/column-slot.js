@@ -4,9 +4,28 @@ module.exports = (function(){
 					props:{
 						data:Object
 					},
+					data:function(){
+						return {
+							invalidName:undefined
+						};
+					},
 					computed:{
 						index:function(){return this.data.index + 1;},
-						name:function(){return this.data.definition.name;},
+						name:{
+							get:function(){return this.invalidName || this.data.definition.name;},
+							set:function(v){
+								try{
+									this.data.definition.name = v;
+									this.invalidName = undefined;
+									this.data.nameValid = true;
+									this.$emit("valid", true);
+								}catch(e){
+									this.data.nameValid = false;
+									this.invalidName = v;
+									this.$emit("valid", false, e.message);
+								}
+							}
+						},
 						nameInvalid:function(){return this.data && !this.data.nameValid;},
 						type:function(){return this.data.definition.type;}
 					},
@@ -29,13 +48,10 @@ module.exports = (function(){
 							if(this.type !== "string"){
 								return;
 							}
-							this.$emit("namechange", v, this.data);
 							if(v && !this.data.definitionExists){
-								this.data.definition.add();
 								this.$emit("definitioncreated");
 							}
 							if(!v && this.data.definitionExists){
-								this.data.definition.remove();
 								this.$emit("definitionremoved");
 							}
 						}
