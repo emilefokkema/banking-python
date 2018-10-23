@@ -38,9 +38,6 @@ module.exports = (function(){
 									this.$emit("deselected", this.data.index);
 								}
 							}
-						},
-						onChange:function(){
-							this.$emit("change");
 						}
 					},
 					watch:{

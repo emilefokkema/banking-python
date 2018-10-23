@@ -17,10 +17,10 @@ module.exports = (function(){
 							collapsed:true,
 							slots:[],
 							selectedSlots:[],
-							dirty:false,
 							saved:false,
 							violationCount:0,
-							categorySlots:[]
+							categorySlots:[],
+							cleanStringifiedSettings:undefined
 						};
 					},
 					mounted:function(){
@@ -68,7 +68,8 @@ module.exports = (function(){
 									this.data.ignoreFirstLine = v;
 								}
 							}
-						}
+						},
+						dirty:function(){return JSON.stringify(this.data) !== this.cleanStringifiedSettings;}
 					},
 					methods:{
 						onValid:function(v, msg){
@@ -88,14 +89,14 @@ module.exports = (function(){
 								if(data){
 									self.data = new Settings(data);
 									console.log(self.data);
-									self.dirty = false;
+									self.cleanStringifiedSettings = JSON.stringify(self.data);
 									self.saved = true;
 									loading.complete();
 								}else{
 									self.collapsed = false;
 									postget.doGet("/api/settings/default", function(data){
 										self.data = new Settings(data);
-										self.dirty = true;
+										self.cleanStringifiedSettings = undefined;
 										self.saved = false;
 										loading.complete();
 									}, function(msg){
@@ -108,18 +109,12 @@ module.exports = (function(){
 								loading.complete();
 							});
 						},
-						onChanged:function(){
-							this.dirty = true;
-						},
 						doSlotSwitch:function(){
 							var self = this;
 							var slot1 = this.slots[self.selectedSlots[0]];
 							var slot2 = this.slots[self.selectedSlots[1]];
 							slot1.definition.columnIndex = this.selectedSlots[1];
 							slot2.definition.columnIndex = this.selectedSlots[0];
-							if(slot1.definitionExists || slot2.definitionExists){
-								this.dirty = true;
-							}
 							this.createSlots();
 						},
 						onSlotSelected:function(i){
@@ -137,11 +132,9 @@ module.exports = (function(){
 						},
 						onDefinitionCreated:function(d){
 							this.createSlots();
-							this.dirty = true;
 						},
 						onDefinitionRemoved:function(d){
 							this.createSlots();
-							this.dirty = true;
 						},
 						addNewSlot:function(){
 							this.slots.push(this.makeSlotData(this.slots.length));

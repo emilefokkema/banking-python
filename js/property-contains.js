@@ -26,12 +26,10 @@ module.exports = (function(){
 							}
 							this.data.values.push(this.newValue);
 							this.newValue = undefined;
-							this.$emit("change");
 						},
 						onKeyDown:function(e){
 							if(e.code === "Backspace" && this.data.values.length > 0 && !this.newValue){
 								this.data.values.pop();
-								this.$emit("change");
 							}
 						}
 					},

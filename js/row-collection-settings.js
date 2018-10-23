@@ -37,9 +37,6 @@ module.exports = (function(){
 									if(v == "amount"){
 										this.property.name = "amount";
 									}
-								},
-								name:function(n){
-									this.$emit("change");
 								}
 							},
 							methods:{
@@ -48,7 +45,6 @@ module.exports = (function(){
 								},
 								onRemove:function(){
 									this.property.remove();
-									this.$emit("change");
 								}
 							},
 							components:{

@@ -75,7 +75,6 @@ module.exports = (function(){
 							console.log("within "+this.data.category.name+": dropped "+draggedCategory.name+" before slot ", slot.category.name);
 							this.data.category.categories = newCategories;
 							this.createCategorySlots();
-							this.changed();
 						},
 						onValid:function(v, msg){
 							this.$emit("valid", v, msg);
@@ -98,9 +97,6 @@ module.exports = (function(){
 						},
 						toggleFilter:function(){
 							this.data.category.toggleFilter();
-						},
-						changed:function(){
-							this.$emit("changed");
 						},
 						nextKey:(function(initial){return function(){
 							return initial++;

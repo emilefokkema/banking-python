@@ -111,7 +111,7 @@
 				<div class="panel-header"><div class ="with-balloon" data-balloon="settings" data-balloon-pos="up"><span class="fas fa-cog panel-title" v-on:click="toggleCollapse"></span></div></div>
 				<div class="panel-body">
 					<div class="column-slots">
-						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:change="onChanged" v-on:valid="onValid"></column-slot>
+						<column-slot v-for="slot in slots" v-bind:data="slot" v-on:definitioncreated="onDefinitionCreated" v-on:definitionremoved="onDefinitionRemoved" v-on:selected="onSlotSelected" v-on:deselected="onSlotDeselected" v-on:valid="onValid"></column-slot>
 						<div class="with-balloon" data-balloon="add a column definition" data-balloon-pos="up">
 							<span class="fas fa-plus add-button" v-on:click="addNewSlot"></span>
 						</div>
@@ -119,11 +119,11 @@
 							<span class="fas fa-exchange-alt slot-switch-button" v-on:click="doSlotSwitch"></span>
 						</div>
 					</div>
-          <custom-checkbox v-model="ignoreFirstLine" v-bind:tooltip="'Use this if the first line of your csv contains column headers instead of data'" v-bind:tooltippos="'down-left'" v-on:input="onChanged"></custom-checkbox>
+          <custom-checkbox v-model="ignoreFirstLine" v-bind:tooltip="'Use this if the first line of your csv contains column headers instead of data'" v-bind:tooltippos="'down-left'"></custom-checkbox>
 					Ignore first line
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="onChanged" v-on:valid="onValid"></category-settings>
+					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:valid="onValid"></category-settings>
 				</div>
 				<div class="panel-body" v-if="dirty">
 					<div class="saved-status">
@@ -162,20 +162,20 @@
 				<template v-if="type == 'date'">
 					<span class="fas fa-calendar-alt"></span>
 					<div class="with-balloon" data-balloon-pos="up-left" v-bind:data-balloon="'the form in which each row\'s date is present in column ' + index">
-						<input class="input" v-model="data.definition.pattern" v-on:input="onChange"/>
+						<input class="input" v-model="data.definition.pattern"/>
 					</div>
 				</template>
 				<template v-if="type == 'direction'">
 					<div>
 						<span class="fas fa-plus"></span>
 						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+index+' that signifies that the transaction is incoming'" data-balloon-length="medium">
-							<input class="input" v-model="data.definition.incoming" v-on:input="onChange"/>
+							<input class="input" v-model="data.definition.incoming"/>
 						</div>
 					</div>
 					<div>
 						<span class="fas fa-minus"></span>
 						<div class="with-balloon" data-balloon-pos="right" v-bind:data-balloon="'value of column '+index+' that signifies that the transaction is outgoing'" data-balloon-length="medium">
-							<input class="input" v-model="data.definition.outgoing" v-on:input="onChange"/>
+							<input class="input" v-model="data.definition.outgoing"/>
 						</div>
 					</div>
 				</template>
@@ -200,62 +200,62 @@
 						</span>
 					</span>
 					<div class="with-balloon" v-bind:data-balloon="nonExistent? 'create category by giving it a name' : ('edit the name of this category'+ (top ? '':' (clear to remove)'))" data-balloon-pos="right">
-						<input class="input" v-model="data.category.name" v-on:input="changed" placeholder="?"/>
+						<input class="input" v-model="data.category.name" placeholder="?"/>
 					</div>
 				</div>
 				<div class="category-set" v-if="data.exists">
 					<div class="category-addon" v-if="!top && !onceOverridden">
-						<custom-checkbox v-bind:tooltip="'use this if this category is the period boundary: only one row per period can be in this category'" v-bind:tooltippos="'up-left'" v-model="oncePerPeriod" v-on:input="changed"></custom-checkbox> once
+						<custom-checkbox v-bind:tooltip="'use this if this category is the period boundary: only one row per period can be in this category'" v-bind:tooltippos="'up-left'" v-model="oncePerPeriod"></custom-checkbox> once
 					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':filterActive}">
 						<div class="with-balloon filter-button" data-balloon="filter rows that enter this category based on a condition" data-balloon-pos="up-left">
 							<span class="fas fa-filter" v-on:click="toggleFilter"></span>
 						</div>
-						<property-contains v-on:change="changed" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
-						<property-matches v-on:change="changed" v-on:valid="onValid" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyMatches" v-bind:data="data.category.acceptRow.propertyMatches" v-bind:property-list="propertyList"></property-matches>
+						<property-contains v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyContains" v-bind:data="data.category.acceptRow.propertyContains" v-bind:property-list="propertyList"></property-contains>
+						<property-matches v-on:valid="onValid" v-on:switch="onSwitch" v-if="data.category.acceptRow && data.category.acceptRow.propertyMatches" v-bind:data="data.category.acceptRow.propertyMatches" v-bind:property-list="propertyList"></property-matches>
 					</div>
 					<div class="category-addon" v-if="!top" v-bind:class="{'active':collectionActive}">
 						<div class="with-balloon filter-button collection-button" data-balloon="display (properties of) rows that enter this category" data-balloon-pos="up-left">
 							<span class="fas fa-list-ul" v-on:click="toggleCollection"></span>
 						</div>
-						<row-collection v-on:valid="onValid" v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList" v-on:change="changed"></row-collection>
+						<row-collection v-on:valid="onValid" v-if="data.category.rowCollection" v-bind:data="data.category.rowCollection" v-bind:property-list="propertyList"></row-collection>
 					</div>
 					<div class="cagegory-addon expectation" v-bind:class="{'active':!!expectation}" v-if="!oncePerPeriod && !top">
 						<span class="fas fa-times filter-button"></span>
 						<div class="category-addon-content expectation-number" data-balloon="expect this number of rows per period to enter this category. Any excess will be displayed." data-balloon-length="medium" data-balloon-pos="up">
-							<input type="number" v-model="expectation" min="0" step="1" class="input" v-on:input="changed"/>
+							<input type="number" v-model="expectation" min="0" step="1" class="input"/>
 						</div>
 					</div>
-					<category-settings v-on:categorydropbefore="onChildCategoryDropBefore" v-bind:parentdraggedslot="draggedSlot" v-on:categorydragstart="onCategoryDragStart" v-on:categorydragend="onChildDragEnd" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-on:changed="changed" v-bind:draggedfrom="slot == draggedSlot" v-on:valid="onValid" :key="slot.key"></category-settings>
+					<category-settings v-on:categorydropbefore="onChildCategoryDropBefore" v-bind:parentdraggedslot="draggedSlot" v-on:categorydragstart="onCategoryDragStart" v-on:categorydragend="onChildDragEnd" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-bind:draggedfrom="slot == draggedSlot" v-on:valid="onValid" :key="slot.key"></category-settings>
 				</div>
 				<div class="category-layover"></div>
 			</div>
 		</script>
 		<script type="text/template" id="rowCollectionSettingsTemplate">
 			<div class="row-collection category-addon-content">
-				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:change="$emit('change')" v-on:valid="onValid"></row-property>
+				<row-property v-for="property in data.properties" v-bind:property="property" v-bind:property-list="propertyList" v-on:valid="onValid"></row-property>
 				<div class="input add-row-property" v-on:click="addProperty" data-balloon="add a property to display for each row" data-balloon-pos="right"><span class="fas fa-plus"></span></div>
 			</div>
 		</script>
 		<script type="text/template" id="rowPropertyTemplate">
 			<div class="row-property">
 				<div class="source-type row-property-part">
-					<source-property-input v-model="property.source" v-bind:property-list="propertyList" v-on:input="$emit('change')"></source-property-input>
+					<source-property-input v-model="property.source" v-bind:property-list="propertyList"></source-property-input>
 				</div>
 				<div class="arrow-container row-property-part" v-if="hasStringSource">
 					<span class="fas fa-arrow-right"></span>
 				</div>
 				<div class="row-property-part target-type" v-if="hasStringSource">
-					<target-type-input v-model="property.targetType" v-on:input="$emit('change')"></target-type-input>
+					<target-type-input v-model="property.targetType"></target-type-input>
 					<div class="with-balloon input-part" data-balloon="name of the property to display" data-balloon-pos="up" v-if="property.targetType === 'string'">
-						<input class="input" v-model="property.name" v-on:input="$emit('change')"/>
+						<input class="input" v-model="property.name"/>
 					</div>
 					<div class="input-part" v-if="property.targetType === 'string'" data-balloon="display the part of the source that is matched by this regular expression. Leave empty to display the whole source" data-balloon-pos="up-right" data-balloon-length="large">
 						<span class="fas fa-search"></span>
-						<regex-input v-model="property.stringMatch" v-on:input="$emit('change')" v-on:valid="onValid"></regex-input>
+						<regex-input v-model="property.stringMatch" v-on:valid="onValid"></regex-input>
 					</div>
 					<div class="with-balloon input-part" data-balloon="the date pattern to look for in the source" data-balloon-pos="up" v-if="property.targetType === 'date'">
-						<input class="input" v-model="property.conversion.pattern" v-on:input="$emit('change')"/>
+						<input class="input" v-model="property.conversion.pattern"/>
 					</div>
 					
 				</div>
@@ -286,7 +286,7 @@
 		<script type="text/template" id="propertyContainsTemplate">
 			<div class="property-contains category-addon-content">
 				<div class="with-balloon" data-balloon="property based on which to filter" data-balloon-pos="up">
-					<select v-model="data.name" class="input" v-on:change="$emit('change')">
+					<select v-model="data.name" class="input">
 						<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
 					</select>
 				</div>
@@ -302,7 +302,7 @@
 		<script type="text/template" id="propertyMatchesTemplate">
 			<div class="property-matches category-addon-content">
 				<div class="with-balloon" data-balloon="property based on which to filter" data-balloon-pos="up">
-					<select v-model="data.name" class="input" v-on:change="$emit('change')">
+					<select v-model="data.name" class="input">
 						<option v-for="prop of propertyList" v-bind:value="prop.name">{{prop.name}}</option>
 					</select>
 				</div>
@@ -310,7 +310,7 @@
 					<option v-bind:value="verb" v-for="verb of verbs">{{verb}}</option>
 				</select>
 				<div class="with-balloon" data-balloon="the value of the property must match this regular expression in order to pass the filter" data-balloon-pos="down" data-balloon-length="medium">
-					<regex-input v-model="data.pattern" v-on:valid="onValid" v-on:input="$emit('change')"></regex-input>
+					<regex-input v-model="data.pattern" v-on:valid="onValid"></regex-input>
 				</div>
 			</div>
 		</script>
