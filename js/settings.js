@@ -20,7 +20,8 @@ module.exports = (function(){
 							saved:false,
 							violationCount:0,
 							categorySlots:[],
-							cleanStringifiedSettings:undefined
+							cleanStringifiedSettings:undefined,
+							draggedCategory:undefined
 						};
 					},
 					mounted:function(){
@@ -72,6 +73,24 @@ module.exports = (function(){
 						dirty:function(){return JSON.stringify(this.data) !== this.cleanStringifiedSettings;}
 					},
 					methods:{
+						onInsertCategoryBefore:function(c){
+							this.data.insertCategoryBefore(this.draggedCategory, c);
+							this.draggedCategory = undefined;
+						},
+						onInsertCategoryAfter:function(c){
+							this.data.insertCategoryAfter(this.draggedCategory, c);
+							this.draggedCategory = undefined;
+						},
+						onAddCategoryToParent:function(p){
+							this.data.addCategoryToParent(this.draggedCategory, p);
+							this.draggedCategory = undefined;
+						},
+						onCategoryDragStart:function(c){
+							this.draggedCategory = c;
+						},
+						onCategoryDragEnd:function(){
+							this.draggedCategory = undefined;
+						},
 						onValid:function(v, msg){
 							if(v){
 								this.violationCount && this.violationCount--;

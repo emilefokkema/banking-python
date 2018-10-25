@@ -123,7 +123,7 @@
 					Ignore first line
 				</div>
 				<div class="panel-body" v-if="data && data.categories">
-					<category-settings v-bind:property-list="data.rowDefinition.additional || []" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:valid="onValid"></category-settings>
+					<category-settings v-on:insertcategorybefore="onInsertCategoryBefore" v-on:insertcategoryafter="onInsertCategoryAfter" v-on:addcategorytoparent="onAddCategoryToParent" v-bind:property-list="data.rowDefinition.additional || []" v-bind:draggedcategory="draggedCategory" v-bind:top="true" v-for="slot in categorySlots" v-bind:data="slot" v-on:valid="onValid" v-on:categorydragstart="onCategoryDragStart" v-on:categorydragend="onCategoryDragEnd"></category-settings>
 				</div>
 				<div class="panel-body" v-if="dirty">
 					<div class="saved-status">
@@ -200,7 +200,7 @@
 						</span>
 					</span>
 					<div class="with-balloon" v-bind:data-balloon="nonExistent? 'create category by giving it a name' : ('edit the name of this category'+ (top ? '':' (clear to remove)'))" data-balloon-pos="right">
-						<input class="input" v-model="data.category.name" placeholder="?"/>
+						<input class="input" v-model="name" placeholder="?"/>
 					</div>
 				</div>
 				<div class="category-set" v-if="data.exists">
@@ -226,7 +226,7 @@
 							<input type="number" v-model="expectation" min="0" step="1" class="input"/>
 						</div>
 					</div>
-					<category-settings v-on:categorydropbefore="onChildCategoryDropBefore" v-bind:parentdraggedslot="draggedSlot" v-on:categorydragstart="onCategoryDragStart" v-on:categorydragend="onChildDragEnd" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-for="slot in categorySlots" v-bind:data="slot" v-bind:draggedfrom="slot == draggedSlot" v-on:valid="onValid" :key="slot.key"></category-settings>
+					<category-settings v-on:insertcategorybefore="onInsertCategoryBefore" v-on:insertcategoryafter="onInsertCategoryAfter" v-on:addcategorytoparent="onAddCategoryToParent" v-on:categorydragstart="onCategoryDragStart" v-on:categorydragend="onChildDragEnd" v-on:categoryremoved="removeCategory" v-on:categorycreated="addNewCategory" v-bind:property-list="propertyList" v-bind:draggedcategory="draggedcategory" v-for="slot in categorySlots" v-bind:data="slot" v-bind:draggedfrom="draggedcategory == slot.category" v-on:valid="onValid" :key="slot.key"></category-settings>
 				</div>
 				<div class="category-layover"></div>
 			</div>

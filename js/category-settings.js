@@ -11,70 +11,58 @@ module.exports = (function(){
 						top:Boolean,
 						data:Object,
 						propertyList:Array,
-						parentdraggedslot:Object,
-						draggedfrom:Boolean
+						draggedfrom:Boolean,
+						draggedcategory:Object
 					},
 					methods:{
 						onDragEnd:function(e){
 							e.preventDefault();
 							e.cancelBubble = true;
-							this.$emit("categorydragend")
+							this.$emit("categorydragend");
 						},
 						onChildDragEnd:function(){
-							this.draggedSlot = undefined;
+							this.$emit("categorydragend");
 						},
 						onDragOver:function(e){
-							if(!this.parentdraggedslot){
+							if(this.top){
 								return;
 							}
 							e.preventDefault();
+							e.cancelBubble = true;
 							this.draggedOver = true;
 						},
 						onDrop:function(e){
-							if(!this.parentdraggedslot){
+							if(this.top){
 								return;
 							}
 							e.preventDefault();
 							e.cancelBubble = true;
-							this.$emit("categorydropbefore", this.data);
 							this.draggedOver = false;
+							if(this.data.exists){
+								this.$emit("insertcategorybefore",this.data.category);
+							}else{
+								if(this.data.previousSlot){
+									this.$emit("insertcategoryafter",this.data.previousSlot.category);
+								}else{
+									this.$emit("addcategorytoparent", this.data.parentSlot.category);
+								}
+							}
+						},
+						onInsertCategoryBefore:function(c){
+							this.$emit("insertcategorybefore", c);
+						},
+						onInsertCategoryAfter:function(c){
+							this.$emit("insertcategoryafter", c);
+						},
+						onAddCategoryToParent:function(p){
+							this.$emit("addcategorytoparent", p);
 						},
 						onDragStart:function(e){
-							this.$emit("categorydragstart", this.data);
+							this.$emit("categorydragstart", this.data.category);
 							e.cancelBubble = true;
 						},
-						onCategoryDragStart:function(slot){
-							this.draggedSlot = slot;
-						},
-						onChildCategoryDropBefore:function(slot){
-							var newCategories = [];
-							var draggedCategory = this.draggedSlot.category;
-							this.draggedSlot = undefined;
-							var indexOfDraggedCategory = this.data.category.categories.indexOf(draggedCategory);
-							var indexOfTargetCategory;
-							if(slot.exists){
-								indexOfTargetCategory = this.data.category.categories.indexOf(slot.category);
-							}else{
-								indexOfTargetCategory = this.data.category.categories.length;
-							}
-							if(indexOfTargetCategory == indexOfDraggedCategory + 1 || indexOfTargetCategory == indexOfDraggedCategory){
-								return;
-							}
-							if(indexOfTargetCategory == 0){
-								newCategories.push(draggedCategory);
-							}
-							for(var i=0;i<this.data.category.categories.length;i++){
-								if(i == indexOfDraggedCategory){
-									continue;
-								}
-								newCategories.push(this.data.category.categories[i])
-								if(i == indexOfTargetCategory - 1){
-									newCategories.push(draggedCategory);
-								}
-							}
-							console.log("within "+this.data.category.name+": dropped "+draggedCategory.name+" before slot ", slot.category.name);
-							this.data.category.categories = newCategories;
-							this.createCategorySlots();
+						onCategoryDragStart:function(cat){
+							this.$emit("categorydragstart", cat);
 						},
 						onValid:function(v, msg){
 							this.$emit("valid", v, msg);
@@ -98,48 +86,29 @@ module.exports = (function(){
 						toggleFilter:function(){
 							this.data.category.toggleFilter();
 						},
-						nextKey:(function(initial){return function(){
-							return initial++;
-						}})(0),
-						createNewCategorySlot:function(){
+						createNewCategorySlot:function(latestSlot){
 							return this.createCategorySlot({
 								category:this.data.category.getNewCategory(),
-								exists:false
+								exists:false,
+								previousSlot:latestSlot
 							});
 						},
 						createCategorySlot:function(specs){
 							return {
 								category:specs.category,
 								exists:specs.exists,
-								key:this.nextKey()
+								key:specs.category.id,
+								previousSlot: specs.previousSlot || undefined,
+								parentSlot: this.data
 							};
-						},
-						createCategorySlots:function(){
-							var self = this;
-							var result = [];
-							result = this.data.category.categories.map(function(cat){
-								return self.createCategorySlot({
-									category:cat,
-									exists:true
-								});});
-							if(this.propertyList.length > 0){
-								result.push(this.createNewCategorySlot());
-							}
-							this.categorySlots = result;
 						},
 						addNewCategory:function(c){
 							c.exists = true;
 							this.data.category.addCategory(c.category);
-							this.categorySlots.push(this.createNewCategorySlot());
 						},
 						removeCategory:function(c){
-							var index = this.categorySlots.indexOf(c);
-							this.categorySlots.splice(index, 1);
 							this.data.category.removeCategory(c.category);
 						}
-					},
-					mounted:function(){
-						this.createCategorySlots();
 					},
 					components:{
 						'property-contains':propertyContains.build(document),
@@ -148,8 +117,36 @@ module.exports = (function(){
 						'custom-checkbox':customCheckboxBuilder.build(document)
 					},
 					computed:{
-						name:function(){return this.data.category.name;},
+						name:{
+							get:function(){return this.data.category.name;},
+							set:function(v){
+								this.data.category.name = v;
+								if(v && !this.data.exists){
+									this.$emit("categorycreated", this.data);
+								}
+								if(!v && this.data.exists){
+									this.$emit("categoryremoved", this.data);
+								}
+							}
+						},
 						filterActive:function(){return !!this.data.category.acceptRow;},
+						categorySlots:function(){
+							var self = this;
+							var result = [];
+							var latestSlot = undefined;
+							result = this.data.category.categories.map(function(cat){
+								latestSlot = self.createCategorySlot({
+									category:cat,
+									exists:true,
+									previousSlot:latestSlot
+								});
+								return latestSlot;
+							});
+							if(this.propertyList.length > 0){
+								result.push(this.createNewCategorySlot(latestSlot));
+							}
+							return result;
+						},
 						expectation:{
 							get:function(){
 								return this.data.category.expect || "";
@@ -183,32 +180,14 @@ module.exports = (function(){
 						onceOverridden:function(){
 							return this.data.category.onceOverridden;
 						},
-						draggable:function(){return !this.top && this.data.exists;},
+						draggable:function(){return !this.top && this.data.exists && this.collapsed;},
 						hasAdditional:function(){return this.propertyList.length > 0;}
-					},
-					watch:{
-						name:function(v){
-							if(v && !this.data.exists){
-								this.$emit("categorycreated", this.data);
-							}
-							if(!v && this.data.exists){
-								this.$emit("categoryremoved", this.data);
-							}
-						},
-						data:function(){
-							this.createCategorySlots();
-						},
-						hasAdditional:function(v){
-							this.createCategorySlots();
-						}
 					},
 					data:function(){
 						return {
 							collapsed:true,
-							categorySlots:[],
 							newCategorySlot:undefined,
 							usedFilters:{},
-							draggedSlot:undefined,
 							draggedOver:false
 						}
 					},

@@ -290,6 +290,8 @@ module.exports = (function(){
 		}
 	});
 
+	var categorySettingsId = 0;
+
 	var CategorySettings = function(data, rowDefinition){
 		var self = this;
 		var node = new TreeNode();
@@ -297,6 +299,7 @@ module.exports = (function(){
 		Object.defineProperty(this, 'node', {value:node});
 		Object.defineProperty(this, 'filterCache', {value:new FilterCache(rowDefinition)});
 		Object.defineProperty(this, 'rowDefinition', {value:rowDefinition});
+		Object.defineProperty(this, 'id', {value:categorySettingsId++});
 		this.name = data.name;
 		this.categories = [];
 		(data.categories || []).map(function(cd){
@@ -339,11 +342,52 @@ module.exports = (function(){
 				this.node.add(cat.node);
 			}
 		},
+		insertCategoryBefore:{
+			value:function(category, referenceCategory){
+				var index = this.categories.indexOf(referenceCategory);
+				if(index > -1){
+					this.categories.splice(index, 0, category);
+					this.node.add(category.node);
+					return true;
+				}
+				return !!this.categories.find(function(c){return c.insertCategoryBefore(category, referenceCategory);});
+			}
+		},
+		insertCategoryAfter:{
+			value:function(category, referenceCategory){
+				var index = this.categories.indexOf(referenceCategory);
+				if(index > -1){
+					this.categories.splice(index + 1, 0, category);
+					this.node.add(category.node);
+					return true;
+				}
+				return !!this.categories.find(function(c){return c.insertCategoryAfter(category, referenceCategory);});
+			}
+		},
+		addCategoryToParent:{
+			value:function(category, parentCategory){
+				if(parentCategory == this){
+					this.addCategory(category);
+					return true;
+				}
+				return !!this.categories.find(function(c){return c.addCategoryToParent(category, parentCategory);});
+			}
+		},
 		removeCategory:{
 			value:function(cat){
 				cat.destroy();
 				var index = this.categories.indexOf(cat);
-				this.categories.splice(index, 1);
+				if(index  > -1){
+					this.categories.splice(index, 1);
+					return true;
+				}else{
+					for(var i=0;i<this.categories.length;i++){
+						if(this.categories[i].removeCategory(cat)){
+							return true;
+						}
+					}
+				}
+				return false;
 			}
 		},
 		destroy:{
@@ -414,6 +458,36 @@ module.exports = (function(){
 		usesProperty:{
 			value:function(prop){
 				return this.categories.incoming.usesProperty(prop) || this.categories.outgoing.usesProperty(prop);
+			}
+		},
+		removeCategory:{
+			value:function(category){
+				this.categories.incoming.removeCategory(category);
+				this.categories.outgoing.removeCategory(category);
+			}
+		},
+		insertCategoryBefore:{
+			value:function(category, referenceCategory){
+				this.removeCategory(category);
+				if(!this.categories.incoming.insertCategoryBefore(category, referenceCategory)){
+					this.categories.outgoing.insertCategoryBefore(category, referenceCategory);
+				}
+			}
+		},
+		insertCategoryAfter:{
+			value:function(category, referenceCategory){
+				this.removeCategory(category);
+				if(!this.categories.incoming.insertCategoryAfter(category, referenceCategory)){
+					this.categories.outgoing.insertCategoryAfter(category, referenceCategory);
+				}
+			}
+		},
+		addCategoryToParent:{
+			value:function(category, parentCategory){
+				this.removeCategory(category);
+				if(!this.categories.incoming.addCategoryToParent(category, parentCategory)){
+					this.categories.outgoing.addCategoryToParent(category, parentCategory);
+				}
 			}
 		}
 	});
