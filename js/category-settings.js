@@ -180,8 +180,7 @@ module.exports = (function(){
 						onceOverridden:function(){
 							return this.data.category.onceOverridden;
 						},
-						draggable:function(){return !this.top && this.data.exists && this.collapsed;},
-						hasAdditional:function(){return this.propertyList.length > 0;}
+						draggable:function(){return !this.top && this.data.exists && this.collapsed;}
 					},
 					data:function(){
 						return {
