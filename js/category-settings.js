@@ -153,16 +153,7 @@ module.exports = (function(){
 							},
 							set:function(v){
 								var num = Math.max(0, parseInt(v));
-								if(num > 0){
-									if(!("expect" in this.data.category)){
-										this.$set(this.data.category, "expect", num);
-									}
-									this.data.category.expect = num;
-								}else{
-									if("expect" in this.data.category){
-										this.$delete(this.data.category, "expect");
-									}
-								}
+								this.data.category.expect = num;
 							}
 						},
 						collectionActive:function(){return !!this.data.category.rowCollection;},
