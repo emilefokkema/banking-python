@@ -309,6 +309,15 @@ module.exports = (function(){
 			configurable:true,
 			enumerable:true
 		});
+		Object.defineProperty(this, '_oncePerPeriod', {value:!!data.oncePerPeriod, writable:true});
+		Object.defineProperty(this, 'oncePerPeriod', {
+			get:function(){return this._oncePerPeriod || undefined;},
+			set:function(n){
+				this._oncePerPeriod = !!n;
+			},
+			configurable:true,
+			enumerable:true
+		});
 		this.name = data.name;
 		this.categories = [];
 		(data.categories || []).map(function(cd){
@@ -318,7 +327,6 @@ module.exports = (function(){
 		});
 		this.rowCollection = data.rowCollection && new RowCollection(data.rowCollection, function(){self.removeRowCollection();}, rowDefinition);
 		this.acceptRow = data.acceptRow && new AcceptRow(data.acceptRow);
-		this.oncePerPeriod = data.oncePerPeriod || false;
 	};
 	CategorySettings.prototype = Object.create(CategorySettings.prototype, {
 		usesProperty:{
