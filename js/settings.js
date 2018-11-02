@@ -132,8 +132,7 @@ module.exports = (function(){
 							var self = this;
 							var slot1 = this.slots[self.selectedSlots[0]];
 							var slot2 = this.slots[self.selectedSlots[1]];
-							slot1.definition.columnIndex = this.selectedSlots[1];
-							slot2.definition.columnIndex = this.selectedSlots[0];
+							slot1.definition.switchPositionsWith(slot2.definition);
 							this.createSlots();
 						},
 						onSlotSelected:function(i){
