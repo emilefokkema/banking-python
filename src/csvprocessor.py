@@ -45,6 +45,6 @@ class CsvProcessor:
 		incomplete = self.getPrintedList(importer.getIncomplete())
 
 		for c in complete:
-			self.history.addItem(c['fileName'], c['file'])
+			self.history.addItem(c)
 
 		return incomplete + complete

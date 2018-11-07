@@ -47,6 +47,9 @@ class AfBij(OptionableCategory):
 	def end(self):
 		self.hasEnd = True
 
+	def getFrom(self):
+		return self.first['date']
+
 	def makeFileName(self):
 		return self.first['date'].strftime(r'%Y-%m-%d')+self.last['date'].strftime(r'%Y-%m-%d')
 
@@ -55,7 +58,7 @@ class AfBij(OptionableCategory):
 			self.af.printSelf(printer1)
 		with printer.indent('Bij') as printer1:
 			self.bij.printSelf(printer1)
-		printer.writeLine('from',self.first['date'])
+		printer.writeLine('from',self.getFrom())
 		printer.writeLine('through',self.last['date'])
 		printer.writeLine('hasBeginning', self.hasBeginning)
 		printer.writeLine('hasEnd', self.hasEnd)
@@ -66,6 +69,7 @@ class PeriodFile:
 
 	def printSelf(self, printer):
 		printer.writeLine('fileName', self.period.makeFileName())
+		printer.writeLine('date', self.period.getFrom())
 		with printer.indent('file') as printer1:
 			self.period.printSelf(printer1)
 

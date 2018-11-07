@@ -746,7 +746,7 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertDeepEquals(dataprovider.getItem('history'), {'entries':['2018-05-092018-05-09']})
+		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':'09-05-2018 00:00'}]})
 		assertEquals(len(result), 2)
 
 
