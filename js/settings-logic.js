@@ -352,6 +352,9 @@ module.exports = (function(){
 		},
 		addRowCollection:{
 			value:function(){
+				if(this.rowCollection){
+					return;
+				}
 				var self = this;
 				this.rowCollection = new RowCollection({properties:[]}, function(){self.removeRowCollection();}, this.rowDefinition);
 				this.rowCollection.addProperty();
