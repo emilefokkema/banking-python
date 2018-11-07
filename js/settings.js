@@ -2,7 +2,7 @@ var customCheckboxBuilder = require("./custom-checkbox.js");
 var postget = require("./postget.js");
 var columnSlot = require("./column-slot.js");
 var categorySettings = require("./category-settings.js");
-var Settings = require("./settings-logic.js")
+var Settings = require("./settings-logic/settings-logic.js")
 
 module.exports = (function(){
 	var build = function(document){
