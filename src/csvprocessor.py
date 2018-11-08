@@ -1,5 +1,16 @@
 import csv
 from src.custom import TopCategory
+from src.jsonprinter import printJson
+from src.printablelist import PrintableList
+
+class PeriodFile:
+	def __init__(self, period):
+		self.period = period
+
+	def printSelf(self, printer):
+		printer.writeLine('fileName', self.period.makeFileName())
+		with printer.indent('file') as printer1:
+			self.period.printSelf(printer1)
 
 class CsvProcessor:
 	def __init__(self, rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst):
@@ -39,4 +50,4 @@ class CsvProcessor:
 		for c in complete:
 			self.history.addItem(c)
 
-		return incomplete + complete
+		return printJson(PrintableList([PeriodFile(period) for period in incomplete + complete]))

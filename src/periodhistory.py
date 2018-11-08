@@ -10,13 +10,13 @@ class PeriodHistory:
 		history = self.dataProvider.getItem(self.historyKey)
 		return {'entries':[]} if not history else history
 
-	def addItem(self, periodFile):
-		periodFile = printJson(periodFile)
+	def addItem(self, period):
 		history = self.getHistory()
-		fileName = periodFile['fileName']
-		file = periodFile['file']
+		fileName = period.makeFileName()
+		date = period.getFrom()
+		file = printJson(period)
 		if not fileName in [entry['fileName'] for entry in history['entries']]:
-			history['entries'].append({'fileName':fileName,'date':periodFile['date']})
+			history['entries'].append({'fileName':fileName,'date':date})
 		self.dataProvider.setItem(self.historyKey, history)
 		self.dataProvider.setItem(fileName, file)
 

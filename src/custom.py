@@ -63,16 +63,6 @@ class AfBij(OptionableCategory):
 		printer.writeLine('hasBeginning', self.hasBeginning)
 		printer.writeLine('hasEnd', self.hasEnd)
 
-class PeriodFile:
-	def __init__(self, period):
-		self.period = period
-
-	def printSelf(self, printer):
-		printer.writeLine('fileName', self.period.makeFileName())
-		printer.writeLine('date', self.period.getFrom())
-		with printer.indent('file') as printer1:
-			self.period.printSelf(printer1)
-
 class TopCategory:
 	def __init__(self, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration):
 		self.categoriesConfiguration = categoriesConfiguration
@@ -92,10 +82,10 @@ class TopCategory:
 		self.categories.append(self.currentCategory)
 
 	def getComplete(self):
-		return PrintableList([PeriodFile(cat) for cat in self.categories if cat.isComplete()])
+		return [cat for cat in self.categories if cat.isComplete()]
 
 	def getIncomplete(self):
-		return PrintableList([PeriodFile(cat) for cat in self.categories if not cat.isComplete()])
+		return [cat for cat in self.categories if not cat.isComplete()]
 
 	def addDayRows(self, rows):
 		if any((self.currentCategory.acceptsRowInDuplicate(row) for row in rows)):
