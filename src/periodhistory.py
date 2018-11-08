@@ -15,15 +15,22 @@ class PeriodHistory:
 		fileName = period.makeFileName()
 		date = period.getFrom()
 		file = printJson(period)
-		if not fileName in [entry['fileName'] for entry in history['entries']]:
+		if self.index(history, fileName) == -1:
 			history['entries'].append({'fileName':fileName,'date':date})
 		self.dataProvider.setItem(self.historyKey, history)
 		self.dataProvider.setItem(fileName, file)
 
+	def index(self, history, fileName):
+		for index, entry in enumerate(history['entries']):
+			if entry['fileName'] == fileName:
+				return index;
+		return -1
+
 	def removeItem(self, key):
 		history = self.getHistory()
-		if key in history['entries']:
-			history['entries'].remove(key)
+		index = self.index(history, key)
+		if index > -1:
+			history['entries'].pop(index)
 			self.dataProvider.deleteItem(key)
 		if len(history['entries']) == 0:
 			self.dataProvider.deleteItem(self.historyKey)
