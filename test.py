@@ -747,6 +747,18 @@ class TestOneComplete(CsvProcessorTest):
 		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
 		assertEquals(len(result), 2)
 
+@test
+class TestHistoryRemove:
+
+	def test(self):
+		dataprovider = MockDataProvider()
+		dataprovider.setItem('history', {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
+		history = PeriodHistory(dataprovider)
+
+		history.removeItem('2018-05-092018-05-09')
+
+		assertEquals(dataprovider.getItem('history'), None)
+
 
 def runTests():
 	failed = []
