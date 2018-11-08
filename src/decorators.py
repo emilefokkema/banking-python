@@ -1,4 +1,5 @@
 import json
+from src.customjson import CustomEncoder
 import traceback
 
 def wraps(wrapper):
@@ -16,7 +17,7 @@ def returnsJson(f):
         tupleReturned = isinstance(result, tuple)
         if tupleReturned:
             (result, *rest) = result
-        result = json.dumps(result)
+        result = json.dumps(result, cls=CustomEncoder)
         if tupleReturned:
             return tuple([result] + rest)
         else:
