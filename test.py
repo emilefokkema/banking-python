@@ -254,7 +254,7 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 			'items':[
 				{
 					'properties':[
-						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'date','type':'date','value':datetime(2018,5,9)},
 						{'name':'infoPart','type':'string','value':'lincoln'},
 						{'name':'amount','type':'amount','value':3467}
 					]
@@ -291,7 +291,7 @@ class RowCollectionTestWithStringConversionNoMatch(RowCollectionTest):
 			'items':[
 				{
 					'properties':[
-						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'date','type':'date','value':datetime(2018,5,9)},
 						{'name':'infoPart','type':'string','value':''},
 						{'name':'amount','type':'amount','value':3467}
 					]
@@ -324,7 +324,7 @@ class RowCollectionTestWithDateConversion(RowCollectionTest):
 			'items':[
 				{
 					'properties':[
-						{'name':'date','type':'date','value':'08-05-2018 12:34'},
+						{'name':'date','type':'date','value':datetime(2018,5,8,12,34)},
 						{'name':'amount','type':'amount','value':3467}
 					]
 				}
@@ -371,7 +371,7 @@ class RowCollectionTestWithDefault(RowCollectionTest):
 				{
 					'properties':[
 						{'name':'direction', 'type':'direction', 'value':Direction.INCOMING.value},
-						{'name':'date','type':'date','value':'09-05-2018 00:00'},
+						{'name':'date','type':'date','value':datetime(2018,5,9)},
 						{'name':'amount','type':'amount','value':3467},
 						{'name':'info','type':'string','value':'something on 08/05/2018 12:34'}
 					]
@@ -514,7 +514,7 @@ class TestCategoryWithExpectationExceeded(CategoryTest):
 			'expectation':{
 				'expected':1,
 				'actual':3,
-				'dates':['09-05-2018 00:00','09-05-2018 00:00','09-05-2018 00:00']
+				'dates':[datetime(2018,5,9),datetime(2018,5,9),datetime(2018,5,9)]
 			}
 		})
 
@@ -628,7 +628,7 @@ class TestAfBijWithStart(TestAfBij):
 		afbij = self.makeAfBij()
 		afbij.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck']))
 		afbijObj = getJsonObj(afbij)
-		assertEquals(afbijObj['from'], '09-05-2018 00:00')
+		assertEquals(afbijObj['from'], datetime(2018,5,9))
 		assertEquals(afbijObj['hasBeginning'], True)
 
 @test
@@ -656,7 +656,7 @@ class TestAfBijWithLeftover(TestAfBij):
 									},
 									{
 										'name': 'date',
-										'value': '09-05-2018 00:00',
+										'value': datetime(2018,5,9),
 										'type': 'date'
 									},
 									{
@@ -744,7 +744,7 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':'09-05-2018 00:00'}]})
+		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
 		assertEquals(len(result), 2)
 
 

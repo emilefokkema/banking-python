@@ -27,8 +27,8 @@ class JsonPrinter(object):
 		self.object = obj
 
 	def sanitizeValue(self, value):
-		if isinstance(value, datetime):
-			return value.strftime(r'%d-%m-%Y %H:%M')
+		# if isinstance(value, datetime):
+		# 	return value.strftime(r'%d-%m-%Y %H:%M')
 		if isinstance(value, Enum):
 			return value.value
 		return value
