@@ -1,7 +1,7 @@
 from src.rowfactory import RowFactory
 from src.rowcheckerfactory import RowCheckerFactory
 from src.rowcollection import RowCollectionFactory
-from src.jsonprinter import JsonPrinter
+from src.jsonprinter import printJson
 from src.csvprocessor import CsvProcessor
 from src.cat import OptionableCategory
 from src.custom import AfBij
@@ -17,9 +17,7 @@ def test(testClass):
 	return testClass
 
 def getJsonObj(printable):
-	printer = JsonPrinter()
-	printable.printSelf(printer)
-	return printer.getObj()
+	return printJson(printable)
 
 class TestFailure(BaseException):
 	pass

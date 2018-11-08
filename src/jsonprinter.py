@@ -62,3 +62,8 @@ class JsonListPrinter(JsonPrinter):
 
 	def indent(self, key):
 		raise Exception('list writer cannot')
+
+def printJson(printable):
+	printer = JsonPrinter()
+	printable.printSelf(printer)
+	return printer.getObj()

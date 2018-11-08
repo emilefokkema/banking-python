@@ -1,3 +1,5 @@
+from src.jsonprinter import printJson
+
 class PeriodHistory:
 	historyKey = 'history'
 
@@ -9,6 +11,7 @@ class PeriodHistory:
 		return {'entries':[]} if not history else history
 
 	def addItem(self, periodFile):
+		periodFile = printJson(periodFile)
 		history = self.getHistory()
 		fileName = periodFile['fileName']
 		file = periodFile['file']

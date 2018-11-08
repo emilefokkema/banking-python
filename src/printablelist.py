@@ -11,6 +11,9 @@ class PrintableList:
 	def __getitem__(self, key):
 		return self.items[key]
 
+	def __add__(self, other):
+		return PrintableList(self.items + other.items)
+
 	def append(self, obj):
 		self.items.append(obj)
 

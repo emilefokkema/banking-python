@@ -1,9 +1,6 @@
 import csv
 from src.custom import TopCategory
 
-from src.jsonprinter import JsonPrinter
-from src.domainexception import DomainException
-
 class CsvProcessor:
 	def __init__(self, rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst):
 		self.rowFactory = rowFactory
@@ -12,11 +9,6 @@ class CsvProcessor:
 		self.categoriesConfiguration = categoriesConfiguration
 		self.ignoreFirst = ignoreFirst
 		self.history = history
-
-	def getPrintedList(self, printableList):
-		printer = JsonPrinter()
-		printableList.printSelf(printer)
-		return printer.getObj()
 
 	def getSkippingReader(self, iterable):
 		counter = 0
@@ -41,8 +33,8 @@ class CsvProcessor:
 		for dayRows in rowsByDay:
 			importer.addDayRows(dayRows[1])
 
-		complete = self.getPrintedList(importer.getComplete())
-		incomplete = self.getPrintedList(importer.getIncomplete())
+		complete = importer.getComplete()
+		incomplete = importer.getIncomplete()
 
 		for c in complete:
 			self.history.addItem(c)

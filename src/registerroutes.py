@@ -7,6 +7,7 @@ from src.rowcheckerfactory import RowCheckerFactory
 from src.rowcollection import RowCollectionFactory
 from src.rowfactory import RowFactory
 from src.csvprocessor import CsvProcessor
+from src.jsonprinter import printJson
 
 def registerRoutes(app, accessesData, mocklogin=False, debug=False):
 
@@ -56,7 +57,7 @@ def registerRoutes(app, accessesData, mocklogin=False, debug=False):
 	    categoriesConfiguration = settings['categories']
 	    ignoreFirst = settings['ignoreFirstLine'] if 'ignoreFirstLine' in settings else False
 	    processor = CsvProcessor(rowFactory, rowCheckerFactory, rowCollectionFactory, categoriesConfiguration, history, ignoreFirst)
-	    return processor.processCsv(request.data.decode('utf-8').splitlines())
+	    return printJson(processor.processCsv(request.data.decode('utf-8').splitlines()))
 
 	@app.route('/api/delete', methods=['POST'])
 	@returnsJson
