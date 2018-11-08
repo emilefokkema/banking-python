@@ -1,5 +1,3 @@
-from enum import Enum
-
-class Direction(Enum):
+class Direction:
 	INCOMING = 1
 	OUTGOING = 2

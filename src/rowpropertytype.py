@@ -1,6 +1,4 @@
-from enum import Enum
-
-class RowPropertyType(Enum):
+class RowPropertyType:
 	DATE = 'date'
 	STRING = 'string'
 	AMOUNT = 'amount'

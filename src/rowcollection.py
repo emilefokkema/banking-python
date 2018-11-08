@@ -17,10 +17,10 @@ class Conversion:
 		self.targetType = options['type']
 		self.convert = lambda x:x
 		if sourceType == RowPropertyType.STRING:
-			if self.targetType == RowPropertyType.DATE.value:
+			if self.targetType == RowPropertyType.DATE:
 				pattern = options['pattern']
 				self.convert = lambda x:datetime.strptime(finddate(pattern, x), pattern)
-			if self.targetType == RowPropertyType.STRING.value:
+			if self.targetType == RowPropertyType.STRING:
 				pattern = options['match']
 				self.convert = lambda x:findMatchOrEmpty(pattern, x)
 	

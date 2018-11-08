@@ -26,15 +26,8 @@ class JsonPrinter(object):
 		self.written = True
 		self.object = obj
 
-	def sanitizeValue(self, value):
-		# if isinstance(value, datetime):
-		# 	return value.strftime(r'%d-%m-%Y %H:%M')
-		if isinstance(value, Enum):
-			return value.value
-		return value
-
 	def writeLine(self, key, value):
-		self.object[key] = self.sanitizeValue(value)
+		self.object[key] = value
 		self.written = True
 
 	def __enter__(self):
@@ -52,7 +45,7 @@ class JsonListPrinter(JsonPrinter):
 		self.object = []
 
 	def addValue(self, obj):
-		self.object.append(self.sanitizeValue(obj))
+		self.object.append(obj)
 
 	def indentItem(self):
 		return JsonPrinter(lambda obj,written:self.addValue(obj) if written else 0)

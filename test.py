@@ -370,7 +370,7 @@ class RowCollectionTestWithDefault(RowCollectionTest):
 			'items':[
 				{
 					'properties':[
-						{'name':'direction', 'type':'direction', 'value':Direction.INCOMING.value},
+						{'name':'direction', 'type':'direction', 'value':Direction.INCOMING},
 						{'name':'date','type':'date','value':datetime(2018,5,9)},
 						{'name':'amount','type':'amount','value':3467},
 						{'name':'info','type':'string','value':'something on 08/05/2018 12:34'}
@@ -651,7 +651,7 @@ class TestAfBijWithLeftover(TestAfBij):
 								'properties':[
 									{
 										'name': 'direction',
-										'value': Direction.OUTGOING.value,
+										'value': Direction.OUTGOING,
 										'type': 'direction'
 									},
 									{
