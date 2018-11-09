@@ -746,6 +746,22 @@ class TestOneComplete(CsvProcessorTest):
 		result = processor.processCsv(rows)
 		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
 		assertEquals(len(result), 2)
+		assertDeepEquals(result[0],{
+			'fileName': '2018-06-092018-06-09',
+			'file': {
+				'Bij': {
+					'name': 'in',
+					'total': 6500,
+					'categories': [
+						{'name': 'paycheck', 'total': 6500}
+						]
+					},
+				'from': datetime(2018, 6, 9, 0, 0),
+				'through': datetime(2018, 6, 9, 0, 0),
+				'hasBeginning': True,
+				'hasEnd': False
+			}
+		})
 
 @test
 class TestHistoryRemove:
@@ -758,6 +774,18 @@ class TestHistoryRemove:
 		history.removeItem('2018-05-092018-05-09')
 
 		assertEquals(dataprovider.getItem('history'), None)
+
+@test
+class TestHistoryAll:
+
+	def test(self):
+		dataprovider = MockDataProvider()
+		dataprovider.setItem('history', {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
+		dataprovider.setItem('2018-05-092018-05-09', {'foo':'bar'})
+		history = PeriodHistory(dataprovider)
+		all = history.getAll()
+
+		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09', 'file':{'foo':'bar'}}])
 
 
 def runTests():
