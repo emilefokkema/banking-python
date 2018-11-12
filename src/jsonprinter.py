@@ -1,5 +1,13 @@
 from datetime import datetime
 from enum import Enum
+
+class PrintableDict:
+	def __init__(self, d):
+		self.dict = d
+
+	def printSelf(self, printer):
+		printer._useObj(self.dict)
+
 class JsonPrinter(object):
 	def __init__(self, doexit = None):
 		self.object = {}
@@ -11,6 +19,10 @@ class JsonPrinter(object):
 
 	def getObj(self):
 		return self.object
+
+	def _useObj(self, o):
+		self.written = any(p for p in o)
+		self.object = o
 
 	def indent(self, key):
 		return JsonPrinter(lambda obj,written:self.endIndent(key, obj, written))
