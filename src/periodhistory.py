@@ -1,4 +1,6 @@
 from src.jsonprinter import printJson
+from src.periodfile import PeriodFile
+from src.printablelist import PrintableList
 
 class PeriodHistory:
 	historyKey = 'history'
@@ -38,11 +40,7 @@ class PeriodHistory:
 			self.dataProvider.setItem(self.historyKey, history)
 
 	def getAll(self):
-		result = []
 		history = self.getHistory()
-		for key in history['entries']:
-			result.append({
-				'fileName':key['fileName'],
-				'file':self.dataProvider.getItem(key['fileName'])
-			})
-		return result
+		fileNames = (entry['fileName'] for entry in history['entries'])
+		result = [PeriodFile.fromPeriodObj(fileName, self.dataProvider.getItem(fileName)) for fileName in fileNames]
+		return printJson(PrintableList(result))
