@@ -2,6 +2,15 @@ from src.jsonprinter import printJson
 from src.periodfile import PeriodFile
 from src.printablelist import PrintableList
 
+class HistoryEntry:
+	def __init__(self, period):
+		self.fileName = period.makeFileName()
+		self.date = period.getFrom()
+
+	def printSelf(self, printer):
+		printer.writeLine('fileName', self.fileName)
+		printer.writeLine('date', self.date)
+
 class PeriodHistory:
 	historyKey = 'history'
 
@@ -14,11 +23,11 @@ class PeriodHistory:
 
 	def addItem(self, period):
 		history = self.getHistory()
-		fileName = period.makeFileName()
-		date = period.getFrom()
+		entry = HistoryEntry(period)
+		fileName = entry.fileName
 		file = printJson(period)
 		if self.index(history, fileName) == -1:
-			history['entries'].append({'fileName':fileName,'date':date})
+			history['entries'].append(printJson(entry))
 		self.dataProvider.setItem(self.historyKey, history)
 		self.dataProvider.setItem(fileName, file)
 
