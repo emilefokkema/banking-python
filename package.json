@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run watch\" \"npm run start\"",
+    "devcodeanywhere":"concurrently --kill-others \"npm run watch\" \"npm run startcodeanywhere\"",
     "devgoogle": "concurrently --kill-others \"npm run watch\" \"npm run startgoogle\"",
     "start": "python mainlocal.py",
-    "startgoogle":"python main.py",
+    "startcodeanywhere":"python mainlocal.py --host 0.0.0.0 --mocklogin --port 3000",
+    "startgoogle": "python main.py",
     "build": "browserify js/main.js | minify --js > static/dist/main.js",
     "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose"
   },
