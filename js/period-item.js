@@ -102,6 +102,7 @@ module.exports = (function(){
 							template:document.getElementById("categoryTemplate").innerHTML
 						},
 						'date':date,
+						'amount':amount,
 						'remove-button':{
 							methods:{
 								click:function(){

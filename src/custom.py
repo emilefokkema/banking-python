@@ -58,6 +58,7 @@ class AfBij(OptionableCategory):
 			self.af.printSelf(printer1)
 		with printer.indent('Bij') as printer1:
 			self.bij.printSelf(printer1)
+		printer.writeLine('balance', self.bij.totalCents - self.af.totalCents)
 		printer.writeLine('from',self.getFrom())
 		printer.writeLine('through',self.last['date'])
 		printer.writeLine('hasBeginning', self.hasBeginning)

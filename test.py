@@ -759,7 +759,8 @@ class TestOneComplete(CsvProcessorTest):
 				'from': datetime(2018, 6, 9, 0, 0),
 				'through': datetime(2018, 6, 9, 0, 0),
 				'hasBeginning': True,
-				'hasEnd': False
+				'hasEnd': False,
+				'balance':6500
 			}
 		})
 

@@ -87,7 +87,12 @@
 		</script>
 		<script type="text/template" id="periodItemTemplate">
 			<div class="panel period-list-item" v-bind:class="{'removing':isRemoving,'with-end':data.hasEnd, 'with-beginning':data.hasBeginning, 'collapsed':collapsed}">
-				<div class="panel-header"><span class="panel-title" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span> <remove-button v-if="data.hasEnd && data.hasBeginning" v-on:click="remove"></remove-button></div>
+				<div class="panel-header">
+					<span class="panel-title" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span>
+					<div class="right">
+						<amount v-if="collapsed" v-bind:numberOfCents="data.balance"></amount>
+						<remove-button v-if="data.hasEnd && data.hasBeginning" v-on:click="remove"></remove-button></div>
+					</div>
 				<div class="panel-body">
 					<category v-bind:top="true" v-bind:categoryData="data.Bij" v-if="data.Bij"></category>
 					<category v-bind:top="true" v-bind:categoryData="data.Af" v-if="data.Af"></category>

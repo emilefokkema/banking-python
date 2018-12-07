@@ -59,9 +59,15 @@ body{
 	padding: 2px;
 	color:#777;
 }
+.panel-header .right{
+	display: inline-block;
+	float: right;
+}
+.right .amount{
+	float: unset;
+}
 .remove-button{
 	cursor: pointer;
-  float:right;
 }
 #app{
 	margin: 20px;
