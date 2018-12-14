@@ -1,5 +1,6 @@
 import json
 from src.customjson import CustomEncoder, CustomDecoder
+from src.filterlikegoogle import filterItemLikeGoogle
 import os
 
 class ItemSet:
@@ -33,7 +34,9 @@ class ItemSet:
 			filePath = self._getFilePath(i)
 			if os.path.exists(filePath):
 				with open(filePath, 'r') as file:
-					result.append(json.load(file, cls=CustomDecoder))
+					item = json.load(file, cls=CustomDecoder)
+					if filterItemLikeGoogle(item, filters):
+						result.append(item)
 		return result
 
 

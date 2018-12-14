@@ -9,6 +9,7 @@ from datetime import datetime
 from src.direction import Direction
 from src.periodhistory import PeriodHistory
 import traceback
+from src.filterlikegoogle import filterItemLikeGoogle
 
 testClasses = []
 
@@ -696,7 +697,7 @@ class MockDataProvider:
 	def getItems(self, kind=None, filters=()):
 		if not kind in self.sets:
 			return []
-		return self.sets[kind]
+		return [item for item in self.sets[kind] if filterItemLikeGoogle(item, filters)]
 
 	def addItem(self, item, kind=None):
 		if not kind in self.sets:
@@ -798,6 +799,20 @@ class TestHistoryAll:
 		all = history.getAll()
 
 		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09', 'file':{'foo':'bar'}}])
+
+@test
+class TestFilteringLikeGoogle:
+
+	def test(self):
+		item1 = {'value':7,'name':'emile'}
+		item2 = {'value':10,'name':'harry'}
+		filters1 = ('value','>',8),
+		filters2 = ('value','<',20),('name','=','emile')
+
+		assertEquals(filterItemLikeGoogle(item1, filters1), False)
+		assertEquals(filterItemLikeGoogle(item1, filters2), True)
+		assertEquals(filterItemLikeGoogle(item2, filters1), True)
+		assertEquals(filterItemLikeGoogle(item2, filters2), False)
 
 
 def runTests():
