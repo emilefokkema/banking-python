@@ -26,6 +26,10 @@ class DataStoreDataProvider:
 			query.add_filter(*_filter)
 		return query.fetch()
 
+	def removeItems(self, kind=None, filters=()):
+		for item in [*self.getItems(kind, filters)]:
+			self.datastore_client.delete(item.key)
+
 	def addItem(self, item, kind=None):
 		key = self.datastore_client.key(kind, ancestor=self.ancestor_key)
 		entity = datastore.Entity(key=key)

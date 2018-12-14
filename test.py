@@ -699,6 +699,11 @@ class MockDataProvider:
 			return []
 		return [item for item in self.sets[kind] if filterItemLikeGoogle(item, filters)]
 
+	def removeItems(self, kind=None, filters=()):
+		if not kind in self.sets:
+			return
+		self.sets[kind] = [item for item in self.sets[kind] if not filterItemLikeGoogle(item, filters)]
+
 	def addItem(self, item, kind=None):
 		if not kind in self.sets:
 			self.sets[kind] = []

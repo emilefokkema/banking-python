@@ -12,8 +12,7 @@ class ItemSet:
 		self.counterPath = self.dirname + '/counter.json'
 		self.counter = 0
 		if not os.path.exists(self.counterPath):
-			with open(self.counterPath, 'w') as file:
-				json.dump({'count':self.counter}, file, cls=CustomEncoder)
+			self._writeCounter()
 		else:
 			with open(self.counterPath, 'r') as file:
 				counterObj = json.load(file, cls=CustomDecoder)
@@ -22,22 +21,41 @@ class ItemSet:
 	def _getFilePath(self, counter):
 		return self.dirName + '/' + self.kind + str(counter) + '.json'
 
+	def _writeCounter(self):
+		with open(self.counterPath, 'w') as file:
+			json.dump({'count':self.counter}, file, cls=CustomEncoder)
+
 	def add(self, item):
 		self.counter += 1
 		filePath = self._getFilePath(self.counter)
 		with open(filePath, 'w') as file:
 			json.dump(item, file, cls=CustomEncoder)
+		self._writeCounter()
 
-	def getAll(self, filters):
-		result = []
+	def _getExistingPaths(self):
 		for i in range(1, self.counter + 1):
 			filePath = self._getFilePath(i)
 			if os.path.exists(filePath):
-				with open(filePath, 'r') as file:
-					item = json.load(file, cls=CustomDecoder)
-					if filterItemLikeGoogle(item, filters):
-						result.append(item)
+				yield filePath
+
+	def _getExisting(self):
+		for filePath in self._getExistingPaths():
+			with open(filePath, 'r') as file:
+				item = json.load(file, cls=CustomDecoder)
+				yield filePath, item
+
+	def getAll(self, filters):
+		result = []
+		for filePath, item in self._getExisting():
+			if filterItemLikeGoogle(item, filters):
+				result.append(item)
+		
 		return result
+
+	def remove(self, filters):
+		for filePath, item in self._getExisting():
+			if filterItemLikeGoogle(item, filters):
+				os.remove(filePath)
 
 
 class DataProvider:
@@ -56,6 +74,9 @@ class DataProvider:
 
 	def getItems(self, kind=None, filters=()):
 		return ItemSet(self.dirname, kind).getAll(filters)
+
+	def removeItems(self, kind=None, filters=()):
+		ItemSet(self.dirname, kind).remove(filters)
 
 	def addItem(self, item, kind=None):
 		ItemSet(self.dirname, kind).add(item)
