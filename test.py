@@ -680,6 +680,7 @@ class TestAfBijWithLeftover(TestAfBij):
 class MockDataProvider:
 	def __init__(self):
 		self.obj = {}
+		self.sets = {}
 
 	def getItem(self, key):
 		if key in self.obj:
@@ -691,6 +692,16 @@ class MockDataProvider:
 
 	def deleteItem(self, key):
 		self.obj.pop(key, None)
+
+	def getItems(self, kind=None, filters=()):
+		if not kind in self.sets:
+			return []
+		return self.sets[kind]
+
+	def addItem(self, item, kind=None):
+		if not kind in self.sets:
+			self.sets[kind] = []
+		self.sets[kind].append(item)
 
 class CsvProcessorTest(CategoryTest):
 

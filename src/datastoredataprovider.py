@@ -20,6 +20,18 @@ class DataStoreDataProvider:
 		result = self.datastore_client.get(itemKey)
 		return result
 
+	def getItems(self, kind=None, filters=()):
+		query = self.datastore_client.query(kind=kind, ancestor=self.ancestor_key)
+		for _filter in filters:
+			query.add_filter(*_filter)
+		return query.fetch()
+
+	def addItem(self, item, kind=None):
+		key = self.datastore_client.key(kind, ancestor=self.ancestor_key)
+		entity = datastore.Entity(key=key)
+		entity.update(item)
+		self.datastore_client.put(entity)
+
 	def setItem(self, key, item):
 		itemKey = self._getItemKey(key)
 		entity = datastore.Entity(key=itemKey)
