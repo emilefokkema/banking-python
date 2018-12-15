@@ -761,7 +761,7 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertDeepEquals(dataprovider.getItem('history'), {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
+		assertDeepEquals(dataprovider.getItems(kind='historyitem'), [{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}])
 		assertEquals(len(result), 2)
 		assertDeepEquals(result[0],{
 			'fileName': '2018-06-092018-06-09',
@@ -786,19 +786,19 @@ class TestHistoryRemove:
 
 	def test(self):
 		dataprovider = MockDataProvider()
-		dataprovider.setItem('history', {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
+		dataprovider.addItem({'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}, kind='historyitem')
 		history = PeriodHistory(dataprovider)
 
 		history.removeItem('2018-05-092018-05-09')
 
-		assertEquals(dataprovider.getItem('history'), None)
+		assertEquals(dataprovider.getItems(kind='historyitem'), [])
 
 @test
 class TestHistoryAll:
 
 	def test(self):
 		dataprovider = MockDataProvider()
-		dataprovider.setItem('history', {'entries':[{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}]})
+		dataprovider.addItem({'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}, kind='historyitem')
 		dataprovider.setItem('2018-05-092018-05-09', {'foo':'bar'})
 		history = PeriodHistory(dataprovider)
 		all = history.getAll()
