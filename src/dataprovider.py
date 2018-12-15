@@ -6,10 +6,10 @@ import os
 class ItemSet:
 	def __init__(self, dirName, kind):
 		self.kind = kind
-		self.dirName = dirname + '/' + kind
+		self.dirName = dirName + '/' + kind
 		if not os.path.isdir(self.dirName):
 			os.mkdir(self.dirName)
-		self.counterPath = self.dirname + '/counter.json'
+		self.counterPath = self.dirName + '/counter.json'
 		self.counter = 0
 		if not os.path.exists(self.counterPath):
 			self._writeCounter()
@@ -39,10 +39,12 @@ class ItemSet:
 				yield filePath
 
 	def _getExisting(self):
+		result = []
 		for filePath in self._getExistingPaths():
 			with open(filePath, 'r') as file:
 				item = json.load(file, cls=CustomDecoder)
-				yield filePath, item
+				result.append((filePath, item))
+		return result
 
 	def getAll(self, filters):
 		result = []
