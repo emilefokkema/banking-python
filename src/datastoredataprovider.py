@@ -31,7 +31,7 @@ class DataStoreDataProvider:
 			self.datastore_client.delete(item.key)
 
 	def addItem(self, item, kind=None):
-		key = self.datastore_client.key(kind, ancestor=self.ancestor_key)
+		key = self.datastore_client.key(kind, parent=self.ancestor_key)
 		entity = datastore.Entity(key=key)
 		entity.update(item)
 		self.datastore_client.put(entity)
