@@ -29,6 +29,9 @@ class PeriodHistory:
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):
-		fileNames = (entry['fileName'] for entry in self.dataProvider.getItems(kind='historyitem'))
+		items = [*self.dataProvider.getItems(kind='historyitem')]
+		items.sort(key=lambda i:i['date'])
+		fileNames = (entry['fileName'] for entry in items)
 		result = [PeriodFile.fromPeriodObj(fileName, self.dataProvider.getItem(fileName)) for fileName in fileNames]
+
 		return printJson(PrintableList(result))
