@@ -21,11 +21,15 @@ class PeriodHistory:
 		entry = HistoryEntry(period)
 		file = printJson(period)
 		fileName = entry.fileName
+		self._removeHistoryItem(fileName)
 		self.dataProvider.addItem(printJson(entry), kind='historyitem')
 		self.dataProvider.setItem(fileName, file)
 
+	def _removeHistoryItem(self, fileName):
+		self.dataProvider.removeItems(kind='historyitem',filters=(('fileName','=',fileName),))
+
 	def removeItem(self, key):
-		self.dataProvider.removeItems(kind='historyitem',filters=(('fileName','=',key),))
+		self._removeHistoryItem(key)
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):

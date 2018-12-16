@@ -805,6 +805,31 @@ class TestHistoryAll:
 
 		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09', 'file':{'foo':'bar'}}])
 
+class MockPeriod:
+	def printSelf(self, printer):
+		printer.writeLine('foo','bar')
+
+	def makeFileName(self):
+		return 'fileName'
+
+	def getFrom(self):
+		return datetime(2018,1,1)
+
+@test
+class TestHistoryNoDuplicateFileNames:
+
+	def test(self):
+		dataprovider = MockDataProvider()
+		history = PeriodHistory(dataprovider)
+		period = MockPeriod()
+
+		history.addItem(period)
+		history.addItem(period)
+
+		items = history.getAll()
+		assertEquals(len(items), 1)
+
+
 @test
 class TestFilteringLikeGoogle:
 
