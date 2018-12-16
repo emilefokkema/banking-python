@@ -29,7 +29,7 @@ class PeriodHistory:
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):
-		items = [*self.dataProvider.getItems(kind='historyitem')]
+		items = list(self.dataProvider.getItems(kind='historyitem'))
 		items.sort(key=lambda i:i['date'])
 		fileNames = (entry['fileName'] for entry in items)
 		result = [PeriodFile.fromPeriodObj(fileName, self.dataProvider.getItem(fileName)) for fileName in fileNames]
