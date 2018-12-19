@@ -7,19 +7,29 @@ module.exports = (function(){
 		var date = dateBuilder.build(document);
 		return {
 					props:{
-						data:Object,
+						initialData:Object,
 						fileName:String,
 						loadingstatus: Object
 					},
 					data:function(){
 						return {
 							isRemoving:false,
-							collapsed:true
+							collapsed:true,
+							retrievedData:undefined
 						}
 					},
 					mounted:function(){
+						var self = this;
 						if(!this.data){
-							console.log("I have no data!");
+							console.log("No data! going to get period '"+this.fileName+"'");
+							var loading = this.loadingstatus.getIncomplete();
+							postget.doGet("api/period/"+this.fileName, function(data){
+								self.retrievedData = data;
+								loading.complete();
+							},function(msg){
+								self.$emit("error", msg);
+								loading.complete();
+							});
 						}
 					},
 					computed:{
@@ -31,6 +41,9 @@ module.exports = (function(){
 						},
 						hasEnd:function(){
 							return this.data && this.data.hasEnd;
+						},
+						data:function(){
+							return this.initialData || this.retrievedData;
 						}
 					},
 					methods:{

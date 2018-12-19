@@ -40,6 +40,13 @@ def registerRoutes(app, accessesData, mocklogin=False, debug=False):
 	    history = PeriodHistory(dataprovider)
 	    return history.getAll()
 
+	@app.route('/api/period/<filename>')
+	@returnsJson
+	@catchesException
+	@accessesData
+	def get_period(dataprovider, filename=None):
+	    return dataprovider.getItem(filename)
+
 	@app.route('/api/csv', methods=['POST'])
 	@returnsJson
 	@catchesException

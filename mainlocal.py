@@ -6,8 +6,8 @@ from src.registerroutes import registerRoutes
 
 @wraps
 def accessesData(f):
-	def wrap():
-		return f(DataProvider())
+	def wrap(*args, **kwargs):
+		return f(DataProvider(), *args, **kwargs)
 	return wrap
 
 app = Flask(__name__)

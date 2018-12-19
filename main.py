@@ -26,7 +26,7 @@ firebase_request_adapter = requests.Request()
 
 @wraps
 def accessesData(f):
-    def wrap():
+    def wrap(*args, **kwargs):
         claims = None
         error_message = None
         # Verify Firebase auth.
@@ -50,7 +50,7 @@ def accessesData(f):
         if error_message:
             return error_message, 500
         dataprovider = DataStoreDataProvider(datastore_client, claims['email'])
-        return f(dataprovider)
+        return f(dataprovider, *args, **kwargs)
     return wrap
 
 app = Flask(__name__)

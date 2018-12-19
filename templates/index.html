@@ -328,16 +328,16 @@
 		<div id="app">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:signout="signOut" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus" v-bind:loggedinname="loggedInName"></settings>
 			<div v-if="loggedIn">
-				<period-item v-for="period in incompleteEndingPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
+				<period-item v-for="period in incompleteEndingPeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div v-if="loggedIn">
-				<period-item v-for="period in completePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
+				<period-item v-for="period in completePeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
 			</div>
 			<div v-if="loggedIn">
-				<period-item v-for="period in incompletePeriods" v-bind:data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
+				<period-item v-for="period in incompletePeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName" v-on:removal="onRemovePeriod" v-on:error="displayError" :key="period.fileName" v-bind:loadingstatus="loadingStatus"></period-item>
 			</div>
 			<div v-if="loggedIn">
-				<period-item v-for="period in incompleteBeginningPeriods" v-bind:data="period.file" v-bind:file-name="period.fileName"></period-item>
+				<period-item v-for="period in incompleteBeginningPeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>
 			<div v-if="!settingsDirty && settingsSaved && loggedIn">
 				<input type="file" ref="file" name="file" id="file" accept=".csv" class="file-input" v-on:change="fileNameChange"/><label class="input" for="file">{{fileName || "Choose a file"}}</label>
