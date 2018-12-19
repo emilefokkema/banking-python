@@ -146,6 +146,15 @@ body{
     width:80%;
     display:block;
   }
+  #app{
+  	margin:0px;
+  }
+  .panel{
+  	margin:0px;
+  }
+  .period-list-item.with-beginning{
+  	border-top: none;
+  }
 }
 .drag-slot-inner{
 	display: none;
