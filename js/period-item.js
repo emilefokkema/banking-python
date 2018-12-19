@@ -17,9 +17,20 @@ module.exports = (function(){
 							collapsed:true
 						}
 					},
+					mounted:function(){
+						if(!this.data){
+							console.log("I have no data!");
+						}
+					},
 					computed:{
 						periodDescription:function(){
 							return this.data.from.toLocaleDateString("nl-NL",{day:"numeric",month:"long"}) + " - " + this.data.through.toLocaleDateString("nl-NL",{day:"numeric",month:"long"});
+						},
+						hasBeginning:function(){
+							return this.data && this.data.hasBeginning;
+						},
+						hasEnd:function(){
+							return this.data && this.data.hasEnd;
 						}
 					},
 					methods:{

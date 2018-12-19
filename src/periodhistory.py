@@ -36,6 +36,6 @@ class PeriodHistory:
 		items = list(self.dataProvider.getItems(kind='historyitem'))
 		items.sort(key=lambda i:i['date'])
 		fileNames = (entry['fileName'] for entry in items)
-		result = [PeriodFile.fromPeriodObj(fileName, self.dataProvider.getItem(fileName)) for fileName in fileNames]
+		result = [{'fileName':fileName} for fileName in fileNames]
 
-		return printJson(PrintableList(result))
+		return result
