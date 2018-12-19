@@ -799,11 +799,10 @@ class TestHistoryAll:
 	def test(self):
 		dataprovider = MockDataProvider()
 		dataprovider.addItem({'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}, kind='historyitem')
-		dataprovider.setItem('2018-05-092018-05-09', {'foo':'bar'})
 		history = PeriodHistory(dataprovider)
 		all = history.getAll()
 
-		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09', 'file':{'foo':'bar'}}])
+		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09'}])
 
 class MockPeriod:
 	def printSelf(self, printer):
