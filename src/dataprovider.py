@@ -46,10 +46,13 @@ class ItemSet:
 				result.append((filePath, item))
 		return result
 
-	def getAll(self, filters):
+	def getAll(self, filters, limit):
 		result = []
+		limit = limit or 0
+		resultcount = 0
 		for filePath, item in self._getExisting():
-			if filterItemLikeGoogle(item, filters):
+			resultcount += 1
+			if filterItemLikeGoogle(item, filters) and (limit == 0 or resultcount <= limit):
 				result.append(item)
 		
 		return result
@@ -74,8 +77,8 @@ class DataProvider:
 				return json.load(file, cls=CustomDecoder)
 		return None
 
-	def getItems(self, kind=None, filters=()):
-		return ItemSet(self.dirname, kind).getAll(filters)
+	def getItems(self, kind=None, filters=(), limit=None):
+		return ItemSet(self.dirname, kind).getAll(filters, limit)
 
 	def removeItems(self, kind=None, filters=()):
 		ItemSet(self.dirname, kind).remove(filters)

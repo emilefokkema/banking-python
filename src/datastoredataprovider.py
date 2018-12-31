@@ -20,11 +20,11 @@ class DataStoreDataProvider:
 		result = self.datastore_client.get(itemKey)
 		return result
 
-	def getItems(self, kind=None, filters=()):
+	def getItems(self, kind=None, filters=(), limit=None):
 		query = self.datastore_client.query(kind=kind, ancestor=self.ancestor_key)
 		for _filter in filters:
 			query.add_filter(*_filter)
-		return query.fetch()
+		return query.fetch(limit=limit)
 
 	def removeItems(self, kind=None, filters=()):
 		for item in [*self.getItems(kind, filters)]:
