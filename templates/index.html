@@ -325,8 +325,9 @@
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
 		<div id="firebaseui-auth-container"></div>
-		<div id="app">
+		<div id="app" v-bind:class="{'loading':loading}">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:signout="signOut" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus" v-bind:loggedinname="loggedInName"></settings>
+			<div class="earlier" v-if="isMore">earlier periods</div>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName"></period-item>
 			</div>

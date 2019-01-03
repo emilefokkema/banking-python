@@ -22,6 +22,7 @@
 			el:"#app",
 			data:{
 				completePeriods: [],
+				isMore:false,
 				incompleteBeginningPeriods: [],
 				incompleteEndingPeriods:[],
 				incompletePeriods:[],
@@ -81,7 +82,8 @@
 					var self = this;
 					var loading = this.loadingStatus.getIncomplete();
 					postget.doGet("/api/complete",function(data){
-						self.addCompletePeriods(data);
+						self.isMore = data.isMore;
+						self.addCompletePeriods(data.items);
 						loading.complete();
 					},function(msg){
 						self.displayError(msg);

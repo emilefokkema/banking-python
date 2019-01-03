@@ -441,3 +441,12 @@ span.toggle-collapse > .amount{
 .custom-checkbox.checked .fa-check{
 	color:#777;
 }
+.earlier{
+	font-family: sans-serif;
+	margin: 15px;
+	color: #999;
+	cursor: pointer;
+}
+.loading .earlier{
+	display: none;
+}

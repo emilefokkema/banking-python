@@ -2,6 +2,12 @@ from src.jsonprinter import printJson
 from src.periodfile import PeriodFile
 from src.printablelist import PrintableList
 
+numberOfItemsAtATime = 3
+
+def last(_list, number):
+	length = len(_list)
+	return [item for index,item in enumerate(_list) if index >= length - number]
+
 class HistoryEntry:
 	def __init__(self, period):
 		self.fileName = period.makeFileName()
@@ -33,9 +39,9 @@ class PeriodHistory:
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):
-		items = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=3))
+		items = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=numberOfItemsAtATime + 1))
 		items.sort(key=lambda i:i['date'])
-		fileNames = (entry['fileName'] for entry in items)
-		result = [{'fileName':fileName} for fileName in fileNames]
+		isMore = len(items) > numberOfItemsAtATime
+		result = last([{'fileName':entry['fileName']} for entry in items], numberOfItemsAtATime)
 
-		return result
+		return {'isMore':isMore,'items':result}
