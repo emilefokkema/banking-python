@@ -33,7 +33,7 @@ class PeriodHistory:
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):
-		items = list(self.dataProvider.getItems(kind='historyitem'))
+		items = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=3))
 		items.sort(key=lambda i:i['date'])
 		fileNames = (entry['fileName'] for entry in items)
 		result = [{'fileName':fileName} for fileName in fileNames]
