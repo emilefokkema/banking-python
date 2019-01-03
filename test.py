@@ -10,6 +10,7 @@ from src.direction import Direction
 from src.periodhistory import PeriodHistory
 import traceback
 from src.filterlikegoogle import filterItemLikeGoogle
+from src.orderedlikegoogle import orderedLikeGoogle
 
 testClasses = []
 
@@ -842,6 +843,14 @@ class TestFilteringLikeGoogle:
 		assertEquals(filterItemLikeGoogle(item1, filters2), True)
 		assertEquals(filterItemLikeGoogle(item2, filters1), True)
 		assertEquals(filterItemLikeGoogle(item2, filters2), False)
+
+@test
+class TestOrderingLikeGoogle:
+
+	def test(self):
+		items = [{'name':'b', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':1}, {'name':'a', 'age':2}]
+		result = [{'name':'a', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':2},{'name':'b', 'age':1}]
+		assertDeepEquals(orderedLikeGoogle(items, ('name', '-age')), result)
 
 
 def runTests():

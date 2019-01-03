@@ -20,8 +20,8 @@ class DataStoreDataProvider:
 		result = self.datastore_client.get(itemKey)
 		return result
 
-	def getItems(self, kind=None, filters=(), limit=None):
-		query = self.datastore_client.query(kind=kind, ancestor=self.ancestor_key)
+	def getItems(self, kind=None, filters=(), limit=None, order=()):
+		query = self.datastore_client.query(kind=kind, order=order, ancestor=self.ancestor_key)
 		for _filter in filters:
 			query.add_filter(*_filter)
 		return query.fetch(limit=limit)
