@@ -39,9 +39,12 @@ class PeriodHistory:
 		self.dataProvider.deleteItem(key)
 
 	def getAll(self):
-		items = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=numberOfItemsAtATime + 1))
-		items.sort(key=lambda i:i['date'])
-		isMore = len(items) > numberOfItemsAtATime
-		result = last([{'fileName':entry['fileName']} for entry in items], numberOfItemsAtATime)
-
-		return {'isMore':isMore,'items':result}
+		historyItems = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=numberOfItemsAtATime + 1))
+		historyItems.sort(key=lambda i:i['date'])
+		isMore = len(historyItems) > numberOfItemsAtATime
+		historyItems = last(historyItems, numberOfItemsAtATime)
+		items = [{'fileName':entry['fileName']} for entry in historyItems]
+		result = {'isMore':isMore,'items':items}
+		if len(items) > 0:
+			result['earliestDate'] = historyItems[0]['date']
+		return result

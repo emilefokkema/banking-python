@@ -23,6 +23,7 @@
 			data:{
 				completePeriods: [],
 				isMore:false,
+				earliestDate:null,
 				incompleteBeginningPeriods: [],
 				incompleteEndingPeriods:[],
 				incompletePeriods:[],
@@ -78,11 +79,25 @@
 				fileNameChange:function(){
 					this.fileName = this.$refs.file.files[0].name;
 				},
+				loadMore:function(){
+					var self = this;
+					var loading = this.loadingStatus.getIncomplete();
+					postget.doGet("/api/additional/"+this.earliestDate.toLocaleString("nl-NL",{year:"numeric",month:"numeric",day:"numeric"}),function(data){
+						self.isMore = data.isMore;
+						self.earliestDate = data.earliestDate;
+						self.prependCompletePeriods(data.items);
+						loading.complete();
+					},function(msg){
+						self.displayError(msg);
+						loading.complete();
+					});
+				},
 				refreshComplete:function(){
 					var self = this;
 					var loading = this.loadingStatus.getIncomplete();
 					postget.doGet("/api/complete",function(data){
 						self.isMore = data.isMore;
+						self.earliestDate = data.earliestDate;
 						self.addCompletePeriods(data.items);
 						loading.complete();
 					},function(msg){
@@ -98,6 +113,9 @@
 				},
 				addCompletePeriods:function(completePeriods){
 					this.completePeriods = this.completePeriods.concat(this.periodComplement(completePeriods, this.completePeriods));
+				},
+				prependCompletePeriods:function(completePeriods){
+					this.completePeriods = completePeriods.concat(this.completePeriods);
 				},
 				displayError:function(msg){
 					this.errorMessage = msg || "Internal Server Error";
