@@ -32,6 +32,14 @@ def registerRoutes(app, accessesData, mocklogin=False, debug=False):
 	def get_default_settings():
 	    return DefaultSettingsProvider().getDefaultSettings()
 
+	@app.route('/api/additional/<maxdate>')
+	@returnsJson
+	@catchesException
+	@accessesData
+	def get_additional(dataprovider, maxdate=None):
+	    history = PeriodHistory(dataprovider)
+	    return history.getAll(maxdate=maxdate)
+
 	@app.route('/api/complete')
 	@returnsJson
 	@catchesException

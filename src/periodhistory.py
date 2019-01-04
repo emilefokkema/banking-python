@@ -1,6 +1,7 @@
 from src.jsonprinter import printJson
 from src.periodfile import PeriodFile
 from src.printablelist import PrintableList
+from datetime import datetime
 
 numberOfItemsAtATime = 3
 
@@ -38,8 +39,11 @@ class PeriodHistory:
 		self._removeHistoryItem(key)
 		self.dataProvider.deleteItem(key)
 
-	def getAll(self):
-		historyItems = list(self.dataProvider.getItems(kind='historyitem', order=('-date',), limit=numberOfItemsAtATime + 1))
+	def getAll(self, maxdate=None):
+		filters = ()
+		if maxdate:
+			filters = (('date','<',datetime.strptime(maxdate, r'%Y%m%d')),)
+		historyItems = list(self.dataProvider.getItems(kind='historyitem', filters=filters, order=('-date',), limit=numberOfItemsAtATime + 1))
 		historyItems.sort(key=lambda i:i['date'])
 		isMore = len(historyItems) > numberOfItemsAtATime
 		historyItems = last(historyItems, numberOfItemsAtATime)

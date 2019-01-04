@@ -6,6 +6,9 @@
 	var Complete = require("./complete.js");
 	var periodItem = require("./period-item.js");
 	var settings = require("./settings.js");
+	var padToTwoDigits = function(number){
+		return ("0"+number).slice(-2);
+	};
 	window.addEventListener("load",function(){
 		// Initialize Firebase
 		var config = {
@@ -82,7 +85,8 @@
 				loadMore:function(){
 					var self = this;
 					var loading = this.loadingStatus.getIncomplete();
-					postget.doGet("/api/additional/"+this.earliestDate.toLocaleString("nl-NL",{year:"numeric",month:"numeric",day:"numeric"}),function(data){
+					var earliestDateString = "" + this.earliestDate.getFullYear() + padToTwoDigits(this.earliestDate.getMonth()) + padToTwoDigits(this.earliestDate.getDate());
+					postget.doGet("/api/additional/"+earliestDateString,function(data){
 						self.isMore = data.isMore;
 						self.earliestDate = data.earliestDate;
 						self.prependCompletePeriods(data.items);
