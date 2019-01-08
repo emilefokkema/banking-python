@@ -695,7 +695,7 @@ class MockDataProvider:
 	def deleteItem(self, key):
 		self.obj.pop(key, None)
 
-	def getItems(self, kind=None, filters=()):
+	def getItems(self, kind=None, filters=(), limit=None, order=()):
 		if not kind in self.sets:
 			return []
 		return [item for item in self.sets[kind] if filterItemLikeGoogle(item, filters)]
@@ -803,7 +803,7 @@ class TestHistoryAll:
 		history = PeriodHistory(dataprovider)
 		all = history.getAll()
 
-		assertDeepEquals(all, [{'fileName':'2018-05-092018-05-09'}])
+		assertDeepEquals(all, {'isMore':False, 'items':[{'fileName':'2018-05-092018-05-09'}], 'earliestDate':datetime(2018,5,9)})
 
 class MockPeriod:
 	def printSelf(self, printer):
@@ -826,7 +826,7 @@ class TestHistoryNoDuplicateFileNames:
 		history.addItem(period)
 		history.addItem(period)
 
-		items = history.getAll()
+		items = history.getAll()['items']
 		assertEquals(len(items), 1)
 
 
