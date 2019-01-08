@@ -5,3 +5,9 @@ indexes:
   properties:
   - name: timestamp
     direction: desc
+
+- kind: historyitem
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
