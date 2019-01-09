@@ -48,7 +48,7 @@ class ItemSet:
 		return result
 
 	def getAll(self, filters, limit, order):
-		existing = orderedLikeGoogle((item for filePath, item in self._getExisting()), order)
+		existing = orderedLikeGoogle((item for filePath, item in self._getExisting()), order=order)
 		result = []
 		limit = limit or 0
 		resultcount = 0
