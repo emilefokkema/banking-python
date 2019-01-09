@@ -1,7 +1,6 @@
 import json
 from src.customjson import CustomEncoder, CustomDecoder
-from src.filterlikegoogle import filterItemLikeGoogle
-from src.orderedlikegoogle import orderedLikeGoogle
+from src.orderfilterandlimitlikegoogle import orderFilterAndLimitLikeGoogle
 import os
 
 class ItemSet:
@@ -48,16 +47,7 @@ class ItemSet:
 		return result
 
 	def getAll(self, filters, limit, order):
-		existing = orderedLikeGoogle((item for filePath, item in self._getExisting()), order=order)
-		result = []
-		limit = limit or 0
-		resultcount = 0
-		for item in existing:
-			resultcount += 1
-			if filterItemLikeGoogle(item, filters) and (limit == 0 or resultcount <= limit):
-				result.append(item)
-		
-		return result
+		return orderFilterAndLimitLikeGoogle((item for filePath, item in self._getExisting()), order=order, filters=filters, limit=limit)
 
 	def remove(self, filters):
 		for filePath, item in self._getExisting():
