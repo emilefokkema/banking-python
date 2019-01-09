@@ -69,6 +69,9 @@
 				}
 			},
 			methods:{
+				refresh:function(){
+					location.reload(true);
+				},
 				signOut:function(){
           		console.log("signing out");
 					firebase.auth().signOut();

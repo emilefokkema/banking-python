@@ -138,7 +138,13 @@ body{
 .period-list-item.removing{
 	color:#ddd;
 }
-
+.refresh{
+	display: none;
+	margin-right: 20px;
+}
+.refresh .fas{
+	float: right;
+}
 .category-top{
 	display: inline-block;
 	min-width:475px;
@@ -159,6 +165,9 @@ body{
   }
   .period-list-item.with-beginning{
   	border-top: none;
+  }
+  .refresh{
+  	display: block;
   }
 }
 .drag-slot-inner{
