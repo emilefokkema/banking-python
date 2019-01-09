@@ -87,6 +87,7 @@
 		</script>
 		<script type="text/template" id="periodItemTemplate">
 			<div class="panel period-list-item" v-bind:class="{'removing':isRemoving,'with-end':hasEnd, 'with-beginning':hasBeginning, 'collapsed':collapsed}">
+				<div class="period-list-item-loading" v-if="!data">&nbsp;</div>
 				<template v-if="data">
 					<div class="panel-header">
 						<span class="panel-title" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span>

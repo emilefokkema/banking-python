@@ -120,6 +120,11 @@ body{
 	color:#ccc;
 	padding: 8px;
 }
+.period-list-item-loading{
+	margin-bottom: 10px;
+	background-color: #eee;
+	padding: 8px;
+}
 .period-list-item{
 	border-top: none;
 	border-bottom: none;

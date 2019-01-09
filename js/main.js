@@ -85,7 +85,7 @@
 				loadMore:function(){
 					var self = this;
 					var loading = this.loadingStatus.getIncomplete();
-					var earliestDateString = "" + this.earliestDate.getFullYear() + padToTwoDigits(this.earliestDate.getMonth()) + padToTwoDigits(this.earliestDate.getDate());
+					var earliestDateString = "" + this.earliestDate.getFullYear() + padToTwoDigits(this.earliestDate.getMonth() + 1) + padToTwoDigits(this.earliestDate.getDate());
 					postget.doGet("/api/additional/"+earliestDateString,function(data){
 						self.isMore = data.isMore;
 						self.earliestDate = data.earliestDate;
