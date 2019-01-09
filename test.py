@@ -11,6 +11,7 @@ from src.periodhistory import PeriodHistory
 import traceback
 from src.filterlikegoogle import filterItemLikeGoogle
 from src.orderedlikegoogle import orderedLikeGoogle
+from src.orderfilterandlimitlikegoogle import orderFilterAndLimitLikeGoogle
 
 testClasses = []
 
@@ -850,8 +851,15 @@ class TestOrderingLikeGoogle:
 	def test(self):
 		items = [{'name':'b', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':1}, {'name':'a', 'age':2}]
 		result = [{'name':'a', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':2},{'name':'b', 'age':1}]
-		assertDeepEquals(orderedLikeGoogle(items, ('name', '-age')), result)
+		assertDeepEquals(orderedLikeGoogle(items, order=('name', '-age')), result)
 
+@test
+class TestOrderFilterAndLimitLikeGoogle:
+
+	def test(self):
+		items = [{'name':'c', 'age':2},{'name':'d', 'age':2}, {'name':'b', 'age':3},{'name':'a', 'age':2}]
+		result = [{'name':'a', 'age':2},{'name':'c', 'age':2}]
+		assertDeepEquals(orderFilterAndLimitLikeGoogle(items, order=('name',), filters=(('age','=', 2),), limit=2), result)
 
 def runTests():
 	failed = []
