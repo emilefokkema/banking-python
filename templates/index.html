@@ -345,6 +345,7 @@
 			</div>
 			<span class="fas fa-spinner fa-spin" v-if="loading"></span>
 			<div class="error" v-if="errorMessage">{{errorMessage}}</div>
+			<div class="refresh" v-on:click="refresh"><span class="fas fa-sync"></span></div>
 		</div>
 		{% endraw %}
 	</body>
