@@ -4,8 +4,8 @@ orderArgPattern = r'^(-)?(.*)$'
 
 def getKeyAndDescending(orderarg):
 	match = re.search(orderArgPattern, orderarg)
-	key = lambda o:o[match[2]]
-	descending = bool(match[1])
+	key = lambda o:o[match.group(2)]
+	descending = bool(match.group(1))
 	return key, descending
 
 def orderedLikeGoogle(iterable, order=()):
