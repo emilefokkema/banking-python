@@ -455,12 +455,25 @@ span.toggle-collapse > .amount{
 .custom-checkbox.checked .fa-check{
 	color:#777;
 }
+.above-periods{
+	margin: 15px;
+	min-height: 1em;
+}
 .earlier{
 	font-family: sans-serif;
-	margin: 15px;
 	color: #999;
 	cursor: pointer;
 }
+.search{
+	float: right;
+	display: inline-block;
+}
+.open-search{
+	cursor: pointer;
+}
 .loading .earlier{
+	display: none;
+}
+.loading .search{
 	display: none;
 }

@@ -27,6 +27,7 @@
 				completePeriods: [],
 				isMore:false,
 				earliestDate:null,
+				searchOpen:false,
 				incompleteBeginningPeriods: [],
 				incompleteEndingPeriods:[],
 				incompletePeriods:[],
@@ -54,6 +55,18 @@
 						self.loggedIn = false;
 					}
 				});
+				document.addEventListener("keydown",function(e){
+					if(e.key == "f" && e.ctrlKey){
+						e.preventDefault();
+						self.openSearch();
+						return false;
+					}
+					if(e.key == "Escape"){
+						e.preventDefault();
+						self.closeSearch();
+						return false;
+					}
+				});
 			},
 			created:function(){
 				var self = this;
@@ -69,6 +82,15 @@
 				}
 			},
 			methods:{
+				openSearch:function(){
+					if(this.loading){
+						return;
+					}
+					this.searchOpen = true;
+				},
+				closeSearch:function(){
+					this.searchOpen = false;
+				},
 				refresh:function(){
 					location.reload(true);
 				},
