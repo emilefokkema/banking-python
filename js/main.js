@@ -6,6 +6,7 @@
 	var Complete = require("./complete.js");
 	var periodItem = require("./period-item.js");
 	var settings = require("./settings.js");
+	var search = require("./search.js");
 	var padToTwoDigits = function(number){
 		return ("0"+number).slice(-2);
 	};
@@ -27,7 +28,6 @@
 				completePeriods: [],
 				isMore:false,
 				earliestDate:null,
-				searchOpen:false,
 				incompleteBeginningPeriods: [],
 				incompleteEndingPeriods:[],
 				incompletePeriods:[],
@@ -42,7 +42,8 @@
 			},
 			components:{
 				'period-item' : periodItem.build(document),
-				'settings': settings.build(document)
+				'settings': settings.build(document),
+				'search': search.build(document)
 			},
 			mounted:function(){
 				var self = this;
@@ -53,18 +54,6 @@
 						self.loggedIn = true;
 					} else {
 						self.loggedIn = false;
-					}
-				});
-				document.addEventListener("keydown",function(e){
-					if(e.key == "f" && e.ctrlKey){
-						e.preventDefault();
-						self.openSearch();
-						return false;
-					}
-					if(e.key == "Escape"){
-						e.preventDefault();
-						self.closeSearch();
-						return false;
 					}
 				});
 			},
@@ -82,15 +71,6 @@
 				}
 			},
 			methods:{
-				openSearch:function(){
-					if(this.loading){
-						return;
-					}
-					this.searchOpen = true;
-				},
-				closeSearch:function(){
-					this.searchOpen = false;
-				},
 				refresh:function(){
 					location.reload(true);
 				},

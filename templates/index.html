@@ -325,16 +325,19 @@
 		<script type="text/template" id="regexInputTemplate">
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
+		<script type="text/template" id="searchTemplate">
+			<div class="search">
+				<span class="fas fa-search open-search" v-on:click="open"></span>
+				<input type="text" v-if="isOpen"/>
+				<span class="fas fa-times close-search" v-on:click="close" v-if="isOpen"></span>
+			</div>
+		</script>
 		<div id="firebaseui-auth-container"></div>
 		<div id="app" v-bind:class="{'loading':loading}">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:signout="signOut" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus" v-bind:loggedinname="loggedInName"></settings>
 			<div class="above-periods">
 				<span class="earlier" v-if="isMore" v-on:click="loadMore">earlier periods</span>
-				<div class="search">
-					<span class="fas fa-search open-search" v-on:click="openSearch"></span>
-					<input type="text" v-if="searchOpen"/>
-					<span class="fas fa-times close-search" v-on:click="closeSearch" v-if="searchOpen"></span>
-				</div>
+				<search v-bind:enabled="!loading"></search>
 			</div>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName"></period-item>
