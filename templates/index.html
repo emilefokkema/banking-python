@@ -328,7 +328,7 @@
 		<script type="text/template" id="searchTemplate">
 			<div class="search">
 				<span class="fas fa-search open-search" v-on:click="open"></span>
-				<input type="text" v-if="isOpen"/>
+				<input type="text" v-model="searchText" v-if="isOpen"/>
 				<span class="fas fa-times close-search" v-on:click="close" v-if="isOpen"></span>
 			</div>
 		</script>

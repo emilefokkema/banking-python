@@ -7,6 +7,7 @@
 	var periodItem = require("./period-item.js");
 	var settings = require("./settings.js");
 	var search = require("./search.js");
+	var Searcher = require("./searcher.js")
 	var padToTwoDigits = function(number){
 		return ("0"+number).slice(-2);
 	};
@@ -39,6 +40,9 @@
 				loading:false,
 				loggedInName:undefined,
 				loadingStatus: new Complete()
+			},
+			provide:{
+				searcher:new Searcher()
 			},
 			components:{
 				'period-item' : periodItem.build(document),

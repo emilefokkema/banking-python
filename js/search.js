@@ -6,9 +6,11 @@ module.exports = (function(){
 					},
 					data:function(){
 						return {
-							isOpen:false
+							isOpen:false,
+							searchText:""
 						}
 					},
+					inject:["searcher"],
 					mounted:function(){
 						var self = this;
 						document.addEventListener("keydown",function(e){
@@ -24,6 +26,15 @@ module.exports = (function(){
 							}
 						});
 					},
+					watch:{
+						searchText:function(v){
+							if(!v){
+								this.searcher.stopSearch();
+								return;
+							}
+							this.searcher.search(v);
+						}
+					},
 					methods:{
 						open:function(){
 							if(!this.enabled){
@@ -33,6 +44,7 @@ module.exports = (function(){
 						},
 						close:function(){
 							this.isOpen = false;
+							this.searchText = "";
 						},
 					},
 					template:document.getElementById("searchTemplate").innerHTML
