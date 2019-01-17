@@ -329,6 +329,7 @@
 			<div class="search">
 				<span class="fas fa-search open-search" v-on:click="open"></span>
 				<input type="text" v-model="searchText" v-if="isOpen"/>
+				{{numberOfResults}}
 				<span class="fas fa-times close-search" v-on:click="close" v-if="isOpen"></span>
 			</div>
 		</script>

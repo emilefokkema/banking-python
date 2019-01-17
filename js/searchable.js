@@ -8,7 +8,9 @@ module.exports = (function(){
 					if(self.text.toLowerCase().indexOf(phrase) == -1){
 						return;
 					}
-					console.log("found "+phrase+" in "+self.text);
+					context.addResult({
+						show:function(){}
+					});
 				});
 			},
 			props:{

@@ -7,7 +7,8 @@ module.exports = (function(){
 					data:function(){
 						return {
 							isOpen:false,
-							searchText:""
+							searchText:"",
+							numberOfResults:0
 						}
 					},
 					inject:["searcher"],
