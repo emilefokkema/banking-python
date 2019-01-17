@@ -1,6 +1,7 @@
 var amountBuilder = require("./amount.js");
 var dateBuilder = require("./date.js");
 var postget = require("./postget.js");
+var searchable = require("./searchable.js")
 module.exports = (function(){
 	var build = function(document){
 		var amount = amountBuilder.build(document);
@@ -118,7 +119,8 @@ module.exports = (function(){
 										}
 									},
 									template:document.getElementById("expectationTemplate").innerHTML
-								}
+								},
+								'searchable':searchable.build(document)
 							},
 							data:function(){
 								return {collapsed:true};

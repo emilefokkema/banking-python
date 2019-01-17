@@ -32,7 +32,7 @@ module.exports = (function(){
 								this.searcher.stopSearch();
 								return;
 							}
-							this.searcher.search(v);
+							this.searcher.search(v.toLowerCase());
 						}
 					},
 					methods:{

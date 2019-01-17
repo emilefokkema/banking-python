@@ -67,7 +67,7 @@
 							<span class="plus category-header-prefix"><span class="fas fa-plus-square"></span></span>
 							<span class="minus category-header-prefix"><span class="fas fa-minus-square"></span></span>
 						</template>
-						{{categoryData.name}}<expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
+						<searchable v-bind:text="categoryData.name"></searchable><expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
 					</span>
 				</div>
 				<div class="category-set" v-if="categoryData.categories">
