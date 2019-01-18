@@ -1,32 +1,27 @@
+var event = require("./event.js")
+
 var SearchContext = function(){
+	this.currentPosition = -1;
 	this.results = [];
 };
 SearchContext.prototype.addResult = function(result){
-	console.log("adding search result");
 	this.results.push(result);
 };
 var Searcher = function(){
-	this.searchHandlers = [];
-	this.stopSearchHandlers = [];
+	this.onSearch = event();
+	this.onStopSearch = event();
+	this.onResult = event();
 	this.currentContext = null;
-};
-Searcher.prototype.onSearch = function(handler){
-	this.searchHandlers.push(handler);
-};
-Searcher.prototype.onStopSearch = function(handler){
-	this.stopSearchHandlers.push(handler);
 };
 Searcher.prototype.search = function(phrase){
 	this.currentContext = new SearchContext();
-	for(var i=0;i<this.searchHandlers.length;i++){
-		this.searchHandlers[i](this.currentContext, phrase);
+	this.onSearch(this.currentContext, phrase);
+	if(this.currentContext.results.length > 0){
+		this.onResult(this.currentContext);
 	}
 };
 Searcher.prototype.stopSearch = function(){
-	console.log("stopping search");
-	for(var i=0;i<this.stopSearchHandlers.length;i++){
-		this.stopSearchHandlers[i]();
-	}
+	this.onStopSearch();
 	this.currentContext = null;
 };
 module.exports = Searcher;

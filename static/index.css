@@ -467,6 +467,7 @@ span.toggle-collapse > .amount{
 .search{
 	float: right;
 	display: inline-block;
+	font-family: sans-serif;
 }
 .open-search{
 	cursor: pointer;
@@ -476,4 +477,7 @@ span.toggle-collapse > .amount{
 }
 .loading .search{
 	display: none;
+}
+.result-navigator{
+	display: inline-block;
 }

@@ -8,7 +8,8 @@ module.exports = (function(){
 						return {
 							isOpen:false,
 							searchText:"",
-							numberOfResults:0
+							numberOfResults:0,
+							currentSearchContext: null
 						}
 					},
 					inject:["searcher"],
@@ -26,6 +27,8 @@ module.exports = (function(){
 								return false;
 							}
 						});
+						this.searcher.onResult.add(function(currentSearchContext){self.currentSearchContext = currentSearchContext;});
+						this.searcher.onStopSearch.add(function(){self.currentSearchContext = null;});
 					},
 					watch:{
 						searchText:function(v){

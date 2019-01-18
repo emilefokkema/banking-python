@@ -4,7 +4,7 @@ module.exports = (function(){
 			inject:["searcher"],
 			mounted:function(){
 				var self = this;
-				this.searcher.onSearch(function(context, phrase){
+				this.searcher.onSearch.add(function(context, phrase){
 					if(self.text.toLowerCase().indexOf(phrase) == -1){
 						return;
 					}
