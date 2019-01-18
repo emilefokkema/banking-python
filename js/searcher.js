@@ -11,6 +11,7 @@ var Searcher = function(){
 	this.onSearch = event();
 	this.onStopSearch = event();
 	this.onResult = event();
+	this.onNoResult = event();
 	this.currentContext = null;
 };
 Searcher.prototype.search = function(phrase){
@@ -18,6 +19,8 @@ Searcher.prototype.search = function(phrase){
 	this.onSearch(this.currentContext, phrase);
 	if(this.currentContext.results.length > 0){
 		this.onResult(this.currentContext);
+	}else{
+		this.onNoResult();
 	}
 };
 Searcher.prototype.stopSearch = function(){

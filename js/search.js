@@ -1,3 +1,5 @@
+var resultNavigator = require("./result-navigator.js");
+
 module.exports = (function(){
 	var build = function(document){
 		return {
@@ -29,6 +31,10 @@ module.exports = (function(){
 						});
 						this.searcher.onResult.add(function(currentSearchContext){self.currentSearchContext = currentSearchContext;});
 						this.searcher.onStopSearch.add(function(){self.currentSearchContext = null;});
+						this.searcher.onNoResult.add(function(){self.currentSearchContext = null;});
+					},
+					components:{
+						'result-navigator':resultNavigator.build(document)
 					},
 					watch:{
 						searchText:function(v){

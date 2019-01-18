@@ -329,8 +329,15 @@
 			<div class="search">
 				<span class="fas fa-search open-search" v-on:click="open"></span>
 				<input type="text" v-model="searchText" v-if="isOpen"/>
-				<div class="result-navigator" v-if="isOpen && currentSearchContext">{{currentSearchContext.currentPosition}} / {{currentSearchContext.results.length}}<span class="fas fa-chevron-up"></span><span class="fas fa-chevron-down"></span></div>
+				<result-navigator v-if="currentSearchContext" v-bind:resultContext="currentSearchContext"></result-navigator>
 				<span class="fas fa-times close-search" v-on:click="close" v-if="isOpen"></span>
+			</div>
+		</script>
+		<script type="text/template" id="resultNavigatorTemplate">
+			<div class="result-navigator">
+				{{resultContext.currentPosition}} / {{resultContext.results.length}}
+				<span class="fas fa-chevron-up"></span>
+				<span class="fas fa-chevron-down"></span>
 			</div>
 		</script>
 		<div id="firebaseui-auth-container"></div>
