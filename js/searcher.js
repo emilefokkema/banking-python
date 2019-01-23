@@ -14,6 +14,11 @@ SearchContext.prototype.moveUp = function(){
 	this.currentPosition = Math.max(0, this.currentPosition - 1);
 	this.showCurrent();
 };
+SearchContext.prototype.dispose = function(){
+	for(var i=0;i<this.results.length;i++){
+		this.results[i].forget();
+	}
+};
 SearchContext.prototype.moveDown = function(){
 	this.currentPosition = Math.min(this.results.length - 1, this.currentPosition + 1);
 	this.showCurrent();
@@ -26,6 +31,7 @@ var Searcher = function(){
 	this.currentContext = null;
 };
 Searcher.prototype.search = function(phrase){
+	this.currentContext && this.currentContext.dispose();
 	this.currentContext = new SearchContext();
 	this.onSearch(this.currentContext, phrase);
 	if(this.currentContext.results.length > 0){
@@ -36,6 +42,7 @@ Searcher.prototype.search = function(phrase){
 };
 Searcher.prototype.stopSearch = function(){
 	this.onStopSearch();
+	this.currentContext && this.currentContext.dispose();
 	this.currentContext = null;
 };
 module.exports = Searcher;
