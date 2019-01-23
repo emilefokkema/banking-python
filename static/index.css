@@ -91,13 +91,15 @@ body{
 	font-family: sans-serif;
 	margin-bottom: 10px;
 }
+.unselectable{
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select:none;
+	user-select:none;
+	-o-user-select:none;
+}
 .panel-title{
 	cursor: pointer;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select:none;
-  user-select:none;
-  -o-user-select:none;
 }
 .panel-header{
 	padding: 8px;
@@ -468,6 +470,7 @@ span.toggle-collapse > .amount{
 	float: right;
 	display: inline-block;
 	font-family: sans-serif;
+
 }
 .open-search{
 	cursor: pointer;

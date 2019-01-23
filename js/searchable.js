@@ -9,7 +9,9 @@ module.exports = (function(){
 						return;
 					}
 					context.addResult({
-						show:function(){}
+						show:function(){
+							self.$emit("show")
+						}
 					});
 				});
 			},

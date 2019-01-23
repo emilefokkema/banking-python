@@ -76,7 +76,11 @@ module.exports = (function(){
 								isSimple:function(){return !this.categoryData.rows && !this.categoryData.categories;}
 							},
 							methods:{
-								toggleCollapse:function(){this.collapsed = !this.collapsed;}
+								toggleCollapse:function(){this.collapsed = !this.collapsed;},
+								onShowChild:function(){
+									this.collapsed = false;
+									this.$emit("show");
+								}
 							},
 							components: {
 								'row-collection':{

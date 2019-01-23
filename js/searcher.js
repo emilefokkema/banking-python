@@ -4,8 +4,19 @@ var SearchContext = function(){
 	this.currentPosition = -1;
 	this.results = [];
 };
+SearchContext.prototype.showCurrent = function(){
+	this.results[this.currentPosition].show();
+};
 SearchContext.prototype.addResult = function(result){
 	this.results.push(result);
+};
+SearchContext.prototype.moveUp = function(){
+	this.currentPosition = Math.max(0, this.currentPosition - 1);
+	this.showCurrent();
+};
+SearchContext.prototype.moveDown = function(){
+	this.currentPosition = Math.min(this.results.length - 1, this.currentPosition + 1);
+	this.showCurrent();
 };
 var Searcher = function(){
 	this.onSearch = event();

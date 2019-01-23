@@ -67,11 +67,11 @@
 							<span class="plus category-header-prefix"><span class="fas fa-plus-square"></span></span>
 							<span class="minus category-header-prefix"><span class="fas fa-minus-square"></span></span>
 						</template>
-						<searchable v-bind:text="categoryData.name"></searchable><expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
+						<searchable v-bind:text="categoryData.name" v-on:show="onShowChild"></searchable><expectation v-if="categoryData.expectation" v-bind:expectation="categoryData.expectation"></expectation>: <amount v-bind:numberOfCents="categoryData.total"></amount>
 					</span>
 				</div>
 				<div class="category-set" v-if="categoryData.categories">
-					<category v-for="category in categoryData.categories" v-bind:categoryData="category" v-bind:top="false"></category>
+					<category v-for="category in categoryData.categories" v-bind:categoryData="category" v-bind:top="false" v-on:show="onShowChild"></category>
 				</div>
 				<row-collection v-if="categoryData.rows" v-bind:data="categoryData.rows"></row-collection>
 			</div>
@@ -90,14 +90,14 @@
 				<div class="period-list-item-loading" v-if="!data">&nbsp;</div>
 				<template v-if="data">
 					<div class="panel-header">
-						<span class="panel-title" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span>
+						<span class="panel-title unselectable" v-on:click="toggleCollapse" unselectable="on" onselectstart="return false;" onmousedown="return false;">{{periodDescription}}</span>
 						<div class="right">
 							<amount v-if="collapsed" v-bind:numberOfCents="data.balance"></amount>
 							<remove-button v-if="data.hasEnd && data.hasBeginning" v-on:click="remove"></remove-button></div>
 						</div>
 					<div class="panel-body">
-						<category v-bind:top="true" v-bind:categoryData="data.Bij" v-if="data.Bij"></category>
-						<category v-bind:top="true" v-bind:categoryData="data.Af" v-if="data.Af"></category>
+						<category v-bind:top="true" v-bind:categoryData="data.Bij" v-if="data.Bij" v-on:show="collapsed = false"></category>
+						<category v-bind:top="true" v-bind:categoryData="data.Af" v-if="data.Af" v-on:show="collapsed = false"></category>
 					</div>
 				</template>
 			</div>
@@ -326,7 +326,7 @@
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
 		<script type="text/template" id="searchTemplate">
-			<div class="search">
+			<div class="search unselectable" unselectable="on">
 				<span class="fas fa-search open-search" v-on:click="open"></span>
 				<input type="text" v-model="searchText" v-if="isOpen"/>
 				<result-navigator v-if="currentSearchContext" v-bind:resultContext="currentSearchContext"></result-navigator>
@@ -335,9 +335,9 @@
 		</script>
 		<script type="text/template" id="resultNavigatorTemplate">
 			<div class="result-navigator">
-				{{resultContext.currentPosition}} / {{resultContext.results.length}}
-				<span class="fas fa-chevron-up"></span>
-				<span class="fas fa-chevron-down"></span>
+				{{resultContext.currentPosition + 1}} / {{resultContext.results.length}}
+				<span class="fas fa-chevron-up" v-on:click="moveUp"></span>
+				<span class="fas fa-chevron-down" v-on:click="moveDown"></span>
 			</div>
 		</script>
 		<div id="firebaseui-auth-container"></div>
