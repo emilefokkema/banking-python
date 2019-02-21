@@ -60,14 +60,6 @@
 				this.loadingStatus.onComplete(function(){self.loading = false;});
 				this.loadingStatus.onIncomplete(function(){self.loading = true;})
 			},
-			computed:{
-				earliestCompleteDate:function(){
-					if(this.completePeriods.length == 0){
-						return undefined;
-					}
-					return Math.min.apply(null, this.completePeriods.map(function(p){return p.file.from;}));
-				}
-			},
 			methods:{
 				refresh:function(){
 					location.reload(true);
@@ -143,8 +135,8 @@
 							self.incompleteBeginningPeriods = data.filter(function(p){return p.file.hasBeginning && !p.file.hasEnd;});
 							self.incompletePeriods = data.filter(function(p){return !p.file.hasBeginning && !p.file.hasEnd;});
 							var incompleteEndingPeriods = data.filter(function(p){return !p.file.hasBeginning && p.file.hasEnd;});
-							if(self.earliestCompleteDate){
-								self.incompleteEndingPeriods = incompleteEndingPeriods.filter(function(p){return p.file.through < self.earliestCompleteDate;})
+							if(self.earliestDate){
+								self.incompleteEndingPeriods = incompleteEndingPeriods.filter(function(p){return p.file.through < self.earliestDate;})
 							}else{
 								self.incompleteEndingPeriods = incompleteEndingPeriods;
 							}
