@@ -1,10 +1,11 @@
 describe("Row definition", function(){
 	var RowDefinition = require('../../js/settings-logic/row-definition.js');
-	var defaultSettingsData = require("./defaultSettingsData.js");
+	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
+
 	var instance;
 
 	beforeEach(function(){
-		instance = new RowDefinition(defaultSettingsData.rowDefinition);
+		instance = new RowDefinition(getDefaultSettingsData().rowDefinition);
 	});
 
 	it("should have max column index", function(){
@@ -49,6 +50,7 @@ describe("Row definition", function(){
 
 		describe("when it is given a name",function(){
 			var newName = "something";
+			var expectedSerialization = "{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[{\"columnIndex\":"+indexOfNewColumn+",\"name\":\""+newName+"\"}]}";
 
 			beforeEach(function(){
 				newColumn.name = newName;
@@ -61,7 +63,36 @@ describe("Row definition", function(){
 			});
 
 			it("should be serializable", function(){
-				expect(JSON.stringify(instance)).toBe("{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[{\"columnIndex\":"+indexOfNewColumn+",\"name\":\""+newName+"\"}]}");
+				expect(JSON.stringify(instance)).toBe(expectedSerialization);
+			});
+
+			describe("when it is recreated after serialization", function(){
+				var recreatedInstance;
+
+				beforeEach(function(){
+					recreatedInstance = new RowDefinition(JSON.parse(expectedSerialization));
+				});
+
+				it("should have four column definitions", function(){
+					expect(recreatedInstance.definitions.length).toBe(4);
+				});
+
+				describe("the added column", function(){
+					var addedColumn;
+
+					beforeEach(function(){
+						addedColumn = recreatedInstance.definitions.find(function(d){return d.name == newName});
+					});
+
+					it("should exist", function(){
+						expect(addedColumn).toBeTruthy();
+					});
+
+					it("should be deletable",function(){
+						addedColumn.name = undefined;
+						expect(recreatedInstance.definitions.length).toBe(3);
+					});
+				});
 			});
 
 			describe("when the name is cleared",function(){
