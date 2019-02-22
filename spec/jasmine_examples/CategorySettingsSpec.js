@@ -7,6 +7,7 @@ describe("Category settings", function(){
 	var expectedSerialization = "{\"name\":\""+categoryName+"\",\"categories\":[]}";
 	var expectedSerializationWithChild = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[]}]}";
 	var expectedSerializationWithChildThatFiltersOnPropertyContains = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyContains\":{\"name\":\""+nameOfPropertyToUse+"\",\"values\":[]}}}]}";
+	var expectedSerializationWithChildThatFiltersOnPropertyMatches = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyMatches\":{\"name\":\""+nameOfPropertyToUse+"\"}}}]}";
 	var rowDefinition;
 	var propertyToUse;
 	var instance;
@@ -71,6 +72,59 @@ describe("Category settings", function(){
 
 			it("should be serializable", function(){
 				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyContains);
+			});
+
+			describe("on a different property", function(){
+				var differentPropertyName = "other";
+
+				beforeEach(function(){
+					childInstance.acceptRow.propertyContains.name = differentPropertyName;
+				});
+
+				it("should not be using the property", function(){
+					expect(instance.usesProperty(propertyToUse)).toBe(false);
+				});
+
+				it("should remember the current filter after a switch", function(){
+					childInstance.filterByPropertyMatches();
+					expect(function(){
+						var name = childInstance.acceptRow.propertyContains.name;
+					}).toThrow();
+					childInstance.filterByPropertyContains();
+					expect(childInstance.acceptRow.propertyContains.name).toBe(differentPropertyName);
+				});
+
+				it("should remember the current filter after a toggle off", function(){
+					childInstance.toggleFilter();
+					expect(function(){
+						var name = childInstance.acceptRow.propertyContains.name;
+					}).toThrow();
+					childInstance.toggleFilter();
+					expect(childInstance.acceptRow.propertyContains.name).toBe(differentPropertyName);
+				});
+
+			});
+
+			describe("on property matches", function(){
+
+				beforeEach(function(){
+					childInstance.filterByPropertyMatches();
+				});
+
+				it("should be using the property", function(){
+					expect(instance.usesProperty(propertyToUse)).toBe(true);
+				});
+
+				it("should be serializable", function(){
+					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyMatches);
+				});
+
+				it("should remember the current filter after a toggle off", function(){
+					childInstance.toggleFilter();
+					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
+					childInstance.toggleFilter();
+					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyMatches);
+				});
 			});
 		});
 
