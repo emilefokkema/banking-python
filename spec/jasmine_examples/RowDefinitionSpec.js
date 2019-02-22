@@ -60,6 +60,10 @@ describe("Row definition", function(){
 				expect(newColumn.name).toBe(newName);
 			});
 
+			it("should be serializable", function(){
+				expect(JSON.stringify(instance)).toBe("{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[{\"columnIndex\":"+indexOfNewColumn+",\"name\":\""+newName+"\"}]}");
+			});
+
 			describe("when the name is cleared",function(){
 
 				beforeEach(function(){
