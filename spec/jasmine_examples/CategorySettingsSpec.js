@@ -8,6 +8,7 @@ describe("Category settings", function(){
 	var expectedSerializationWithChild = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[]}]}";
 	var expectedSerializationWithChildThatFiltersOnPropertyContains = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyContains\":{\"name\":\""+nameOfPropertyToUse+"\",\"values\":[]}}}]}";
 	var expectedSerializationWithChildThatFiltersOnPropertyMatches = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyMatches\":{\"name\":\""+nameOfPropertyToUse+"\"}}}]}";
+	var expectedSerializationWithChildThatCollectsRows = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"rowCollection\":{\"properties\":[{\"name\":\""+nameOfPropertyToUse+"\",\"source\":\""+nameOfPropertyToUse+"\"}]}}]}";
 	var rowDefinition;
 	var propertyToUse;
 	var instance;
@@ -126,6 +127,29 @@ describe("Category settings", function(){
 					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyMatches);
 				});
 			});
+		});
+
+		describe("that collects rows using a property", function(){
+			var collectedProperty;
+
+			beforeEach(function(){
+				childInstance.addRowCollection();
+				collectedProperty = childInstance.rowCollection.properties[0];
+			});
+
+			it("should be using the property", function(){
+				expect(instance.usesProperty(propertyToUse)).toBe(true);
+			});
+
+			it("should be serializable", function(){
+				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatCollectsRows);
+			});
+
+			it("should stop collecting rows if the one property is removed", function(){
+				collectedProperty.remove();
+				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
+			});
+
 		});
 
 		describe("that is once per period", function(){
