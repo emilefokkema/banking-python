@@ -9,6 +9,7 @@ describe("Category settings", function(){
 	var expectedSerializationWithChildThatFiltersOnPropertyContains = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyContains\":{\"name\":\""+nameOfPropertyToUse+"\",\"values\":[]}}}]}";
 	var expectedSerializationWithChildThatFiltersOnPropertyMatches = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyMatches\":{\"name\":\""+nameOfPropertyToUse+"\"}}}]}";
 	var expectedSerializationWithChildThatCollectsRows = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"rowCollection\":{\"properties\":[{\"name\":\""+nameOfPropertyToUse+"\",\"source\":\""+nameOfPropertyToUse+"\"}]}}]}";
+	var expectedSerializationWithChildThatCollectsRowsUsingAPropertyWithDateConversion = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"rowCollection\":{\"properties\":[{\"name\":\""+nameOfPropertyToUse+"\",\"source\":\""+nameOfPropertyToUse+"\",\"conversion\":{\"type\":\"date\",\"pattern\":\"%Y%m%d\"}}]}}]}";
 	var rowDefinition;
 	var propertyToUse;
 	var instance;
@@ -141,6 +142,10 @@ describe("Category settings", function(){
 				expect(instance.usesProperty(propertyToUse)).toBe(true);
 			});
 
+			it("should have a row collection property", function(){
+				expect(collectedProperty).toBeTruthy();
+			});
+
 			it("should be serializable", function(){
 				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatCollectsRows);
 			});
@@ -148,6 +153,49 @@ describe("Category settings", function(){
 			it("should stop collecting rows if the one property is removed", function(){
 				collectedProperty.remove();
 				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
+			});
+
+			describe("and now this property", function(){
+
+				it("should not have a conversion", function(){
+					expect(collectedProperty.conversion).toBeFalsy();
+				});
+
+				it("should have targetType string", function(){
+					expect(collectedProperty.targetType).toBe("string");
+				});
+
+				describe("if its targetType is set to 'date'", function(){
+
+					beforeEach(function(){
+						collectedProperty.targetType = "date";
+					});
+
+					it("should have targetType 'date'", function(){
+						expect(collectedProperty.targetType).toBe("date");
+					});
+
+					it("should have a date conversion", function(){
+						expect(collectedProperty.conversion).toBeTruthy();
+						expect(collectedProperty.conversion.type).toBe("date");
+						expect(collectedProperty.conversion.pattern).toBe("%Y%m%d");
+					});
+
+					it("should be serializable", function(){
+						expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatCollectsRowsUsingAPropertyWithDateConversion);
+					});
+
+					describe("and then back to 'string'", function(){
+
+						beforeEach(function(){
+							collectedProperty.targetType = "string";
+						});
+
+						it("should not have a conversion", function(){
+							expect(collectedProperty.conversion).toBeFalsy();
+						});
+					});
+				});
 			});
 
 		});
