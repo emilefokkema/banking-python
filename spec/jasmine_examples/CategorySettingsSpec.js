@@ -165,6 +165,25 @@ describe("Category settings", function(){
 					expect(collectedProperty.targetType).toBe("string");
 				});
 
+				describe("if it is given a stringMatch", function(){
+
+					beforeEach(function(){
+						collectedProperty.stringMatch = "\\d+";
+					});
+
+					it("should have a string conversion", function(){
+						expect(collectedProperty.conversion).toBeTruthy();
+						expect(collectedProperty.conversion.type).toBe("string");
+						expect(collectedProperty.conversion.match).toBe("\\d+");
+					});
+
+					it("should have no conversion if stringMatch is removed", function(){
+						collectedProperty.stringMatch = null;
+						expect(collectedProperty.conversion).toBeFalsy();
+					});
+
+				});
+
 				describe("if its targetType is set to 'date'", function(){
 
 					beforeEach(function(){
