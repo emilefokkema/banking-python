@@ -1,18 +1,19 @@
 describe("Category settings", function(){
+	var expectedSerialization = require("./expected-serialization.js");
 	var CategorySettings = require("../../js/settings-logic/category-settings.js");
 	var RowDefinition = require('../../js/settings-logic/row-definition.js');
 	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
 	var categoryName = "category";
 	var nameOfPropertyToUse = "property";
-	var expectedSerialization = "{\"name\":\""+categoryName+"\",\"categories\":[]}";
-	var expectedSerializationWithChild = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[]}]}";
-	var expectedSerializationWithChildThatFiltersOnPropertyContains = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyContains\":{\"name\":\""+nameOfPropertyToUse+"\",\"values\":[]}}}]}";
-	var expectedSerializationWithChildThatFiltersOnPropertyMatches = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"acceptRow\":{\"propertyMatches\":{\"name\":\""+nameOfPropertyToUse+"\"}}}]}";
-	var expectedSerializationWithChildThatCollectsRows = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"rowCollection\":{\"properties\":[{\"name\":\""+nameOfPropertyToUse+"\",\"source\":\""+nameOfPropertyToUse+"\"}]}}]}";
-	var expectedSerializationWithChildThatCollectsRowsUsingAPropertyWithDateConversion = "{\"name\":\""+categoryName+"\",\"categories\":[{\"name\":\""+categoryName+"\",\"categories\":[],\"rowCollection\":{\"properties\":[{\"name\":\""+nameOfPropertyToUse+"\",\"source\":\""+nameOfPropertyToUse+"\",\"conversion\":{\"type\":\"date\",\"pattern\":\"%Y%m%d\"}}]}}]}";
 	var rowDefinition;
 	var propertyToUse;
 	var instance;
+	var getExpectedSerialization;
+	var checkSerialization = function(){
+		it("should be serializable", function(){
+			expect(JSON.stringify(instance)).toBe(getExpectedSerialization());
+		});
+	};
 
 	beforeEach(function(){
 		var defaultSettingsData = getDefaultSettingsData();
@@ -20,11 +21,10 @@ describe("Category settings", function(){
 		propertyToUse = rowDefinition.getNewDefinition(3);
 		propertyToUse.name = nameOfPropertyToUse;
 		instance = new CategorySettings({name:categoryName}, rowDefinition);
+		getExpectedSerialization = expectedSerialization.root(categoryName);
 	});
 
-	it("should be serializable", function(){
-		expect(JSON.stringify(instance)).toBe(expectedSerialization);
-	});
+	checkSerialization();
 
 	it("should not be using the property", function(){
 		expect(instance.usesProperty(propertyToUse)).toBe(false);
@@ -37,15 +37,14 @@ describe("Category settings", function(){
 			childInstance = instance.getNewCategory();
 			childInstance.name = categoryName;
 			instance.addCategory(childInstance);
+			getExpectedSerialization = getExpectedSerialization.withChild(categoryName);
 		});
 
-		it("should be serializable", function(){
-			expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
-		});
+		checkSerialization();
 
 		it("should be removable", function(){
 			instance.removeCategory(childInstance);
-			expect(JSON.stringify(instance)).toBe(expectedSerialization);
+			expect(JSON.stringify(instance)).toBe(getExpectedSerialization.parent());
 		});
 
 		it("can override oncePerPeriod", function(){
@@ -66,15 +65,14 @@ describe("Category settings", function(){
 
 			beforeEach(function(){
 				childInstance.toggleFilter();
+				getExpectedSerialization = getExpectedSerialization.thatFiltersOnPropertyContains(nameOfPropertyToUse);
 			});
 
 			it("should be using the property", function(){
 				expect(instance.usesProperty(propertyToUse)).toBe(true);
 			});
 
-			it("should be serializable", function(){
-				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyContains);
-			});
+			checkSerialization();
 
 			describe("on a different property", function(){
 				var differentPropertyName = "other";
@@ -111,21 +109,20 @@ describe("Category settings", function(){
 
 				beforeEach(function(){
 					childInstance.filterByPropertyMatches();
+					getExpectedSerialization = getExpectedSerialization.parent.thatFiltersOnPropertyMatches(nameOfPropertyToUse)
 				});
 
 				it("should be using the property", function(){
 					expect(instance.usesProperty(propertyToUse)).toBe(true);
 				});
 
-				it("should be serializable", function(){
-					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyMatches);
-				});
+				checkSerialization();
 
 				it("should remember the current filter after a toggle off", function(){
 					childInstance.toggleFilter();
-					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
+					expect(JSON.stringify(instance)).toBe(getExpectedSerialization.parent());
 					childInstance.toggleFilter();
-					expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatFiltersOnPropertyMatches);
+					expect(JSON.stringify(instance)).toBe(getExpectedSerialization());
 				});
 			});
 		});
@@ -136,6 +133,7 @@ describe("Category settings", function(){
 			beforeEach(function(){
 				childInstance.addRowCollection();
 				collectedProperty = childInstance.rowCollection.properties[0];
+				getExpectedSerialization = getExpectedSerialization.thatCollectsRows(nameOfPropertyToUse);
 			});
 
 			it("should be using the property", function(){
@@ -146,13 +144,11 @@ describe("Category settings", function(){
 				expect(collectedProperty).toBeTruthy();
 			});
 
-			it("should be serializable", function(){
-				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatCollectsRows);
-			});
+			checkSerialization();
 
 			it("should stop collecting rows if the one property is removed", function(){
 				collectedProperty.remove();
-				expect(JSON.stringify(instance)).toBe(expectedSerializationWithChild);
+				expect(JSON.stringify(instance)).toBe(getExpectedSerialization.parent());
 			});
 
 			describe("and now this property", function(){
@@ -171,10 +167,12 @@ describe("Category settings", function(){
 						collectedProperty.stringMatch = "\\d+";
 					});
 
-					it("should have a string conversion", function(){
-						expect(collectedProperty.conversion).toBeTruthy();
-						expect(collectedProperty.conversion.type).toBe("string");
-						expect(collectedProperty.conversion.match).toBe("\\d+");
+					it("should have targetType string", function(){
+						expect(collectedProperty.targetType).toBe("string");
+					});
+
+					it("should have a stringMatch", function(){
+						expect(collectedProperty.stringMatch).toBe("\\d+");
 					});
 
 					it("should have no conversion if stringMatch is removed", function(){
@@ -188,6 +186,7 @@ describe("Category settings", function(){
 
 					beforeEach(function(){
 						collectedProperty.targetType = "date";
+						getExpectedSerialization = getExpectedSerialization.usingAPropertyWithDateConversion()
 					});
 
 					it("should have targetType 'date'", function(){
@@ -200,9 +199,7 @@ describe("Category settings", function(){
 						expect(collectedProperty.conversion.pattern).toBe("%Y%m%d");
 					});
 
-					it("should be serializable", function(){
-						expect(JSON.stringify(instance)).toBe(expectedSerializationWithChildThatCollectsRowsUsingAPropertyWithDateConversion);
-					});
+					checkSerialization();
 
 					describe("and then back to 'string'", function(){
 
