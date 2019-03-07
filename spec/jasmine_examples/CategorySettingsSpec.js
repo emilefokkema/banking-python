@@ -21,7 +21,7 @@ describe("Category settings", function(){
 		propertyToUse = rowDefinition.getNewDefinition(3);
 		propertyToUse.name = nameOfPropertyToUse;
 		instance = new CategorySettings({name:categoryName}, rowDefinition);
-		getExpectedSerialization = expectedSerialization.root(categoryName);
+		getExpectedSerialization = expectedSerialization.category(categoryName);
 	});
 
 	checkSerialization();

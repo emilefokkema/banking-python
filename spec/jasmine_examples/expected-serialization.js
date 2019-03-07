@@ -15,7 +15,7 @@ var something = function(constr, parent){
 };
 
 module.exports = {
-	root:something(function(categoryName){
+	category:something(function(categoryName){
 		return {
 			returnValue: "{\"name\":\""+categoryName+"\",\"categories\":[]}",
 			withChild: function(childCategoryName){
@@ -43,6 +43,11 @@ module.exports = {
 					}
 				};
 			}
+		};
+	}),
+	settings:something(function(){
+		return {
+			returnValue:"{\"rowDefinition\":{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[]},\"categories\":{\"incoming\":{\"name\":\"Credit\",\"categories\":[]},\"outgoing\":{\"name\":\"Debit\",\"categories\":[]}},\"ignoreFirstLine\":true}"
 		};
 	})
 };
