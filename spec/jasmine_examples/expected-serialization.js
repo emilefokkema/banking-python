@@ -47,7 +47,17 @@ module.exports = {
 	}),
 	settings:something(function(){
 		return {
-			returnValue:"{\"rowDefinition\":{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[]},\"categories\":{\"incoming\":{\"name\":\"Credit\",\"categories\":[]},\"outgoing\":{\"name\":\"Debit\",\"categories\":[]}},\"ignoreFirstLine\":true}"
+			returnValue:"{\"rowDefinition\":{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[]},\"categories\":{\"incoming\":{\"name\":\"Credit\",\"categories\":[]},\"outgoing\":{\"name\":\"Debit\",\"categories\":[]}},\"ignoreFirstLine\":true}",
+			whereOutgoingHasAChildCategory: function(childCategoryName){
+				return {
+					returnValue: "{\"rowDefinition\":{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[]},\"categories\":{\"incoming\":{\"name\":\"Credit\",\"categories\":[]},\"outgoing\":{\"name\":\"Debit\",\"categories\":[{\"name\":\""+childCategoryName+"\",\"categories\":[]}]}},\"ignoreFirstLine\":true}"
+				};
+			},
+			whereOutgoingHasThreeChildCategories:function(childCategoryName1, childCategoryName2, childCategoryName3){
+				return {
+					returnValue: "{\"rowDefinition\":{\"amount\":{\"columnIndex\":2},\"date\":{\"columnIndex\":0,\"pattern\":\"yyyymmdd\"},\"direction\":{\"columnIndex\":1,\"incoming\":\"Credit\",\"outgoing\":\"Debit\"},\"additional\":[]},\"categories\":{\"incoming\":{\"name\":\"Credit\",\"categories\":[]},\"outgoing\":{\"name\":\"Debit\",\"categories\":[{\"name\":\""+childCategoryName1+"\",\"categories\":[]},{\"name\":\""+childCategoryName2+"\",\"categories\":[]},{\"name\":\""+childCategoryName3+"\",\"categories\":[]}]}},\"ignoreFirstLine\":true}"
+				};
+			}
 		};
 	})
 };

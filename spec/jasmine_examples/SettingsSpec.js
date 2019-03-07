@@ -4,6 +4,17 @@ describe("Settings", function(){
 	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
 	var instance, incoming, outgoing;
 	var getExpectedSerialization;
+	var makeNewCategoryAndAppendToParent = function(parent, name){
+		var result = parent.getNewCategory();
+		result.name = name;
+		parent.addCategory(result);
+		return result;
+	};
+	var checkSerialization = function(){
+		it("should be serializable", function(){
+			expect(JSON.stringify(instance)).toBe(getExpectedSerialization());
+		});
+	};
 
 	beforeEach(function(){
 		getExpectedSerialization = expectedSerialization.settings();
@@ -16,9 +27,7 @@ describe("Settings", function(){
 		expect(instance).toBeTruthy();
 	});
 
-	it("should serialize correctly", function(){
-		expect(JSON.stringify(instance)).toBe(getExpectedSerialization());
-	});
+	checkSerialization();
 
 	it("should have two categories", function(){
 		expect(incoming).toBeTruthy();
@@ -26,13 +35,14 @@ describe("Settings", function(){
 	});
 
 	describe("whose outgoing has a descendant category", function(){
-		var newCategory;
+		var newCategory, nameOfNewCategory = "category";
 
 		beforeEach(function(){
-			newCategory = outgoing.getNewCategory();
-			newCategory.name = "category";
-			outgoing.addCategory(newCategory);
+			newCategory = makeNewCategoryAndAppendToParent(outgoing, nameOfNewCategory);
+			getExpectedSerialization = getExpectedSerialization.whereOutgoingHasAChildCategory(nameOfNewCategory);
 		});
+
+		checkSerialization();
 
 		describe("that is once per period", function(){
 
@@ -57,6 +67,26 @@ describe("Settings", function(){
 
 			it("the property should be in use", function(){
 				expect(propertyInUse.inUse).toBe(true);
+			});
+		});
+
+		describe("that has siblings", function(){
+			var newCategory2,
+				nameOfNewCategory2 = "category2",
+				newCategory3,
+				nameOfNewCategory3 = "category3";
+
+			beforeEach(function(){
+				newCategory2 = makeNewCategoryAndAppendToParent(outgoing, nameOfNewCategory2);
+				newCategory3 = makeNewCategoryAndAppendToParent(outgoing, nameOfNewCategory3);
+				getExpectedSerialization = getExpectedSerialization.parent.whereOutgoingHasThreeChildCategories(nameOfNewCategory, nameOfNewCategory2, nameOfNewCategory3);
+			});
+
+			checkSerialization();
+
+			it("now the last can be inserted before the first", function(){
+				instance.insertCategoryBefore(newCategory3, newCategory);
+				expect(JSON.stringify(instance)).toBe(getExpectedSerialization.parent.whereOutgoingHasThreeChildCategories(nameOfNewCategory3, nameOfNewCategory, nameOfNewCategory2)());
 			});
 		});
 	});
