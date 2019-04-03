@@ -1,6 +1,9 @@
 var event = require("./event.js")
 
-var SearchContext = function(){
+var SearchContext = function(searchPhrase){
+	this.searchPhrase = searchPhrase;
+	this.searchPattern = searchPhrase.replace(/[-$()*+.\/?[\\\]^{|}]/g, '\\$&');
+	this.replacePattern = "("+this.searchPattern+")|((?:(?!"+this.searchPattern+").)+)";
 	this.currentPosition = -1;
 	this.results = [];
 };
@@ -23,6 +26,27 @@ SearchContext.prototype.moveDown = function(){
 	this.currentPosition = Math.min(this.results.length - 1, this.currentPosition + 1);
 	this.showCurrent();
 };
+SearchContext.prototype.matches = function(text){
+	return text.toLowerCase().indexOf(this.searchPhrase) > -1;
+};
+SearchContext.prototype.subdivide = function(text){
+	var result = [];
+	text.replace(new RegExp(this.replacePattern, "ig"), function(match, foundGroup, notFoundGroup){
+		if(foundGroup){
+			result.push({
+				match:true,
+				text:match
+			});
+		}else{
+			result.push({
+				match:false,
+				text:match
+			});
+		}
+	});
+	return result;
+};
+
 var Searcher = function(){
 	this.onSearch = event();
 	this.onStopSearch = event();
@@ -32,8 +56,8 @@ var Searcher = function(){
 };
 Searcher.prototype.search = function(phrase){
 	this.currentContext && this.currentContext.dispose();
-	this.currentContext = new SearchContext();
-	this.onSearch(this.currentContext, phrase);
+	this.currentContext = new SearchContext(phrase);
+	this.onSearch(this.currentContext);
 	if(this.currentContext.results.length > 0){
 		this.onResult(this.currentContext);
 	}else{
