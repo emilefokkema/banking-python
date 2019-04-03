@@ -10,10 +10,9 @@ describe("A searcher", function(){
 		var onSearchHandler;
 		var onNoResultHandler;
 		var onResultHandler;
-		var searchPhrase;
+		var searchPhrase = "phrase";
 
 		beforeEach(function(){
-			searchPhrase = "phrase";
 			onSearchHandler = function(){};
 			onNoResultHandler = function(){};
 			onResultHandler = function(){};
@@ -59,6 +58,48 @@ describe("A searcher", function(){
 				{match:true, text: searchPhrase},
 				{match:false, text: nonMatchingPart}
 			]);
+		});
+
+		describe("and that has searched and found two results", function(){
+			var show1Spy, show2Spy, context;
+
+			beforeEach(function(){
+				var result1 = {show:function(){}, forget:function(){}};
+				var result2 = {show:function(){}, forget:function(){}};
+				show1Spy = spyOn(result1, 'show');
+				show2Spy = spyOn(result2, 'show');
+				onSearchHandler = function(_context){
+					_context.addResult(result1);
+					_context.addResult(result2);
+				};
+				onResultHandler = function(_context){
+					context = _context;
+				};
+				instance.search(searchPhrase);
+			});
+
+			describe("and whose context moves down one result", function(){
+
+				beforeEach(function(){
+					context.moveDown();
+				});
+
+				it("should call show on the first result", function(){
+					expect(show1Spy).toHaveBeenCalled();
+				});
+			});
+
+			describe("and whose context moves down two results", function(){
+
+				beforeEach(function(){
+					context.moveDown();
+					context.moveDown();
+				});
+
+				it("should call show on the second result", function(){
+					expect(show2Spy).toHaveBeenCalled();
+				});
+			});
 		});
 
 		describe("and that is given a result when searching", function(){
