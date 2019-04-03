@@ -77,8 +77,10 @@ module.exports = (function(){
 							},
 							methods:{
 								toggleCollapse:function(){this.collapsed = !this.collapsed;},
-								onShowChild:function(){
-									this.collapsed = false;
+								onShowChild:function(needsExpand){
+									if(needsExpand){
+										this.collapsed = false;
+									}
 									this.$emit("show");
 								}
 							},
