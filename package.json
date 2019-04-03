@@ -11,7 +11,8 @@
     "startcodeanywhere":"python mainlocal.py --host 0.0.0.0 --mocklogin --port 3000",
     "startgoogle": "python main.py",
     "build": "browserify js/main.js | minify --js > static/dist/main.js",
-    "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose"
+    "watch": "watchify js/main.js -o static/dist/main.js --debug --verbose",
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "browserify": "^16.2.3",
     "concurrently": "^4.0.1",
+    "jasmine": "^3.3.1",
     "minify": "^3.0.5",
     "watchify": "^3.11.0"
   }

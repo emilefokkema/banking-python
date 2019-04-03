@@ -1,3 +1,4 @@
+import unittest
 from src.rowfactory import RowFactory
 from src.rowcheckerfactory import RowCheckerFactory
 from src.rowcollection import RowCollectionFactory
@@ -13,65 +14,9 @@ from src.filterlikegoogle import filterItemLikeGoogle
 from src.orderedlikegoogle import orderedLikeGoogle
 from src.orderfilterandlimitlikegoogle import orderFilterAndLimitLikeGoogle
 
-testClasses = []
-
-def test(testClass):
-	testClasses.append(testClass)
-	return testClass
-
-def getJsonObj(printable):
-	return printJson(printable)
-
-class TestFailure(BaseException):
-	pass
-
-def wrapAssertion(whatToPrint):
-	def wrapper(asserter):
-		def wrapFn(*args):
-			try:
-				asserter(*args)
-			except AssertionError:
-				print(whatToPrint(*args))
-				raise
-		return wrapFn
-	return wrapper
-
-@wrapAssertion(lambda one, two:'expected '+repr(one)+' to equal '+repr(two))
-def assertEquals(one, two):
-	assert one == two
-
-@wrapAssertion(lambda obj, _type:'expected '+repr(obj)+' to be of type '+repr(_type))
-def assertInstance(obj, _type):
-	assert isinstance(obj, _type)
-
-@wrapAssertion(lambda key, _dict:'expected dictionary '+repr(_dict)+' to contain key '+key)
-def assertInDict(key, _dict):
-	assert key in _dict
-
-@wrapAssertion(lambda list1, list2:'expected list '+repr(list1)+' and list '+repr(list2)+' to be of equal length')
-def assertEqualLength(list1, list2):
-	assert len(list1) == len(list2)
-
-@wrapAssertion(lambda obj1, obj2:'expected '+repr(obj1)+' to deep-equal '+repr(obj2))
-def assertDeepEquals(obj1, obj2):
-	if isinstance(obj1, dict):
-		assertInstance(obj2, dict)
-		for p in obj1:
-			assertInDict(p, obj2)
-			assertDeepEquals(obj1[p], obj2[p])
-		for p in obj2:
-			assertInDict(p, obj1)
-			assertDeepEquals(obj2[p], obj1[p])
-	elif isinstance(obj1, list):
-		assertInstance(obj2, list)
-		assertEqualLength(obj1, obj2)
-		for index in range(len(obj1)):
-			assertDeepEquals(obj1[index], obj2[index])
-	else:
-		assertEquals(obj1, obj2)
-
-class RowFactoryTest:
-	def __init__(self):
+class RowFactoryTest(unittest.TestCase):
+	def __init__(self, *args, **kwargs):
+		super(RowFactoryTest, self).__init__(*args, **kwargs)
 		self.options = {
 			'date':{
 				'columnIndex':0,
@@ -93,18 +38,17 @@ class RowFactoryTest:
 			]
 		}
 
-@test
+
 class RowFactoryTest1(RowFactoryTest):
 
 	def test(self):
 		factory = RowFactory(self.options)
 		row = factory.createRow(['20180509','34.34','in','something'])
-		assertEquals(row['date'], datetime(2018, 5, 9))
-		assertEquals(row['amount'], 3434)
-		assertEquals(row['direction'], Direction.INCOMING)
-		assertEquals(row['info'], 'something')
+		self.assertEqual(row['date'], datetime(2018, 5, 9))
+		self.assertEqual(row['amount'], 3434)
+		self.assertEqual(row['direction'], Direction.INCOMING)
+		self.assertEqual(row['info'], 'something')
 
-@test
 class RowFactoryTest2(RowFactoryTest):
 
 	def test(self):
@@ -118,13 +62,14 @@ class RowFactoryTest2(RowFactoryTest):
 		directionProp = factory.getProperty('direction')
 		infoProp = factory.getProperty('info')
 
-		assertEquals(dateProp.getValue(row), datetime(2018, 5, 9))
-		assertEquals(amountProp.getValue(row), 3434)
-		assertEquals(directionProp.getValue(row), Direction.INCOMING)
-		assertEquals(infoProp.getValue(row), 'something')
+		self.assertEqual(dateProp.getValue(row), datetime(2018, 5, 9))
+		self.assertEqual(amountProp.getValue(row), 3434)
+		self.assertEqual(directionProp.getValue(row), Direction.INCOMING)
+		self.assertEqual(infoProp.getValue(row), 'something')
 
-class RowCheckerFactoryTest:
-	def __init__(self):
+class RowCheckerFactoryTest(unittest.TestCase):
+	def __init__(self, *args, **kwargs):
+		super(RowCheckerFactoryTest, self).__init__(*args, **kwargs)
 		self.rowFactory = RowFactory({
 			'date':{
 				'columnIndex':0,
@@ -147,7 +92,7 @@ class RowCheckerFactoryTest:
 		})
 		self.rowCheckerFactory = RowCheckerFactory(self.rowFactory)
 
-@test
+
 class PropertyContainsTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -158,11 +103,11 @@ class PropertyContainsTest(RowCheckerFactoryTest):
 			}
 		})
 		row = self.rowFactory.createRow(['20180509','34.34','in','something'])
-		assertEquals(rowChecker.checkRow(row), False)
+		self.assertEqual(rowChecker.checkRow(row), False)
 		row = self.rowFactory.createRow(['20180509','34.34','in','abraham'])
-		assertEquals(rowChecker.checkRow(row), True)
+		self.assertEqual(rowChecker.checkRow(row), True)
 
-@test
+
 class PropertyContainsTestWithTrickyCharacters(RowCheckerFactoryTest):
 
 	def test(self):
@@ -173,11 +118,11 @@ class PropertyContainsTestWithTrickyCharacters(RowCheckerFactoryTest):
 			}
 		})
 		row = self.rowFactory.createRow(['20180509','34.34','in','to amazon.com'])
-		assertEquals(rowChecker.checkRow(row), True)
+		self.assertEqual(rowChecker.checkRow(row), True)
 		row = self.rowFactory.createRow(['20180509','34.34','in','to amazonacom'])
-		assertEquals(rowChecker.checkRow(row), False)
+		self.assertEqual(rowChecker.checkRow(row), False)
 
-@test
+
 class PropertyMatchesTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -188,11 +133,11 @@ class PropertyMatchesTest(RowCheckerFactoryTest):
 			}
 		})
 		row = self.rowFactory.createRow(['20180509','34.34','in','simon lincoln'])
-		assertEquals(rowChecker.checkRow(row), False)
+		self.assertEqual(rowChecker.checkRow(row), False)
 		row = self.rowFactory.createRow(['20180509','34.34','in','abraham lincoln'])
-		assertEquals(rowChecker.checkRow(row), True)
+		self.assertEqual(rowChecker.checkRow(row), True)
 
-@test
+
 class IncomingTest(RowCheckerFactoryTest):
 
 	def test(self):
@@ -200,12 +145,13 @@ class IncomingTest(RowCheckerFactoryTest):
 			'incoming':True
 		})
 		row = self.rowFactory.createRow(['20180509','34.34','out','something'])
-		assertEquals(rowChecker.checkRow(row), False)
+		self.assertEqual(rowChecker.checkRow(row), False)
 		row = self.rowFactory.createRow(['20180509','34.34','in','something'])
-		assertEquals(rowChecker.checkRow(row), True)
+		self.assertEqual(rowChecker.checkRow(row), True)
 
-class RowCollectionTest:
-	def __init__(self):
+class RowCollectionTest(unittest.TestCase):
+	def __init__(self, *args, **kwargs):
+		super(RowCollectionTest, self).__init__(*args, **kwargs)
 		self.rowFactory = RowFactory({
 			'date':{
 				'columnIndex':0,
@@ -228,7 +174,7 @@ class RowCollectionTest:
 		})
 		self.rowCollectionFactory = RowCollectionFactory(self.rowFactory)
 
-@test
+
 class RowCollectionTestWithStringConversion(RowCollectionTest):
 
 	def test(self):
@@ -253,7 +199,7 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 			]
 		})
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'abraham lincoln\'s car']))
-		assertDeepEquals(getJsonObj(collection), {
+		self.assertEqual(printJson(collection), {
 			'items':[
 				{
 					'properties':[
@@ -265,7 +211,7 @@ class RowCollectionTestWithStringConversion(RowCollectionTest):
 			]
 		})
 
-@test
+
 class RowCollectionTestWithStringConversionNoMatch(RowCollectionTest):
 
 	def test(self):
@@ -290,7 +236,7 @@ class RowCollectionTestWithStringConversionNoMatch(RowCollectionTest):
 			]
 		})
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'lincoln\'s car']))
-		assertDeepEquals(getJsonObj(collection), {
+		self.assertEqual(printJson(collection), {
 			'items':[
 				{
 					'properties':[
@@ -302,7 +248,7 @@ class RowCollectionTestWithStringConversionNoMatch(RowCollectionTest):
 			]
 		})
 
-@test
+
 class RowCollectionTestWithDateConversion(RowCollectionTest):
 
 	def test(self):
@@ -323,7 +269,7 @@ class RowCollectionTestWithDateConversion(RowCollectionTest):
 			]
 		})
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
-		assertDeepEquals(getJsonObj(collection), {
+		self.assertEqual(printJson(collection), {
 			'items':[
 				{
 					'properties':[
@@ -334,7 +280,7 @@ class RowCollectionTestWithDateConversion(RowCollectionTest):
 			]
 		})
 
-@test
+
 class RowCollectionTestWithDisplayLimit(RowCollectionTest):
 
 	def test(self):
@@ -357,19 +303,19 @@ class RowCollectionTestWithDisplayLimit(RowCollectionTest):
 		})
 		for i in range(4):
 			collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
-		collectionObj = getJsonObj(collection)
+		collectionObj = printJson(collection)
 		items = collectionObj['items']
-		assertEquals(len(items), 3)
-		assertInDict('more', collectionObj)
-		assertEquals(collectionObj['more'], 1)
+		self.assertEqual(len(items), 3)
+		self.assertTrue('more' in collectionObj)
+		self.assertEqual(collectionObj['more'], 1)
 
-@test
+
 class RowCollectionTestWithDefault(RowCollectionTest):
 
 	def test(self):
 		collection = self.rowCollectionFactory.getDefault({'default':True})
 		collection.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
-		assertDeepEquals(getJsonObj(collection), {
+		self.assertEqual(printJson(collection), {
 			'items':[
 				{
 					'properties':[
@@ -382,8 +328,9 @@ class RowCollectionTestWithDefault(RowCollectionTest):
 			]
 		})
 
-class CategoryTest:
-	def __init__(self):
+class CategoryTest(unittest.TestCase):
+	def __init__(self, *args, **kwargs):
+		super(CategoryTest, self).__init__(*args, **kwargs)
 		self.rowFactory = RowFactory({
 			'date':{
 				'columnIndex':0,
@@ -410,7 +357,7 @@ class CategoryTest:
 	def makeCategory(self, options):
 		return OptionableCategory(options, self.rowCheckerFactory, self.rowCollectionFactory)
 
-@test
+
 class TestCategoryOrder(CategoryTest):
 
 	def test(self):
@@ -426,9 +373,9 @@ class TestCategoryOrder(CategoryTest):
 			]
 		})
 		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
-		assertEquals(category.canAddRow(row), True)
+		self.assertEqual(category.canAddRow(row), True)
 		category.addRow(row)
-		assertDeepEquals(getJsonObj(category), {
+		self.assertEqual(printJson(category), {
 			'name':'test',
 			'total': 3467,
 			'categories':[
@@ -439,7 +386,7 @@ class TestCategoryOrder(CategoryTest):
 			]
 		})
 
-@test
+
 class TestCategoryOrderFirstNoMatch(CategoryTest):
 
 	def test(self):
@@ -461,9 +408,9 @@ class TestCategoryOrderFirstNoMatch(CategoryTest):
 			]
 		})
 		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
-		assertEquals(category.canAddRow(row), True)
+		self.assertEqual(category.canAddRow(row), True)
 		category.addRow(row)
-		assertDeepEquals(getJsonObj(category), {
+		self.assertEqual(printJson(category), {
 			'name':'test',
 			'total': 3467,
 			'categories':[
@@ -474,7 +421,7 @@ class TestCategoryOrderFirstNoMatch(CategoryTest):
 			]
 		})
 
-@test
+
 class TestCategoryOrderNeitherMatches(CategoryTest):
 
 	def test(self):
@@ -502,16 +449,16 @@ class TestCategoryOrderNeitherMatches(CategoryTest):
 			]
 		})
 		row = self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34'])
-		assertEquals(category.canAddRow(row), False)
+		self.assertEqual(category.canAddRow(row), False)
 
-@test
+
 class TestCategoryWithExpectationExceeded(CategoryTest):
 
 	def test(self):
 		category = self.makeCategory({'name':'test','expect':1})
 		for i in range(3):
 			category.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
-		assertDeepEquals(getJsonObj(category), {
+		self.assertEqual(printJson(category), {
 			'name':'test',
 			'total':3 * 3467,
 			'expectation':{
@@ -521,13 +468,13 @@ class TestCategoryWithExpectationExceeded(CategoryTest):
 			}
 		})
 
-@test
+
 class TestCategoryWithExpectationNotExceeded(CategoryTest):
 
 	def test(self):
 		category = self.makeCategory({'name':'test','expect':1})
 		category.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'something on 08/05/2018 12:34']))
-		assertDeepEquals(getJsonObj(category), {
+		self.assertEqual(printJson(category), {
 			'name':'test',
 			'total':3467
 		})
@@ -554,7 +501,7 @@ class OncePerPeriodTest(CategoryTest):
 			]
 		})
 
-@test
+
 class TestFirstOther(OncePerPeriodTest):
 
 	def test(self):
@@ -562,15 +509,15 @@ class TestFirstOther(OncePerPeriodTest):
 		otherRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'something else'])
 		paycheckRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck'])
 
-		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
-		assertEquals(category.acceptsRowInDuplicate(paycheckRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(otherRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(paycheckRow), False)
 
 		category.addRow(otherRow)
 
-		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
-		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
+		self.assertEqual(category.acceptsRowInDuplicate(otherRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(paycheckRow), True)
 
-@test
+
 class TestFirstOPP(OncePerPeriodTest):
 
 	def test(self):
@@ -578,15 +525,15 @@ class TestFirstOPP(OncePerPeriodTest):
 		otherRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'something else'])
 		paycheckRow = self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck'])
 
-		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
-		assertEquals(category.acceptsRowInDuplicate(paycheckRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(otherRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(paycheckRow), False)
 
 		category.addRow(paycheckRow)
 
-		assertEquals(category.acceptsRowInDuplicate(otherRow), False)
-		assertEquals(category.acceptsRowInDuplicate(paycheckRow), True)
+		self.assertEqual(category.acceptsRowInDuplicate(otherRow), False)
+		self.assertEqual(category.acceptsRowInDuplicate(paycheckRow), True)
 
-@test
+
 class TestAfBijConstructor(CategoryTest):
 
 	def test(self):
@@ -624,24 +571,24 @@ class TestAfBij(CategoryTest):
 			}
 		}, self.rowCheckerFactory, self.rowCollectionFactory)
 
-@test
+
 class TestAfBijWithStart(TestAfBij):
 
 	def test(self):
 		afbij = self.makeAfBij()
 		afbij.addRow(self.rowFactory.createRow(['20180509','34.67', 'in', 'paycheck']))
-		afbijObj = getJsonObj(afbij)
-		assertEquals(afbijObj['from'], datetime(2018,5,9))
-		assertEquals(afbijObj['hasBeginning'], True)
+		afbijObj = printJson(afbij)
+		self.assertEqual(afbijObj['from'], datetime(2018,5,9))
+		self.assertEqual(afbijObj['hasBeginning'], True)
 
-@test
+
 class TestAfBijWithLeftover(TestAfBij):
 
 	def test(self):
 		afbij = self.makeAfBij()
 		afbij.addRow(self.rowFactory.createRow(['20180509','34.67', 'out', 'something']))
-		afbijObj = getJsonObj(afbij)
-		assertDeepEquals(afbijObj['Af'], {
+		afbijObj = printJson(afbij)
+		self.assertEqual(afbijObj['Af'], {
 			'name': 'out',
 			'total': 3467,
 			'categories': [
@@ -739,7 +686,7 @@ class CsvProcessorTest(CategoryTest):
 		}, history, False)
 		return dataprovider, processor
 
-@test
+
 class TestTwoIncomplete(CsvProcessorTest):
 
 	def test(self):
@@ -749,10 +696,10 @@ class TestTwoIncomplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertEquals(dataprovider.getItem('history'), None)
-		assertEquals(len(result), 1)
+		self.assertEqual(dataprovider.getItem('history'), None)
+		self.assertEqual(len(result), 1)
 
-@test
+
 class TestOneComplete(CsvProcessorTest):
 
 	def test(self):
@@ -763,9 +710,9 @@ class TestOneComplete(CsvProcessorTest):
 			'"20180509","65.00","in","paycheck"',
 			'"20180509","1.00","out","something"']
 		result = processor.processCsv(rows)
-		assertDeepEquals(dataprovider.getItems(kind='historyitem'), [{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}])
-		assertEquals(len(result), 2)
-		assertDeepEquals(result[0],{
+		self.assertEqual(dataprovider.getItems(kind='historyitem'), [{'fileName':'2018-05-092018-05-09','date':datetime(2018,5,9)}])
+		self.assertEqual(len(result), 2)
+		self.assertEqual(result[0],{
 			'fileName': '2018-06-092018-06-09',
 			'file': {
 				'Bij': {
@@ -783,8 +730,8 @@ class TestOneComplete(CsvProcessorTest):
 			}
 		})
 
-@test
-class TestHistoryRemove:
+
+class TestHistoryRemove(unittest.TestCase):
 
 	def test(self):
 		dataprovider = MockDataProvider()
@@ -793,10 +740,10 @@ class TestHistoryRemove:
 
 		history.removeItem('2018-05-092018-05-09')
 
-		assertEquals(dataprovider.getItems(kind='historyitem'), [])
+		self.assertEqual(dataprovider.getItems(kind='historyitem'), [])
 
-@test
-class TestHistoryAll:
+
+class TestHistoryAll(unittest.TestCase):
 
 	def test(self):
 		dataprovider = MockDataProvider()
@@ -804,7 +751,7 @@ class TestHistoryAll:
 		history = PeriodHistory(dataprovider)
 		all = history.getAll()
 
-		assertDeepEquals(all, {'isMore':False, 'items':[{'fileName':'2018-05-092018-05-09'}], 'earliestDate':datetime(2018,5,9)})
+		self.assertEqual(all, {'isMore':False, 'items':[{'fileName':'2018-05-092018-05-09'}], 'earliestDate':datetime(2018,5,9)})
 
 class MockPeriod:
 	def printSelf(self, printer):
@@ -816,8 +763,8 @@ class MockPeriod:
 	def getFrom(self):
 		return datetime(2018,1,1)
 
-@test
-class TestHistoryNoDuplicateFileNames:
+
+class TestHistoryNoDuplicateFileNames(unittest.TestCase):
 
 	def test(self):
 		dataprovider = MockDataProvider()
@@ -828,11 +775,11 @@ class TestHistoryNoDuplicateFileNames:
 		history.addItem(period)
 
 		items = history.getAll()['items']
-		assertEquals(len(items), 1)
+		self.assertEqual(len(items), 1)
 
 
-@test
-class TestFilteringLikeGoogle:
+
+class TestFilteringLikeGoogle(unittest.TestCase):
 
 	def test(self):
 		item1 = {'value':7,'name':'emile'}
@@ -840,41 +787,26 @@ class TestFilteringLikeGoogle:
 		filters1 = ('value','>',8),
 		filters2 = ('value','<',20),('name','=','emile')
 
-		assertEquals(filterItemLikeGoogle(item1, filters1), False)
-		assertEquals(filterItemLikeGoogle(item1, filters2), True)
-		assertEquals(filterItemLikeGoogle(item2, filters1), True)
-		assertEquals(filterItemLikeGoogle(item2, filters2), False)
+		self.assertEqual(filterItemLikeGoogle(item1, filters1), False)
+		self.assertEqual(filterItemLikeGoogle(item1, filters2), True)
+		self.assertEqual(filterItemLikeGoogle(item2, filters1), True)
+		self.assertEqual(filterItemLikeGoogle(item2, filters2), False)
 
-@test
-class TestOrderingLikeGoogle:
+
+class TestOrderingLikeGoogle(unittest.TestCase):
 
 	def test(self):
 		items = [{'name':'b', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':1}, {'name':'a', 'age':2}]
 		result = [{'name':'a', 'age':2},{'name':'a', 'age':1},{'name':'b', 'age':2},{'name':'b', 'age':1}]
-		assertDeepEquals(orderedLikeGoogle(items, order=('name', '-age')), result)
+		self.assertEqual(orderedLikeGoogle(items, order=('name', '-age')), result)
 
-@test
-class TestOrderFilterAndLimitLikeGoogle:
+
+class TestOrderFilterAndLimitLikeGoogle(unittest.TestCase):
 
 	def test(self):
 		items = [{'name':'c', 'age':2},{'name':'d', 'age':2}, {'name':'b', 'age':3},{'name':'a', 'age':2}]
 		result = [{'name':'a', 'age':2},{'name':'c', 'age':2}]
-		assertDeepEquals(orderFilterAndLimitLikeGoogle(items, order=('name',), filters=(('age','=', 2),), limit=2), result)
+		self.assertEqual(orderFilterAndLimitLikeGoogle(items, order=('name',), filters=(('age','=', 2),), limit=2), result)
 
-def runTests():
-	failed = []
-	passed = 0
-	tests = [tc() for tc in testClasses]
-
-	for test in tests:
-		try:
-			test.test()
-			passed += 1
-		except BaseException:
-			traceback.print_exc()
-			failed.append(type(test).__name__)
-
-	print('tests passed: ',passed)
-	print('tests failed: ', '\n'.join(failed) if len(failed) > 0 else '0')
-
-runTests()
+if __name__ == '__main__':
+    unittest.main()
