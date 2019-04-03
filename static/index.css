@@ -488,3 +488,6 @@ span.toggle-collapse > .amount{
 	background-color: #000;
 	color:#fff;
 }
+.found.highlighted{
+	background-color: #888;
+}
