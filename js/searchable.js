@@ -19,6 +19,9 @@ module.exports = (function(){
 						},
 						forget:function(){
 							self.reset();
+						},
+						blur:function(){
+							part.highlighted = false;
 						}
 					});
 					return part;

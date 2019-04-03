@@ -10,10 +10,17 @@ var SearchContext = function(searchPhrase){
 SearchContext.prototype.showCurrent = function(){
 	this.results[this.currentPosition].show();
 };
+SearchContext.prototype.blurCurrentIfAny = function(){
+	if(this.currentPosition == -1){
+		return;
+	}
+	this.results[this.currentPosition].blur();
+};
 SearchContext.prototype.addResult = function(result){
 	this.results.push(result);
 };
 SearchContext.prototype.moveUp = function(){
+	this.blurCurrentIfAny();
 	this.currentPosition = Math.max(0, this.currentPosition - 1);
 	this.showCurrent();
 };
@@ -23,6 +30,7 @@ SearchContext.prototype.dispose = function(){
 	}
 };
 SearchContext.prototype.moveDown = function(){
+	this.blurCurrentIfAny();
 	this.currentPosition = Math.min(this.results.length - 1, this.currentPosition + 1);
 	this.showCurrent();
 };

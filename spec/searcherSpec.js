@@ -61,13 +61,15 @@ describe("A searcher", function(){
 		});
 
 		describe("and that has searched and found two results", function(){
-			var show1Spy, show2Spy, context;
+			var show1Spy, show2Spy, blur1Spy, blur2Spy, context;
 
 			beforeEach(function(){
-				var result1 = {show:function(){}, forget:function(){}};
-				var result2 = {show:function(){}, forget:function(){}};
+				var result1 = {show:function(){}, forget:function(){}, blur:function(){}};
+				var result2 = {show:function(){}, forget:function(){}, blur:function(){}};
 				show1Spy = spyOn(result1, 'show');
 				show2Spy = spyOn(result2, 'show');
+				blur1Spy = spyOn(result1, 'blur');
+				blur2Spy = spyOn(result2, 'blur');
 				onSearchHandler = function(_context){
 					_context.addResult(result1);
 					_context.addResult(result2);
@@ -96,21 +98,34 @@ describe("A searcher", function(){
 					context.moveDown();
 				});
 
+				it("should call blur on the first result", function(){
+					expect(blur1Spy).toHaveBeenCalled();
+				});
+
 				it("should call show on the second result", function(){
 					expect(show2Spy).toHaveBeenCalled();
+				});
+
+				describe("and then up one result", function(){
+
+					beforeEach(function(){
+						context.moveUp();
+					});
+
+					it("should call blur on the second result", function(){
+						expect(blur2Spy).toHaveBeenCalled();
+					});
 				});
 			});
 		});
 
 		describe("and that is given a result when searching", function(){
-			var showResult, forgetResult, otherSearchPhrase = "other";
+			var forgetResult, otherSearchPhrase = "other";
 
 			beforeEach(function(){
-				showResult = function(){};
 				forgetResult = function(){};
 				onSearchHandler = function(context){
 					context.addResult({
-						show:function(){showResult();},
 						forget:function(){forgetResult();}
 					});
 				};
