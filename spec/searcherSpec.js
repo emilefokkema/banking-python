@@ -49,8 +49,20 @@ describe("A searcher", function(){
 			expect(called).toBe(false);
 		});
 
+		it("should be able to split up a string when searching", function(){
+			var split, nonMatchingPart = "other";
+			onSearchHandler = function(context){
+				split = context.subdivide(searchPhrase + nonMatchingPart);
+			};
+			instance.search(searchPhrase);
+			expect(split).toEqual([
+				{match:true, text: searchPhrase},
+				{match:false, text: nonMatchingPart}
+			]);
+		});
+
 		describe("and that is given a result when searching", function(){
-			var showResult, forgetResult;
+			var showResult, forgetResult, otherSearchPhrase = "other";
 
 			beforeEach(function(){
 				showResult = function(){};
@@ -82,6 +94,15 @@ describe("A searcher", function(){
 				forgetResult = function(){called = true;};
 				instance.search(searchPhrase);
 				instance.stopSearch();
+				expect(called).toBe(true);
+			});
+
+			it("should forget the result when searching for something else", function(){
+				var called = false;
+				forgetResult = function(){called = true;};
+				instance.search(searchPhrase);
+				onSearchHandler = function(){};
+				instance.search(otherSearchPhrase);
 				expect(called).toBe(true);
 			});
 		});
