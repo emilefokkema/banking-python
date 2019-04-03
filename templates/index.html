@@ -326,7 +326,7 @@
 			<input v-model="inputValue" class="input pattern-input" v-bind:class="{invalid:!valid}"/>
 		</script>
 		<script type="text/template" id="searchTemplate">
-			<div class="search unselectable" unselectable="on">
+			<div class="search unselectable" v-bind:class="{open:isOpen}" unselectable="on">
 				<span class="fas fa-search open-search" v-on:click="open"></span>
 				<input type="text" v-model="searchText" v-if="isOpen"/>
 				<result-navigator v-if="currentSearchContext" v-bind:resultContext="currentSearchContext"></result-navigator>

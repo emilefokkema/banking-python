@@ -16,6 +16,15 @@ module.exports = (function(){
 						show:function(){
 							self.$emit("show");
 							part.highlighted = true;
+							self.$nextTick(function(){
+								var rect = self.$refs.el.getBoundingClientRect();
+								var top = rect.top;
+								if(top < 0){
+									window.scroll(0, -top-100);
+								}else if(top > window.innerHeight){
+									window.scroll(0, top - window.innerHeight + 100);
+								}
+							});
 						},
 						forget:function(){
 							self.reset();
@@ -56,7 +65,7 @@ module.exports = (function(){
 			props:{
 				text:String
 			},
-			template:'<span class="searchable"><span v-for="part of parts" v-bind:class="{found:part.found, highlighted:part.highlighted}">{{part.text}}</span></span>'
+			template:'<span class="searchable" ref="el"><span v-for="part of parts" v-bind:class="{found:part.found, highlighted:part.highlighted}">{{part.text}}</span></span>'
 		};
 	};
 	return {build:build};

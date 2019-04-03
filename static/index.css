@@ -472,6 +472,10 @@ span.toggle-collapse > .amount{
 	font-family: sans-serif;
 
 }
+.search.open{
+	position: fixed;
+	right: 20px;
+}
 .open-search{
 	cursor: pointer;
 }
