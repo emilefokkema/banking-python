@@ -1,6 +1,6 @@
 describe("Settings", function(){
 	var expectedSerialization = require("./expected-serialization.js");
-	var Settings = require("../../js/settings-logic/settings-logic.js");
+	var Settings = require("../js/settings-logic/settings-logic.js");
 	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
 	var instance, incoming, outgoing;
 	var getExpectedSerialization;

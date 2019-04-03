@@ -1,7 +1,7 @@
 describe("Category settings", function(){
 	var expectedSerialization = require("./expected-serialization.js");
-	var CategorySettings = require("../../js/settings-logic/category-settings.js");
-	var RowDefinition = require('../../js/settings-logic/row-definition.js');
+	var CategorySettings = require("../js/settings-logic/category-settings.js");
+	var RowDefinition = require('../js/settings-logic/row-definition.js');
 	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
 	var categoryName = "category";
 	var nameOfPropertyToUse = "property";

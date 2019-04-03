@@ -1,5 +1,5 @@
 describe("Row definition", function(){
-	var RowDefinition = require('../../js/settings-logic/row-definition.js');
+	var RowDefinition = require('../js/settings-logic/row-definition.js');
 	var getDefaultSettingsData = require("./getDefaultSettingsData.js");
 
 	var instance;
