@@ -33,18 +33,21 @@ module.exports = (function(){
 						this.searcher.onResult.add(function(currentSearchContext){self.currentSearchContext = currentSearchContext;});
 						this.searcher.onStopSearch.add(function(){self.currentSearchContext = null;});
 						this.searcher.onNoResult.add(function(){self.currentSearchContext = null;});
+						this.$refs.input.addEventListener("keyup", throttle(function(){
+							self.searchText = self.$refs.input.value;
+						}, 20));
 					},
 					components:{
 						'result-navigator':resultNavigator.build(document)
 					},
 					watch:{
-						searchText:throttle(function(v){
+						searchText:function(v){
 							if(!v){
 								this.searcher.stopSearch();
 								return;
 							}
 							this.searcher.search(v.toLowerCase());
-						}, 20)
+						}
 					},
 					methods:{
 						open:function(){

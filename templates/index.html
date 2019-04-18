@@ -328,7 +328,7 @@
 		<script type="text/template" id="searchTemplate">
 			<div class="search unselectable" v-bind:class="{open:isOpen}" unselectable="on">
 				<span class="fas fa-search search-button" v-on:click="open"></span>
-				<input type="text" v-model="searchText" class="search-input" ref="input"/>
+				<input type="text" class="search-input" ref="input"/>
 				<result-navigator v-if="currentSearchContext" v-bind:resultContext="currentSearchContext"></result-navigator>
 				<span class="fas fa-times close-search search-button" v-on:click="close" v-if="isOpen"></span>
 			</div>
