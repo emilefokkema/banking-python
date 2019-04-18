@@ -1,4 +1,5 @@
 var resultNavigator = require("./result-navigator.js");
+var throttle = require("./throttle.js");
 
 module.exports = (function(){
 	var build = function(document){
@@ -37,13 +38,13 @@ module.exports = (function(){
 						'result-navigator':resultNavigator.build(document)
 					},
 					watch:{
-						searchText:function(v){
+						searchText:throttle(function(v){
 							if(!v){
 								this.searcher.stopSearch();
 								return;
 							}
 							this.searcher.search(v.toLowerCase());
-						}
+						}, 20)
 					},
 					methods:{
 						open:function(){
