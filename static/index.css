@@ -470,14 +470,21 @@ span.toggle-collapse > .amount{
 	float: right;
 	display: inline-block;
 	font-family: sans-serif;
-
+	background-color: #fff;
+}
+.search .search-button{
+	margin:5px;
+	cursor: pointer;
+}
+.search-input{
+	display: none;
+}
+.search.open .search-input{
+	display: inline-block;
 }
 .search.open{
 	position: fixed;
 	right: 20px;
-}
-.open-search{
-	cursor: pointer;
 }
 .loading .earlier{
 	display: none;

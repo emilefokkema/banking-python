@@ -47,14 +47,20 @@ module.exports = (function(){
 					},
 					methods:{
 						open:function(){
+							var self = this;
 							if(!this.enabled){
 								return;
 							}
 							this.isOpen = true;
+							this.$nextTick(function(){
+								self.$refs.input.focus();
+							});
+							this.$emit("opened");
 						},
 						close:function(){
 							this.isOpen = false;
 							this.searchText = "";
+							this.$emit("closed");
 						},
 					},
 					template:document.getElementById("searchTemplate").innerHTML

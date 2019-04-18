@@ -39,7 +39,8 @@
 				loggedIn:false,
 				loading:false,
 				loggedInName:undefined,
-				loadingStatus: new Complete()
+				loadingStatus: new Complete(),
+				searchOpen: false
 			},
 			provide:{
 				searcher:new Searcher()

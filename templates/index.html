@@ -327,25 +327,25 @@
 		</script>
 		<script type="text/template" id="searchTemplate">
 			<div class="search unselectable" v-bind:class="{open:isOpen}" unselectable="on">
-				<span class="fas fa-search open-search" v-on:click="open"></span>
-				<input type="text" v-model="searchText" v-if="isOpen"/>
+				<span class="fas fa-search search-button" v-on:click="open"></span>
+				<input type="text" v-model="searchText" class="search-input" ref="input"/>
 				<result-navigator v-if="currentSearchContext" v-bind:resultContext="currentSearchContext"></result-navigator>
-				<span class="fas fa-times close-search" v-on:click="close" v-if="isOpen"></span>
+				<span class="fas fa-times close-search search-button" v-on:click="close" v-if="isOpen"></span>
 			</div>
 		</script>
 		<script type="text/template" id="resultNavigatorTemplate">
 			<div class="result-navigator">
 				{{resultContext.currentPosition + 1}} / {{resultContext.results.length}}
-				<span class="fas fa-chevron-up" v-on:click="moveUp"></span>
-				<span class="fas fa-chevron-down" v-on:click="moveDown"></span>
+				<span class="fas fa-chevron-up search-button" v-on:click="moveUp"></span>
+				<span class="fas fa-chevron-down search-button" v-on:click="moveDown"></span>
 			</div>
 		</script>
 		<div id="firebaseui-auth-container"></div>
 		<div id="app" v-bind:class="{'loading':loading}">
 			<settings v-on:settingsdirty="setSettingsDirty" v-on:signout="signOut" v-on:settingsclean="setSettingsClean" v-on:settingsvalid="clearError" v-on:error="displayError" v-if="loggedIn" v-on:saved="settingsSaved = true" v-bind:loadingstatus="loadingStatus" v-bind:loggedinname="loggedInName"></settings>
 			<div class="above-periods">
-				<span class="earlier" v-if="isMore" v-on:click="loadMore">earlier periods</span>
-				<search v-bind:enabled="!loading"></search>
+				<span class="earlier" v-if="isMore && !searchOpen" v-on:click="loadMore">earlier periods</span>
+				<search v-bind:enabled="!loading" v-on:opened="searchOpen = true" v-on:closed="searchOpen = false"></search>
 			</div>
 			<div v-if="loggedIn">
 				<period-item v-for="period in incompleteEndingPeriods" v-bind:initial-data="period.file" v-bind:file-name="period.fileName"></period-item>
