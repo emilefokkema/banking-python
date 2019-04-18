@@ -19,10 +19,11 @@ module.exports = (function(){
 							self.$nextTick(function(){
 								var rect = self.$refs.el.getBoundingClientRect();
 								var top = rect.top;
-								if(top < 0){
-									window.scroll(0, -top-100);
-								}else if(top > window.innerHeight){
-									window.scroll(0, top - window.innerHeight + 100);
+								if(top < 0 || top > window.innerHeight){
+									var targetScrollHeight = window.scrollY + top - window.innerHeight / 2;
+									setTimeout(function(){
+										window.scrollTo(0, targetScrollHeight);
+									}, 50);
 								}
 							});
 						},
