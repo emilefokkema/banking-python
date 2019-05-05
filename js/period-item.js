@@ -105,9 +105,15 @@ module.exports = (function(){
 													return this.row.properties.filter(function(p){return p.type == 'string';})
 												}
 											},
+											methods:{
+												onShowChild:function(){
+													this.$emit("show");
+												}
+											},
 											components:{
 												'amount':amount,
-												'date':date
+												'date':date,
+												'searchable':searchable.build(document)
 											},
 											template: document.getElementById("rowTemplate").innerHTML
 										}

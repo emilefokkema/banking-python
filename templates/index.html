@@ -73,7 +73,7 @@
 				<div class="category-set" v-if="categoryData.categories">
 					<category v-for="category in categoryData.categories" v-bind:categoryData="category" v-bind:top="false" v-on:show="onShowChild(true)"></category>
 				</div>
-				<row-collection v-if="categoryData.rows" v-bind:data="categoryData.rows"></row-collection>
+				<row-collection v-if="categoryData.rows" v-bind:data="categoryData.rows" v-on:show="onShowChild(true)"></row-collection>
 			</div>
 		</script>
 		<script type="text/template" id="removeButtonTemplate">
@@ -81,7 +81,7 @@
 		</script>
 		<script type="text/template" id="rowCollectionTemplate">
 			<div class="category-set">
-				<row v-for="row in data.items" v-bind:row="row"></row>
+				<row v-for="row in data.items" v-bind:row="row" v-on:show="$emit('show')"></row>
 				<span class="more" v-if="data.more">(en nog {{data.more}})</span>
 			</div>
 		</script>
@@ -109,7 +109,7 @@
 			<div class="row">
 				<date v-bind:date="dateProperty.value" v-if="dateProperty" class="row-part"></date>
 				<div class="row-part">
-					<div class="string-property" v-for="prop in stringProperties"><span class="string-property-name" v-if="stringProperties.length > 1">{{prop.name}}:&nbsp;</span>{{prop.value}}</div>
+					<div class="string-property" v-for="prop in stringProperties"><span class="string-property-name" v-if="stringProperties.length > 1">{{prop.name}}:&nbsp;</span><searchable v-bind:text="prop.value" v-on:show="onShowChild"></searchable></div>
 				</div>
 				<amount v-bind:numberOfCents="amountProperty.value" v-if="amountProperty" class="row-part"></amount>
 			</div>
